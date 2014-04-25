@@ -8,13 +8,13 @@ Gem::Specification.new do |s|
   s.authors     = ['Reid MacDonald', 'Doug McInnes']
   s.email       = ['reidmix@gmail.com', 'doug@dougmcinnes.com']
   s.homepage    = ''
-  s.summary     = %q{Javascript Coverage Tool}
-  s.description = %q{Javascript Coverage Tool}
+  s.summary     = %q{}
+  s.description = %q{}
 
   s.add_runtime_dependency 'activeresource', '~> 4.0.0'
 
-  s.files         = `git ls-files`.split('\n')
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split('\n')
-  s.executables   = `git ls-files -- bin/*`.split('\n').map{ |f| File.basename(f) }
+  s.files         = `git ls-files`.split("\n")
+  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
+  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ['lib']
 end
