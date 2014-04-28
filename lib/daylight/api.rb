@@ -42,7 +42,7 @@ class Daylight::API < ActiveResource::Base
 
       headers['X-Daylight-Client'] = Daylight::VERSION
 
-      alias_apis
+      # alias_apis
     end
 
     ##
