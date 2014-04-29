@@ -1,3 +1,6 @@
+require 'rack'
+require 'fakeweb'
+
 ##
 # Simple mocking framework that simplifies the process of writing tests for code that uses the Daylight client library.
 #
@@ -95,7 +98,7 @@ module Daylight
 
       private
         def model_class(model_name)
-          "Daylight::#{path_parts.version.upcase}::#{model_name.classify}".constantize
+          model_name.classify.constantize
         end
 
         def handle_request
