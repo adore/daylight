@@ -180,7 +180,7 @@ describe Daylight::Associations do
     it 'fetches embedded "through" object' do
       resource = AssociationsTestClass.find(2)
 
-      resource.grandparent.should_not be_kind_of(ActiveRecord::Base)
+      resource.grandparent.should be_kind_of(ActiveResource::Base)
       resource.grandparent.id.should   == 4
       resource.grandparent.name.should == 'embed'
     end
