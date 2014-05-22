@@ -11,6 +11,12 @@ GEM
     activemodel (4.0.5)
       activesupport (= 4.0.5)
       builder (~> 3.1.0)
+    activerecord (4.0.5)
+      activemodel (= 4.0.5)
+      activerecord-deprecated_finders (~> 1.0.2)
+      activesupport (= 4.0.5)
+      arel (~> 4.0.0)
+    activerecord-deprecated_finders (1.0.3)
     activeresource (4.0.0)
       activemodel (~> 4.0)
       activesupport (~> 4.0)
@@ -22,6 +28,7 @@ GEM
       thread_safe (~> 0.1)
       tzinfo (~> 0.3.37)
     addressable (2.3.6)
+    arel (4.0.2)
     artifice (0.6)
       rack-test
     builder (3.1.4)
@@ -64,6 +71,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activerecord
   artifice (~> 0.6)
   daylight!
   fakeweb

@@ -9,3 +9,11 @@ require 'daylight/inflections'
 require 'daylight/refinements'
 require 'daylight/resource_proxy'
 require 'daylight/api'
+
+module Daylight
+
+  def self.install_rails_extensions
+    Dir[File.expand_path('../../rails/**/*.rb', __FILE__)].each {|file| require file }
+  end
+
+end

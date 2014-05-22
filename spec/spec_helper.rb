@@ -1,4 +1,5 @@
 $:.unshift File.expand_path('../lib')
+$:.unshift File.expand_path('../rails/extensions')
 
 # Simplecov must be loaded before environment
 require File.expand_path('spec/config/simplecov_rcov')
