@@ -1,1 +1,2 @@
-daylight-*.gem
+/spec/dummy/db/*.sqlite3
+/spec/dummy/log/*.log
