@@ -1,6 +1,6 @@
 ##
 # Methods in which to refine a query by a model's scopes or attributes
-module Refiners
+module Daylight::Refiners
   extend ActiveSupport::Concern
 
   ##
@@ -40,7 +40,7 @@ module Refiners
   ##
   # Mixin refiners into an +ActiveRecord+ model
   module ClassMethods
-    include Params
+    include Daylight::Params
 
     ##
     # Returns currently registered scopes or empty Array

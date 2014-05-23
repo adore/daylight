@@ -1,10 +1,10 @@
 ##
 # Mixin to simulate access to params (from Helpers) outside of ActiveController context
-module Params
+module Daylight::Params
   extend ActiveSupport::Concern
 
   class HelperProxy
-    include Helpers
+    include Daylight::Helpers
 
     attr_accessor :params
 

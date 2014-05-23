@@ -1,6 +1,6 @@
 ##
 # Mixin helpers to get specific params in an +ActionController+
-module Helpers
+module Daylight::Helpers
   def scoped_params
     params[:scopes]
   end

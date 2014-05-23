@@ -13,7 +13,7 @@ class TestAssociatedRoutesController < TestAssociatedRouteController
 end
 
 class TestMethodRoute < ActiveRecord::Base
-  include Refiners
+  include Daylight::Refiners
 end
 
 class TestMethodRouteController < ActionController::Base
