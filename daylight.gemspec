@@ -15,12 +15,16 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'activesupport',  '~> 4.0.0'
 
   s.add_development_dependency 'rspec'
+  s.add_development_dependency 'rspec-rails',    '~> 2.14.0'
   s.add_development_dependency 'simplecov-rcov', '~> 0.2.3'
   s.add_development_dependency 'fakeweb'
   s.add_development_dependency 'webmock',        '~> 1.16.1'
   s.add_development_dependency 'artifice',       '~> 0.6'
-
-  s.add_development_dependency 'activerecord'
+  s.add_development_dependency 'rails'
+  s.add_development_dependency 'active_model_serializers'
+  s.add_development_dependency 'sqlite3'
+  s.add_development_dependency 'factory_girl'
+  s.add_development_dependency 'faker'
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")

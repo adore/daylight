@@ -14,7 +14,7 @@ class RenderJsonMetaTestSerializer < ActiveModel::Serializer
   def valid?; true; end
 end
 
-class RenderJsonMetaTestController < ApplicationController
+class RenderJsonMetaTestController < ActionController::Base
   # The read_only values will be activated based on Serializer
   def index
     render json: RenderJsonMetaTest.all

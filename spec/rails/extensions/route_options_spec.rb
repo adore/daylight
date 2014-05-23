@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-class TestAssociatedRouteController < ApplicationController
+class TestAssociatedRouteController < ActionController::Base
   def associated
     render text: [params[:controller], params[:id], params[:associated]].join('/')
   end
@@ -16,7 +16,7 @@ class TestMethodRoute < ActiveRecord::Base
   include Refiners
 end
 
-class TestMethodRouteController < ApplicationController
+class TestMethodRouteController < ActionController::Base
   def remoted
     render text: [params[:controller], params[:id], params[:remoted]].join('/')
   end

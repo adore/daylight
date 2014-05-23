@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'active_record'
 
 class HasOneSerializerTest < ActiveRecord::Base
   belongs_to :associated_test
@@ -13,7 +12,7 @@ end
 class AssociatedThroughTest < ActiveRecord::Base
 end
 
-class HasOneSerializerTestController < ApplicationController
+class HasOneSerializerTestController < ActionController::Base
   # The read_only values will be activated based on Serializer
   def show
     render json: HasOneSerializerTest.find(params[:id])
