@@ -54,6 +54,6 @@ Dummy::Application.routes.draw do
   #     resources :products
   #   end
 
-  mount Daylight::Engine => '/docs'
+  mount Daylight::Documentation => '/docs'
 
 end

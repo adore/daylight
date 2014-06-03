@@ -1,4 +1,4 @@
-Daylight::Engine.routes.draw do
+Daylight::Documentation.routes.draw do
 
   with_options controller: 'documentation' do |c|
     c.get '/',          action: :index
