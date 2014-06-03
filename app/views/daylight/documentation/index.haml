@@ -1,0 +1,38 @@
+- content_for :title, 'Bluesky'
+
+.container.text-center
+  .spacer20
+
+  = image_tag('bluesky-logo-clean.png', alt:'Bluesky')
+
+  .spacer50
+
+  .row
+    .col-md-6.col-md-offset-3
+      .panel.panel-default
+        .panel-body
+          =link_to 'API DOCUMENTATION', :docs_api, class:'btn btn-warning btn-lg btn-block'
+
+  .row
+    .col-md-6.col-md-offset-3
+      .panel.panel-default
+        .panel-body
+          %a.btn.btn-success.btn-lg.btn-block{href:'/docs/app/index.html'} APPLICATION RDOC
+
+  .row
+    .col-md-6.col-md-offset-3
+      .panel.panel-default
+        .panel-body
+          %a.btn.btn-danger.btn-lg.btn-block{href:'/docs/dev/index.html'} DEVELOPMENT
+
+  .row
+    .col-md-6.col-md-offset-3
+      .panel.panel-default
+        .panel-body
+          %a.btn.btn-primary.btn-lg.btn-block{href:'/docs/dev/contact.html'} CONTACT
+
+
+  .row
+    .col-md-2.col-md-offset-5
+      .div.lead{style: 'margin-top: 40px'}
+        %a.text-muted{href: 'http://portal.sl.attcompute.com'} &#9729;

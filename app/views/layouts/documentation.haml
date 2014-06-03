@@ -1,0 +1,20 @@
+!!! 5
+%html
+  %head
+    %meta{charset: "utf-8"}
+    %meta{name: "viewport", content: "width=device-width, initial-scale=1"}
+
+    %link{rel: "stylesheet", href: "https://netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css"}
+    %script{src: "https://code.jquery.com/jquery-1.10.1.min.js"}
+    %script{src: "https://netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"}
+
+    %title= yield :title
+
+    :css
+      .spacer20 { height: 20px; width: 100%; font-size: 0; margin: 0; padding: 0; border: 0; display: block; }
+      .spacer50 { height: 50px; width: 100%; font-size: 0; margin: 0; padding: 0; border: 0; display: block; }
+      .btn-lg   { font-size: 40px; }
+
+  %body{:'data-spy' => "scroll", :'data-target' => "#navigation"}
+
+    = yield

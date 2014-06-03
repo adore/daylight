@@ -1,3 +1,5 @@
+require 'active_model_serializers'
+
 ##
 # Allows `:through`	options	to be specified	on has_one associations
 #

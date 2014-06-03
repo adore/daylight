@@ -1,0 +1,118 @@
+- content_for :title, "Bluesky :: #{@model.name} API"
+
+%nav.navbar.navbar-default{role: 'navigation'}
+  .container-fluid
+    .navbar-header
+      =link_to 'Bluesky', :docs_api, class: 'navbar-brand'
+
+.container
+
+  .row
+
+    .col-md-9
+      .page-header
+        %h1= @model.name
+
+      #api.panel.panel-default
+        .panel-heading
+          %h3 API
+        %table.table.table-condensed
+          - model_verbs_and_routes(@model) do |verb, path, defaults|
+            %tr
+              %td= defaults[:action].capitalize
+              %td= verb
+              %td= path
+              %td= action_definition(defaults, @model)
+
+      #filters.panel.panel-default
+        .panel-heading
+          %h3.panel-title Filters
+        .panel-body
+          %ul.list-inline
+          - model_filters(@model).each do |filter|
+            %li.btn.btn-default= filter
+
+          - attribute = @model.attribute_names.second
+          %h4 API Examples
+          %pre
+            == /v1/#{@model.name.underscore.pluralize}.json?filters[#{attribute}]=foo
+
+          %h4 Client Examples
+          %pre
+            == Bluesky::#{@model.name}.where(#{attribute}: 'foo')
+
+      - scopes = @model.registered_scopes
+      - if scopes.present?
+        #scopes.panel.panel-default
+          .panel-heading
+            %h3.panel-title Scopes
+
+          .panel-body
+            %ul.list-group
+              - scopes.each do |scope|
+                %li.list-group-item= "#{@model.name}.#{scope}"
+
+            %h4 API Examples
+            %pre
+              ==/v1/#{@model.name.underscore.pluralize}.json?scopes[]=#{scopes.first}
+              - if scopes.count > 1
+                %br
+                == /v1/#{@model.name.underscore.pluralize}.json?scopes[]=#{scopes.first}&scopes[]=#{scopes.last}
+
+            %h4 Client Examples
+            %pre
+              == Bluesky::#{@model.name}.#{scopes.first}
+              - if scopes.count > 1
+                %br
+                == Bluesky::#{@model.name}.#{scopes.first}.#{scopes.last}
+
+      #associations.panel.panel-default
+        .panel-heading
+          %h3.panel-title Associations
+        .panel-body
+          %ul.list-group
+            - @model.reflections.each_pair do |key, reflection|
+              %li.list-group-item
+                %a{title: reflection.klass.name, href: "#{reflection.klass.name.downcase}.html"}= reflection.name
+
+          - reflections = @model.reflection_names.grep /s$/
+          %h4 API Examples
+          %pre
+            ==/v1/#{@model.name.underscore.pluralize}/1/#{reflections.first}.json
+
+          %h4 Client Examples
+          %pre
+            == zone.#{reflections.first}
+
+      #client-examples.panel.panel-default
+        .panel-heading
+          %h3.panel-title Other Client Examples
+        .panel-body
+          %pre
+            Bluesky::#{@model.name}.first
+            %br
+            Bluesky::#{@model.name}.find(1)
+            - reflection = @model.reflections.values.find {|ref| ref.macro == :has_many }
+            - if reflection
+              %br
+              Bluesky::#{@model.name}.find(1).#{reflection.name}
+              %br
+              Bluesky::#{@model.name}.find(1).#{reflection.name} &lt;&lt; Bluesky::#{reflection.klass.name}.find(2)
+              - filter = reflection.klass.attribute_names.last
+              %br
+              Bluesky::#{@model.name}.find(1).#{reflection.name}.where(#{filter}: filter_value)
+              %br
+              Bluesky::#{@model.name}.find(1).#{reflection.name}.where(#{filter}: filter_value).first_or_create
+
+    #navigation.col-md-3
+      %ul.nav.nav-pills.nav-stacked.affix
+        %li.active
+          %a{href:'#api'} API
+        %li
+          %a{href:'#filters'} Filters
+        %li
+          %a{href:'#scopes'} Scopes
+        %li
+          %a{href:'#associations'} Associations
+        %li
+          %a{href:'#client-examples'} Client Examples
