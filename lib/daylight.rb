@@ -1,3 +1,5 @@
+$: << File.expand_path('../../rails', __FILE__)
+
 require 'active_support/core_ext'
 require 'active_resource'
 
