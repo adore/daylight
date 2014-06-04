@@ -1,9 +1,9 @@
-# Modules requireed to execute Daylight::Server queries
+# Modules requireed to handle Daylight::API queries
 require 'daylight/helpers'
 require 'daylight/params'
 require 'daylight/refiners'
 
-# Extensions, fixes and patches for Rails to needed for Daylight::Server
+# Extensions, fixes and patches on Rails to needed for Daylight::Server
 require 'extensions/array_ext'
 require 'extensions/autosave_association_fix'
 require 'extensions/has_one_serializer_ext'
