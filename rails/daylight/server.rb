@@ -9,7 +9,7 @@ require 'extensions/route_options'
 
 ##
 # Include into Rails server to handle Daylight::API queries
-module Bluesky
+module Daylight
   extend ActiveSupport::Autoload
 
   autoload :Helpers
