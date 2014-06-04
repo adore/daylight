@@ -3,7 +3,7 @@
 %nav.navbar.navbar-default{role: 'navigation'}
   .container-fluid
     .navbar-header
-      =link_to 'Bluesky', :docs, class: 'navbar-brand'
+      =link_to 'Bluesky', :index, class: 'navbar-brand'
 
 .container
 
@@ -14,4 +14,4 @@
     - @models.sort_by(&:name).each_slice(1+@models.count/3) do |group|
       .list-group.col-md-3
         - group.each do |model|
-          =link_to model.name, docs_model_path(model.name.underscore), class: 'list-group-item'
+          =link_to model.name, model_path(model.name.underscore), class: 'list-group-item'

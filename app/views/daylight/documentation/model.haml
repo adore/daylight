@@ -3,7 +3,7 @@
 %nav.navbar.navbar-default{role: 'navigation'}
   .container-fluid
     .navbar-header
-      =link_to 'Bluesky', :docs_api, class: 'navbar-brand'
+      =link_to 'Bluesky', :api, class: 'navbar-brand'
 
 .container
 
@@ -56,14 +56,14 @@
             %pre
               ==/v1/#{@model.name.underscore.pluralize}.json?scopes[]=#{scopes.first}
               - if scopes.count > 1
-                %br
+                %br<>
                 == /v1/#{@model.name.underscore.pluralize}.json?scopes[]=#{scopes.first}&scopes[]=#{scopes.last}
 
             %h4 Client Examples
             %pre
               == Bluesky::#{@model.name}.#{scopes.first}
               - if scopes.count > 1
-                %br
+                %br<>
                 == Bluesky::#{@model.name}.#{scopes.first}.#{scopes.last}
 
       #associations.panel.panel-default
@@ -90,18 +90,18 @@
         .panel-body
           %pre
             Bluesky::#{@model.name}.first
-            %br
+            %br<>
             Bluesky::#{@model.name}.find(1)
             - reflection = @model.reflections.values.find {|ref| ref.macro == :has_many }
             - if reflection
-              %br
+              %br<>
               Bluesky::#{@model.name}.find(1).#{reflection.name}
-              %br
+              %br<>
               Bluesky::#{@model.name}.find(1).#{reflection.name} &lt;&lt; Bluesky::#{reflection.klass.name}.find(2)
               - filter = reflection.klass.attribute_names.last
-              %br
+              %br<>
               Bluesky::#{@model.name}.find(1).#{reflection.name}.where(#{filter}: filter_value)
-              %br
+              %br<>
               Bluesky::#{@model.name}.find(1).#{reflection.name}.where(#{filter}: filter_value).first_or_create
 
     #navigation.col-md-3
