@@ -1,3 +1,6 @@
+##
+# Include into Rails server to handle and execute Daylight::API queries
+
 # Modules requireed to handle Daylight::API queries
 require 'daylight/helpers'
 require 'daylight/params'

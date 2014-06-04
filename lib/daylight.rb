@@ -1,3 +1,6 @@
+##
+# Include into API client to enable Daylight::API based queries
+
 $: << File.expand_path('../../rails', __FILE__)
 
 require 'active_support/core_ext'
