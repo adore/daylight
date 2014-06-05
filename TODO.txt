@@ -1,4 +1,0 @@
-support versios in some way
-
-Daylight::Mock.setup model_prefix: 'Bluesky::V1'
-
