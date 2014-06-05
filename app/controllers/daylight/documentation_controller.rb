@@ -3,7 +3,7 @@
 class Daylight::DocumentationController < ActionController::Base
   layout 'documentation'
 
-  # caches_page :index, :model_index, :model
+  caches_page :index, :model_index, :model
 
   ##
   # Index

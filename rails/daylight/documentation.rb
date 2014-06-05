@@ -1,4 +1,5 @@
 require 'haml'
+require 'actionpack/page_caching'
 
 ##
 # Rails::Engine to add Documentation features to a Daylight::Server
