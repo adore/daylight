@@ -1,9 +1,9 @@
-- content_for :title, "Bluesky :: #{@model.name} API"
+- content_for :title, "#{Daylight::API.namespace} :: #{@model.name} API"
 
 %nav.navbar.navbar-default{role: 'navigation'}
   .container-fluid
     .navbar-header
-      =link_to 'Bluesky', :api, class: 'navbar-brand'
+      =link_to Daylight::API.namespace, :api, class: 'navbar-brand'
 
 .container
 
@@ -39,7 +39,7 @@
 
           %h4 Client Examples
           %pre
-            == Bluesky::#{@model.name}.where(#{attribute}: 'foo')
+            == #{Daylight::API.namespace}::#{@model.name}.where(#{attribute}: 'foo')
 
       - scopes = @model.registered_scopes
       - if scopes.present?
@@ -61,10 +61,10 @@
 
             %h4 Client Examples
             %pre
-              == Bluesky::#{@model.name}.#{scopes.first}
+              == #{Daylight::API.namespace}::#{@model.name}.#{scopes.first}
               - if scopes.count > 1
                 %br<>
-                == Bluesky::#{@model.name}.#{scopes.first}.#{scopes.last}
+                == #{Daylight::API.namespace}::#{@model.name}.#{scopes.first}.#{scopes.last}
 
       #associations.panel.panel-default
         .panel-heading
@@ -89,20 +89,20 @@
           %h3.panel-title Other Client Examples
         .panel-body
           %pre
-            Bluesky::#{@model.name}.first
+            #{Daylight::API.namespace}::#{@model.name}.first
             %br<>
-            Bluesky::#{@model.name}.find(1)
+            #{Daylight::API.namespace}::#{@model.name}.find(1)
             - reflection = @model.reflections.values.find {|ref| ref.macro == :has_many }
             - if reflection
               %br<>
-              Bluesky::#{@model.name}.find(1).#{reflection.name}
+              #{Daylight::API.namespace}::#{@model.name}.find(1).#{reflection.name}
               %br<>
-              Bluesky::#{@model.name}.find(1).#{reflection.name} &lt;&lt; Bluesky::#{reflection.klass.name}.find(2)
+              #{Daylight::API.namespace}::#{@model.name}.find(1).#{reflection.name} &lt;&lt; #{Daylight::API.namespace}::#{reflection.klass.name}.find(2)
               - filter = reflection.klass.attribute_names.last
               %br<>
-              Bluesky::#{@model.name}.find(1).#{reflection.name}.where(#{filter}: filter_value)
+              #{Daylight::API.namespace}::#{@model.name}.find(1).#{reflection.name}.where(#{filter}: filter_value)
               %br<>
-              Bluesky::#{@model.name}.find(1).#{reflection.name}.where(#{filter}: filter_value).first_or_create
+              #{Daylight::API.namespace}::#{@model.name}.find(1).#{reflection.name}.where(#{filter}: filter_value).first_or_create
 
     #navigation.col-md-3
       %ul.nav.nav-pills.nav-stacked.affix

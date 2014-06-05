@@ -1,9 +1,9 @@
-- content_for :title, "Bluesky :: API"
+- content_for :title, "#{Daylight::API.namespace} :: API"
 
 %nav.navbar.navbar-default{role: 'navigation'}
   .container-fluid
     .navbar-header
-      =link_to 'Bluesky', :index, class: 'navbar-brand'
+      =link_to Daylight::API.namespace, :index, class: 'navbar-brand'
 
 .container
 
