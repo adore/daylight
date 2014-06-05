@@ -15,14 +15,14 @@ class Daylight::API < ActiveResource::Base
   include Daylight::Associations
 
   class << self
-    attr_reader    :version
+    attr_reader    :version, :versions, :namespace
     cattr_accessor :request_root_in_json
     alias_method   :endpoint, :site
 
-    SUPPORTED_VERSIONS = %w[v1].freeze
     DEFAULT_CONFIG = {
-      endpoint: 'http://localhost',
-      version:  SUPPORTED_VERSIONS.last
+      namespace: 'API',
+      endpoint:  'http://localhost',
+      versions:  %w[v1],
     }.freeze
 
     ##
@@ -30,17 +30,20 @@ class Daylight::API < ActiveResource::Base
     def setup! options={}
       config = options.with_indifferent_access.reverse_merge(DEFAULT_CONFIG)
 
-      self.password = config[:password]
-      self.endpoint = config[:endpoint]
-      self.version  = config[:version]
-      self.timeout  = config[:timeout] if config[:timeout] # default read_timeout is 60
+      self.namespace = config[:namespace]
+      self.password  = config[:password]
+      self.endpoint  = config[:endpoint]
+      self.versions  = config[:versions].freeze
+      self.version   = config[:version] || config[:versions].last  # specify or use most recent version
+      self.timeout   = config[:timeout] if config[:timeout]        # default read_timeout is 60
 
       # API requires JSON request to emit a root node named after the object’s type
       # this is different from `include_root_in_json` where every ActiveResource
       # supplies its root.
       self.request_root_in_json = config[:request_root_in_json] || true
 
-      headers['X-Daylight-Client'] = Daylight::VERSION
+      headers['X-Daylight-Framework']  = Daylight::VERSION
+      headers["X-#{namespace}-Client"] = version
 
       # alias_apis
     end
@@ -60,13 +63,14 @@ class Daylight::API < ActiveResource::Base
     end
 
     private
+      attr_writer  :versions, :namespace
       alias_method :endpoint=, :site=
 
       ##
       # Set the version and make sure it's appropiate
       def version= v
-        unless SUPPORTED_VERSIONS.include?(v)
-          raise "Unsupported version #{v} is not one of #{SUPPORTED_VERSIONS.join(', ')}"
+        unless versions.include?(v)
+          raise "Unsupported version #{v} is not one of #{versions.join(', ')}"
         end
 
         @version     = v.upcase

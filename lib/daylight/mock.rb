@@ -263,7 +263,7 @@ module Daylight
       def capture_api_requests
         # capture all requests to the API server
         stub_request(:any, /#{site_with_credentials}/)
-          .with(headers: {'X-Daylight-Client' => /.*/})
+          .with(headers: {'X-Daylight-Framework' => /.*/})
           .to_return do |request|
             handler = Handler.new(request)
             daylight_mock.record(handler)
