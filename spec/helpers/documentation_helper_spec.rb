@@ -7,6 +7,24 @@ describe Daylight::DocumentationHelper do
     include Daylight::Associations
 
     has_many :users
+
+    # override attribute names so we don't have to mock
+    # out the database table
+    def self.attribute_names
+      ['name']
+    end
+  end
+
+  before do
+    # create routes for our test model
+    Daylight::Documentation.routes.draw do
+      resources :test_models, associated: [:users]
+    end
+  end
+
+  after do
+    # make sure our existing routes are reloaded
+    Rails.application.reload_routes!
   end
 
   describe :model_verbs_and_routes do
@@ -15,7 +33,7 @@ describe Daylight::DocumentationHelper do
       verbs = %w[GET POST PUT PATCH DELETE]
       model_verbs_and_routes TestModel do |verb, path, defaults|
         verbs.should include(verb)
-        path.to_s.should =~ %r{/test-model}
+        path.to_s.should =~ %r{/test_model}
         defaults.should be_a(Hash)
         yielded = true
       end

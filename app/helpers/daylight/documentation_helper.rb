@@ -16,7 +16,7 @@ module Daylight::DocumentationHelper
   #
   # Yields route verb (GET, POST, etc), path specification, route defaults
   def model_verbs_and_routes(model)
-    routes = Daylight::Documentation.routes.routes.select {|route| route.path.spec.to_s.starts_with? "/v1/#{model.name.underscore.pluralize}" }
+    routes = Daylight::Documentation.routes.routes.select {|route| route.path.spec.to_s.include? "/#{model.name.underscore.pluralize}" }
 
     routes.each do |route|
       yield route_verb(route), route.path.spec, route.defaults

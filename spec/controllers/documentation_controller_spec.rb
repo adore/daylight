@@ -6,13 +6,13 @@ describe Daylight::DocumentationController do
   end
 
   it "renders an index" do
-    get :index
+    get :index, :use_route => :daylight
 
     assert_response :success
   end
 
   it "renders an index for models" do
-    get :model_index
+    get :model_index, :use_route => :daylight
 
     assert_response :success
 
@@ -20,7 +20,7 @@ describe Daylight::DocumentationController do
   end
 
   it "renders a model view" do
-    get :model, model: 'project'
+    get :model, model: 'test_model', :use_route => :daylight
 
     assert_response :success
 
