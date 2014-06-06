@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe Daylight::DocumentationHelper do
-  include Daylight::DocumentationHelper
+describe DaylightDocumentation::DocumentationHelper do
+  include DaylightDocumentation::DocumentationHelper
 
   class TestModel < ActiveRecord::Base
     include Daylight::Associations

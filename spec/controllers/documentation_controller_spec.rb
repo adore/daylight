@@ -1,18 +1,12 @@
 require 'spec_helper'
 
-describe Daylight::DocumentationController do
+describe DaylightDocumentation::DocumentationController do
 
   class TestModel < ActiveRecord::Base
   end
 
   it "renders an index" do
     get :index, :use_route => :daylight
-
-    assert_response :success
-  end
-
-  it "renders an index for models" do
-    get :model_index, :use_route => :daylight
 
     assert_response :success
 
