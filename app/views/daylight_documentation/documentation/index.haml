@@ -1,38 +1,12 @@
-- content_for :title, Daylight::API.namespace
+- content_for :title, "#{Daylight::API.namespace} :: API"
 
-.container.text-center
-  .spacer20
+.container
 
-  = image_tag('bluesky-logo-clean.png', alt: Daylight::API.namespace)
-
-  .spacer50
+  .page-header
+    %h1 Models
 
   .row
-    .col-md-6.col-md-offset-3
-      .panel.panel-default
-        .panel-body
-          =link_to 'API DOCUMENTATION', :api, class:'btn btn-warning btn-lg btn-block'
-
-  .row
-    .col-md-6.col-md-offset-3
-      .panel.panel-default
-        .panel-body
-          %a.btn.btn-success.btn-lg.btn-block{href:'/docs/app/index.html'} APPLICATION RDOC
-
-  .row
-    .col-md-6.col-md-offset-3
-      .panel.panel-default
-        .panel-body
-          %a.btn.btn-danger.btn-lg.btn-block{href:'/docs/dev/index.html'} DEVELOPMENT
-
-  .row
-    .col-md-6.col-md-offset-3
-      .panel.panel-default
-        .panel-body
-          %a.btn.btn-primary.btn-lg.btn-block{href:'/docs/dev/contact.html'} CONTACT
-
-
-  .row
-    .col-md-2.col-md-offset-5
-      .div.lead{style: 'margin-top: 40px'}
-        %a.text-muted{href: 'http://portal.sl.attcompute.com'} &#9729;
+    - @models.sort_by(&:name).each_slice(1+@models.count/3) do |group|
+      .list-group.col-md-3
+        - group.each do |model|
+          =link_to model.name, model_path(model.name.underscore), class: 'list-group-item'

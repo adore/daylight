@@ -3,16 +3,11 @@
 class DaylightDocumentation::DocumentationController < ActionController::Base
   layout 'documentation'
 
-  caches_page :index, :model_index, :model
-
-  ##
-  # Index
-  def index
-  end
+  caches_page :index, :model
 
   ##
   # Index of all the models/endpoints
-  def model_index
+  def index
     @models = models
   end
 
