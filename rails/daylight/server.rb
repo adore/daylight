@@ -18,7 +18,7 @@ module Daylight
   autoload :Helpers
   autoload :Params
   autoload :Refiners
-  autoload :ApiController
+  autoload :APIController
 end
 
 # A convinience alias that will avoids any name collisions
