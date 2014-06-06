@@ -1,14 +1,17 @@
 ##
 # Daylight API Client Library
 #
-# Use this client in your Ruby/Rails applications for ease of use access to the Daylight API.
+# Use this client in your Ruby/Rails applications for ease of use access to the
+# Client API.
 #
-# Unlike typical ActiveResource clients, the Daylight API Client has been designed to be used similarly to ActiveRecord with scopes and the ability to chain queries.
+# Unlike typical ActiveResource clients, the Daylight API Client has been
+# designed to be used similarly to ActiveRecord with scopes and the ability to
+# chain queries.
 #
-#     Daylight::Zone.all
-#     Daylight::Zone.where(code:'iad1')
-#     Daylight::Zone.internal # scope
-#     Daylight::Zone.find(1).tenants # associations
+#     ClientAPI::Zone.all
+#     ClientAPI::Zone.where(code:'iad1')
+#     ClientAPI::Zone.internal # scope
+#     ClientAPI::Zone.find(1).tenants # associations
 #
 class Daylight::API < ActiveResource::Base
   include Daylight::Refinements
@@ -42,10 +45,9 @@ class Daylight::API < ActiveResource::Base
       # supplies its root.
       self.request_root_in_json = config[:request_root_in_json] || true
 
-      headers['X-Daylight-Framework']  = Daylight::VERSION
-      headers["X-#{namespace}-Client"] = version
+      headers['X-Daylight-Framework'] = Daylight::VERSION
 
-      # alias_apis
+      # alias_apis if config[:alias_apis]
     end
 
     ##
@@ -81,10 +83,10 @@ class Daylight::API < ActiveResource::Base
 
       ##
       # Alias the configured version APIs to be references without a version number
-      # Daylight::V1::Zone => Daylight::Zone
+      # ClientAPI::V1::Zone => Daylight::Zone
       def alias_apis
         api_classes.each do |api|
-          Daylight.const_set(api, "Daylight::#{version}::#{api}".constantize)
+          Daylight.const_set(api, "#{namespace}::#{version}::#{api}".constantize)
         end
 
         true
@@ -97,7 +99,7 @@ class Daylight::API < ActiveResource::Base
 
         Dir[api_files].each { |filename| load filename }
 
-        "Daylight::#{version}".constantize.constants
+        "#{namespace}::#{version}".constantize.constants
       end
   end
 
