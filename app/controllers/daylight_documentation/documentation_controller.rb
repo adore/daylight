@@ -1,6 +1,6 @@
 ##
 # Controller that handles rendering the API Documentation
-class Daylight::DocumentationController < ActionController::Base
+class DaylightDocumentation::DocumentationController < ActionController::Base
   layout 'documentation'
 
   caches_page :index, :model_index, :model

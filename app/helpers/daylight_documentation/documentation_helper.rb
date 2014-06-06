@@ -1,6 +1,6 @@
 ##
 # Helper methods for rendering the endpoint/model documentation.
-module Daylight::DocumentationHelper
+module DaylightDocumentation::DocumentationHelper
 
   ACTION_DEFINITIONS = {
     'index'      => "Retrieves a list of %{names}",
