@@ -9,6 +9,7 @@ require 'extensions/nested_attributes_ext'      # associates two previously exis
 require 'extensions/read_only_attributes'       # serializer support for `read_only` attributes
 require 'extensions/render_json_meta'           # adds metadata to the json response
 require 'extensions/route_options'              # adds associated, remoted options to routes
+require 'extensions/versioned_url_for'          # uses versioned paths for `url_for`
 
 ##
 # Include into Rails server to handle Daylight::API queries

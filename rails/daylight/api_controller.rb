@@ -47,6 +47,7 @@
 
 class Daylight::APIController < ApplicationController
   include Daylight::Helpers
+  include VersionedUrlFor
 
   class_attribute :record_name, :model_name
 
