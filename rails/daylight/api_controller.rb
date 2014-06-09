@@ -46,6 +46,8 @@
 # ApplicationController
 
 class Daylight::APIController < ApplicationController
+  include Daylight::Helpers
+
   class_attribute :record_name, :model_name
 
   API_ACTIONS = [:index, :create, :show, :update, :destroy, :associated, :remoted].freeze
