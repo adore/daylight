@@ -49,9 +49,23 @@ class Daylight::APIController < ApplicationController
   include Daylight::Helpers
   include VersionedUrlFor
 
+  API_ACTIONS = [:index, :create, :show, :update, :destroy, :associated, :remoted].freeze
   class_attribute :record_name, :model_name
 
-  API_ACTIONS = [:index, :create, :show, :update, :destroy, :associated, :remoted].freeze
+  ##
+  # Ensure messaging when sending unknown attributes or improper SQL
+  rescue_from ArgumentError,
+              ActiveRecord::UnknownAttributeError,
+              ActiveRecord::StatementInvalid do |e|
+
+    render json: { errors: e.message }, status: :bad_request
+  end
+
+  ##
+  # Ensure messaging when there are validation errors on save and update
+  rescue_from ActiveRecord::RecordInvalid do |e|
+    render json: { errors: e.record.errors }, status: :unprocessable_entity
+  end
 
   class << self
     protected
@@ -90,6 +104,8 @@ class Daylight::APIController < ApplicationController
         api.model_name  = api.controller_name
         api.record_name = "@#{api.controller_name}"
         api.delegate :primary_key, to: api.model
+      rescue
+        # for testing, call `inherited` manually
       end
   end
 
