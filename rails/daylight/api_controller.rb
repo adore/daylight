@@ -79,6 +79,13 @@ class Daylight::APIController < ApplicationController
       # `public` is called in context of the subclass
       def handles *actions
         whitelisted = actions.map(&:to_sym) & API_ACTIONS
+        whitelisted = API_ACTIONS.dup if actions.any? {|a| a == :all }
+
+        if (unhandled = actions - whitelisted).present?
+          logger.warn "Daylight::APIController isn't handling the following unwhitelisted actions:"
+          logger.warn "\t#{unhandled.join(',')}"
+        end
+
         public *whitelisted if whitelisted.present?
       end
 
@@ -95,6 +102,13 @@ class Daylight::APIController < ApplicationController
       end
 
       ##
+      # Delegates to `model#primary_key`
+      # Not using delegate as model may change via `model_name` configuration
+      def primary_key
+        model.primary_key
+      end
+
+      ##
       # Sets the default `model_name` and `record_name` by default.
       # By default, they are based on the value determined by `controller_name`
       #
@@ -102,9 +116,11 @@ class Daylight::APIController < ApplicationController
       # ActionController::Base.controller_name
       def inherited api
         api.model_name  = api.controller_name
-        api.record_name = "@#{api.controller_name}"
-        api.delegate :primary_key, to: api.model
-      rescue
+        api.record_name = api.controller_name
+      rescue => e
+        logger.warn "Bypassing default configuration on Daylight::APIController"
+        logger.warn "\t#{e.name}: #{e.message}"
+
         # for testing, call `inherited` manually
       end
   end
@@ -113,13 +129,13 @@ class Daylight::APIController < ApplicationController
     ##
     # Retrieves the value for the `record_name` instance variable
     def record
-      instance_variable_get(record_name)
+      instance_variable_get("@#{record_name}")
     end
 
     ##
     # Sets the value for the `record_name` instance variable
     def record= value
-      instance_variable_set(record_name, value)
+      instance_variable_set("@#{record_name}", value)
     end
 
     ##

@@ -2,7 +2,31 @@ require 'spec_helper'
 
 describe Daylight::APIController, type: :controller do
 
-  class Anonymous
+  class Anonymous; end
+
+  class Suite
+    def self.primary_key
+      'id'
+    end
+  end
+
+  class SuitesController < Daylight::APIController
+    handles :all
+  end
+
+  class Case
+    def self.primary_key
+      'test_id'
+    end
+  end
+
+  # defined second to prove `handles :all` in SuitesController doesn't
+  # publicize every subclass.
+  class TestsController < Daylight::APIController
+    handles :create, :update, :destroy
+
+    self.model_name  = :case
+    self.record_name = :results
   end
 
   TestAppRecord = Class.new(ActiveResource::Base)
@@ -60,4 +84,83 @@ describe Daylight::APIController, type: :controller do
       body['errors']['bar'].should == ['error two']
     end
   end
+
+  describe "default configuration" do
+    let(:controller) { SuitesController }
+
+    it "uses controller name for record name" do
+      controller.record_name.should == 'suites'
+    end
+
+    it "uses controller name for model name" do
+      controller.model_name.should == 'suites'
+    end
+
+    it "uses controller name for model key" do
+      controller.send(:model_key).should == :suite
+    end
+
+    it 'determines model class' do
+      controller.send(:model).should == Suite
+    end
+
+    it 'delegates primary key to model class' do
+      controller.send(:primary_key).should == 'id'
+    end
+  end
+
+  describe "custom configuration" do
+    let(:controller) { TestsController }
+
+    it "overrides record name" do
+      controller.record_name.should == :results
+    end
+
+    it "overrides model name" do
+      controller.model_name.should == :case
+    end
+
+    it 'determines model key' do
+      controller.send(:model_key).should == :case
+    end
+
+    it 'determines model class' do
+      controller.send(:model).should == Case
+    end
+
+    it 'delegates primary key to determined model class' do
+      controller.send(:primary_key).should == 'test_id'
+    end
+  end
+
+  describe "API handling" do
+    let(:tests_controller)  { TestsController.new }
+    let(:suites_controller) { SuitesController.new }
+
+    it 'handles no API actions by default' do
+      Daylight::APIController::API_ACTIONS.each do |action|
+        @controller.should_not respond_to(action)
+      end
+    end
+
+    it 'handles some API actions but not others' do
+      allowed = [:create, :update, :destroy]
+      denied  = Daylight::APIController::API_ACTIONS.dup - allowed
+
+      allowed.each do |action|
+        tests_controller.should respond_to(action)
+      end
+
+      denied.each do |action|
+        tests_controller.should_not respond_to(action)
+      end
+    end
+
+    it 'handles all API actions' do
+      Daylight::APIController::API_ACTIONS.each do |action|
+        suites_controller.should respond_to(action)
+      end
+    end
+  end
+
 end
