@@ -2,11 +2,18 @@ require 'spec_helper'
 
 describe Daylight::APIController, type: :controller do
 
+  #
+  # Test classes
+  #
+
   class Anonymous; end
 
-  class Suite
-    def self.primary_key
-      'id'
+  class Suite < ActiveRecord::Base
+    has_many :cases
+
+    def odd_suites
+      # computational results
+      all.values_at(*all.each_index.select(&:odd?))
     end
   end
 
@@ -14,10 +21,8 @@ describe Daylight::APIController, type: :controller do
     handles :all
   end
 
-  class Case
-    def self.primary_key
-      'test_id'
-    end
+  class Case < ActiveRecord::Base
+    belongs_to :suite
   end
 
   # defined second to prove `handles :all` in SuitesController doesn't
@@ -46,12 +51,53 @@ describe Daylight::APIController, type: :controller do
     end
   end
 
+  #
+  # Hooks
+  #
+
   before do
     @routes.draw do
       get '/anonymous/raise_argument_error'
       get '/anonymous/raise_record_invalid_error'
+
+      resources :suites, associated: [:cases], remoted: [:odd_suites]
     end
   end
+
+  before :all do
+    FactoryGirl.define do
+      factory :suite do
+        name { Faker::Name.name }
+
+        after(:create) do |suite|
+          create_list :case,  2, suite
+        end
+      end
+
+      factory :case do
+      end
+    end
+  end
+
+  migrate do
+    create_table :suites do |t|
+      t.boolean :switch
+      t.string  :name
+    end
+
+    create_table :cases, id: false do |t|
+      t.primary_key :test_id
+      t.integer     :suite_id
+    end
+  end
+
+  after :all do
+    Rails.application.reload_routes!
+  end
+
+  #
+  # Specs
+  #
 
   describe "rescue from ArgumentError" do
     it "has status of bad_request" do
@@ -161,6 +207,10 @@ describe Daylight::APIController, type: :controller do
         suites_controller.should respond_to(action)
       end
     end
+  end
+
+  describe "common actions" do
+
   end
 
 end
