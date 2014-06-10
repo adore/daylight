@@ -9,6 +9,9 @@ describe Daylight::APIController, type: :controller do
   class Anonymous; end
 
   class Suite < ActiveRecord::Base
+    # TODO: remove when incorporated into ActiveRecord::Base
+    include Daylight::Refiners
+
     has_many :cases
 
     def odd_suites
@@ -18,7 +21,6 @@ describe Daylight::APIController, type: :controller do
   end
 
   class SuitesController < Daylight::APIController
-    handles :all
   end
 
   class Case < ActiveRecord::Base
@@ -39,6 +41,11 @@ describe Daylight::APIController, type: :controller do
   controller(Daylight::APIController) do
     inherited(self)
 
+    # act like SuitesController should
+    self.model_name  = :suite
+    self.record_name = :suites
+    handles :all
+
     def raise_argument_error
       raise ArgumentError.new('this is my message')
     end
@@ -48,6 +55,16 @@ describe Daylight::APIController, type: :controller do
       record.errors.add 'foo', 'error one'
       record.errors.add 'bar', 'error two'
       raise ActiveRecord::RecordInvalid.new(record)
+    end
+
+    # strong parameters to permit mass-assignment
+    def suite_params
+      params.require(:suite).permit(:name, :switch)
+    end
+
+    # url helper to generate location url
+    def anonymous_path model
+      "/anonymous/#{model.to_param}"
     end
   end
 
@@ -60,17 +77,18 @@ describe Daylight::APIController, type: :controller do
       get '/anonymous/raise_argument_error'
       get '/anonymous/raise_record_invalid_error'
 
-      resources :suites, associated: [:cases], remoted: [:odd_suites]
+      resources :anonymous, associated: [:cases], remoted: [:odd_suites]
     end
   end
 
   before :all do
     FactoryGirl.define do
       factory :suite do
-        name { Faker::Name.name }
+        name   { Faker::Name.name }
+        switch false
 
         after(:create) do |suite|
-          create_list :case,  2, suite
+          create_list :case,  2, suite: suite
         end
       end
 
@@ -185,7 +203,7 @@ describe Daylight::APIController, type: :controller do
 
     it 'handles no API actions by default' do
       Daylight::APIController::API_ACTIONS.each do |action|
-        @controller.should_not respond_to(action)
+        suites_controller.should_not respond_to(action)
       end
     end
 
@@ -204,12 +222,55 @@ describe Daylight::APIController, type: :controller do
 
     it 'handles all API actions' do
       Daylight::APIController::API_ACTIONS.each do |action|
-        suites_controller.should respond_to(action)
+        @controller.should respond_to(action)
       end
     end
   end
 
   describe "common actions" do
+    let!(:suite1) { create(:suite, switch: true)  }
+    let!(:suite2) { create(:suite, switch: false) }
+    let!(:suite3) { create(:suite, switch: true)  }
+
+    def parse_response body
+      JSON.parse(body)['anonymous'].
+        map(&:values).
+        map(&:first).
+        map(&:with_indifferent_access)
+    end
+
+    it 'responds to index' do
+      get :index
+
+      results = parse_response(response.body)
+      results.size.should == 3
+
+      names = results.map {|suite| suite["name"] }
+      names.should be_include(suite1.name)
+      names.should be_include(suite2.name)
+      names.should be_include(suite3.name)
+    end
+
+    it 'responds to index with refine_by' do
+      get :index, filters: {switch: true}
+
+      results = parse_response(response.body)
+
+      results.size.should == 2
+      names = results.map {|suite| suite[:name] }
+      names.should be_include(suite1.name)
+      names.should be_include(suite3.name)
+    end
+
+    it 'creates a record' do
+      post :create, suite: suite = FactoryGirl.attributes_for(:suite)
+
+      result = JSON.parse(response.body).with_indifferent_access
+      result[:name].should   == suite[:name]
+      result[:switch].should == suite[:switch]
+
+      response.headers['Location'].should == @controller.anonymous_path(Suite.new(result))
+    end
 
   end
 
