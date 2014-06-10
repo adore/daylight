@@ -69,17 +69,24 @@ describe Daylight::Mock do
 
     describe 'update' do
       it "returns a new object with the updated attributes" do
-        zone = TestClient.find(1)
-        zone.update_attributes(name: 'wibble').should be_true
+        object = TestClient.find(1)
+        object.update_attributes(name: 'wibble').should be_true
       end
     end
 
     describe 'create' do
       it "returns the created object" do
-        zone = TestClient.new(name: 'foo')
-        zone.name = 'foo'
-        zone.save.should be_true
-        zone.id.should_not be_nil
+        object = TestClient.new(name: 'foo')
+        object.name = 'foo'
+        object.save.should be_true
+        object.id.should_not be_nil
+      end
+    end
+
+    describe 'destroy' do
+      it "returns a new object with the updated attributes" do
+        object = TestClient.find(1)
+        object.destroy.should be_true
       end
     end
   end
@@ -99,8 +106,8 @@ describe Daylight::Mock do
     end
 
     it "keeps track of the responses" do
-      zone = TestClient.find(1)
-      zone.update_attributes(name: 'wibble')
+      object = TestClient.find(1)
+      object.update_attributes(name: 'wibble')
 
       daylight_mock.updated(:test_client).first.status.should == 201
     end
@@ -114,16 +121,16 @@ describe Daylight::Mock do
 
     describe :target_object do
       it "sets the target_object value for examination on update" do
-        zone = TestClient.find(1)
-        zone.update_attributes(code: 'wibble')
+        object = TestClient.find(1)
+        object.update_attributes(code: 'wibble')
 
         daylight_mock.last_updated(:test_clients).target_object.code.should == 'wibble'
       end
 
       it "sets the target_object value for examination on create" do
-        zone = TestClient.new(code: 'foo')
-        zone.name = 'foo'
-        zone.save.should be_true
+        object = TestClient.new(code: 'foo')
+        object.name = 'foo'
+        object.save.should be_true
 
         daylight_mock.last_created(:test_clients).target_object.code.should == 'foo'
       end
