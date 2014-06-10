@@ -82,8 +82,8 @@ class Daylight::APIController < ApplicationController
         whitelisted = API_ACTIONS.dup if actions.any? {|a| a == :all }
 
         if (unhandled = actions - whitelisted).present?
-          logger.warn "Daylight::APIController isn't handling the following unwhitelisted actions:"
-          logger.warn "\t#{unhandled.join(',')}"
+          logger.warn "Daylight::APIController isn't handling unwhitelisted actions"
+          logger.warn "\tspecified in #{self.name}#handles: #{unhandled.join(',')}"
         end
 
         public *whitelisted if whitelisted.present?
@@ -118,10 +118,9 @@ class Daylight::APIController < ApplicationController
         api.model_name  = api.controller_name
         api.record_name = api.controller_name
       rescue => e
+        # for testing, call `inherited` manually
         logger.warn "Bypassing default configuration on Daylight::APIController"
         logger.warn "\t#{e.name}: #{e.message}"
-
-        # for testing, call `inherited` manually
       end
   end
 
