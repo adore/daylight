@@ -156,6 +156,14 @@ class Daylight::APIController < ApplicationController
       self.class.send(:model_key)
     end
 
+    ##
+    # Instance-level delegate of the `primary_key` method
+    #
+    # See:
+    # #primary_key
+    def primary_key
+      self.class.send(:primary_key)
+    end
   private
     #
     # The common actions for Daylight::APIController

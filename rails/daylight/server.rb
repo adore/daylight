@@ -23,4 +23,4 @@ module Daylight
 end
 
 # A convinience alias that will avoids any name collisions
-APIController = Daylight::APIController unless Module.const_defined?(:APIController)
+APIController = Daylight::APIController unless defined?(APIController)
