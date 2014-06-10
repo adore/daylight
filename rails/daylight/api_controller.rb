@@ -156,6 +156,18 @@ class Daylight::APIController < ApplicationController
     end
 
     ##
+    # Retrieves the strong parameters for a model based on the `model_key` name.
+    # Ex. post_params
+    #
+    # If strong parameters are not defined, it will use the `model_key` to
+    # dereference the raw params.
+    # Ex. params[:post]
+    def model_params
+      model_params_name = "#{model_key}_params"
+      respond_to?(model_params_name) ? send(model_params_name) : params[model_key]
+    end
+
+    ##
     # Instance-level delegate of the `primary_key` method
     #
     # See:
@@ -201,7 +213,7 @@ class Daylight::APIController < ApplicationController
     #     render json: @post, status: :created, location: @post
     #   end
     def create
-      record = model.new(params[model_key])
+      record = model.new(model_params)
       record.save!
 
       render json: record, status: :created, location: record
@@ -242,7 +254,7 @@ class Daylight::APIController < ApplicationController
     #     head :no_content
     #   end
     def update
-      model.find(params[primary_key]).update!(params[model_key])
+      model.find(params[primary_key]).update!(model_params)
 
       head :no_content
     end
