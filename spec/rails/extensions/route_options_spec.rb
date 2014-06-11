@@ -22,6 +22,20 @@ class TestMethodRouteController < ActionController::Base
   end
 end
 
+class TestAltModel < ActiveRecord::Base
+  include Daylight::Refiners
+end
+
+class TestMethodRouteAltModelController < ActionController::Base
+  def self.model
+    TestAltModel
+  end
+
+  def remoted
+    render text: [params[:controller], params[:id], params[:remoted]].join('/')
+  end
+end
+
 describe RouteOptions, type: [:controller, :routing] do
 
   after :all do
@@ -29,7 +43,6 @@ describe RouteOptions, type: [:controller, :routing] do
   end
 
   describe 'associated on resources' do
-
     # rspec's controller temporarily wipes out routes and recreates
     # routes for the anonymnous controller, we don't want to do that
     def self.controller_class
@@ -245,6 +258,45 @@ describe RouteOptions, type: [:controller, :routing] do
 
     it 'keeps track for remoted methods on the controller' do
       TestMethodRoute.remoted?(:foo).should be_true
+    end
+  end
+
+  describe "remoted resource with alternate model" do
+    # rspec's controller temporarily wipes out routes and recreates
+    # routes for the anonymnous controller, we don't want to do that
+    def self.controller_class
+      TestMethodRouteAltModelController
+    end
+
+    before do
+      @routes.draw do
+        resources :test_method_route_alt_model, remoted: %w[bar]
+      end
+    end
+
+    it 'adds associated route' do
+      expect(get: '/test_method_route_alt_model/1/bar').to route_to(
+        controller: 'test_method_route_alt_model',
+        action: 'remoted',
+        id: '1',
+        remoted: 'bar'
+      )
+    end
+
+    it 'respsonds to method with expected params' do
+      get :remoted, id: 1, remoted: 'bar'
+
+      assert_response :success
+
+      response.body.should == 'test_method_route_alt_model/1/bar'
+    end
+
+    it 'sets up named link helpers' do
+      bar_test_method_route_alt_model_path(10).should == '/test_method_route_alt_model/10/bar'
+    end
+
+    it 'keeps track for remoted methods on the controller' do
+      TestAltModel.remoted?(:bar).should be_true
     end
   end
 

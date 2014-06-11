@@ -19,8 +19,16 @@ module RouteOptions
         end
 
         remoted.each do |remote|
-          parent_resource.name.classify.constantize.add_remoted(remote) rescue nil
-          get remote, to: "#{parent_resource.plural}#remoted", defaults: {remoted: remote}, as: remote
+
+          begin
+            controller = "#{parent_resource.name}_controller".classify.constantize
+            model      = controller.respond_to?(:model) ? controller.send(:model) : parent_resource.name.classify.constantize
+
+            model.add_remoted(remote)
+          rescue
+          end
+
+          get remote, to: "#{parent_resource.name}#remoted", defaults: {remoted: remote}, as: remote
         end
       end
 

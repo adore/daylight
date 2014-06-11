@@ -1,89 +1,68 @@
 require 'spec_helper'
 
+class Suite < ActiveRecord::Base
+  include Daylight::Refiners
+
+  has_many :cases
+
+  def odd_cases
+    # computational results
+    cases.select {|c| c.id.odd? }
+  end
+end
+
+class SuitesController < Daylight::APIController
+  handles :all
+
+  def suite_params
+    params.require(:suite).permit(:name, :switch)
+  end
+end
+
+class Case < ActiveRecord::Base
+  include Daylight::Refiners
+
+  belongs_to :suite
+end
+
+# defined second to prove `handles :all` in SuitesController doesn't
+# publicize every subclass.
+class TestCasesController < Daylight::APIController
+  handles :create, :update, :destroy
+
+  self.model_name  = :case
+  self.record_name = :results
+end
+
+
+class TestAppRecord < ActiveResource::Base
+end
+
+class TestErrorsController < Daylight::APIController
+  self.model_name  = :test_app
+
+  def raise_argument_error
+    raise ArgumentError.new('this is my message')
+  end
+
+  def raise_record_invalid_error
+    record = TestAppRecord.new
+    record.errors.add 'foo', 'error one'
+    record.errors.add 'bar', 'error two'
+    raise ActiveRecord::RecordInvalid.new(record)
+  end
+end
+
 describe Daylight::APIController, type: :controller do
-
-  #
-  # Test classes
-  #
-
-  class Anonymous; end
-
-  class Suite < ActiveRecord::Base
-    # TODO: remove when incorporated into ActiveRecord::Base
-    include Daylight::Refiners
-
-    # weirdness with route_options only adding to anonymous controller,
-    # this wouldn't normally happen as anonymous controllers do not get used.
-    add_remoted :odd_cases
-    has_many    :cases
-
-    def odd_cases
-      # computational results
-      cases.select {|c| c.id.odd? }
-    end
-  end
-
-  class SuitesController < Daylight::APIController
-  end
-
-  class Case < ActiveRecord::Base
-    # TODO: remove when incorporated into ActiveRecord::Base
-    include Daylight::Refiners
-
-    belongs_to :suite
-  end
-
-  # defined second to prove `handles :all` in SuitesController doesn't
-  # publicize every subclass.
-  class TestsController < Daylight::APIController
-    handles :create, :update, :destroy
-
-    self.model_name  = :case
-    self.record_name = :results
-  end
-
-  TestAppRecord = Class.new(ActiveResource::Base)
-
-  controller(Daylight::APIController) do
-    inherited(self)
-
-    # act like SuitesController should
-    self.model_name  = :suite
-    self.record_name = :suites
-    handles :all
-
-    def raise_argument_error
-      raise ArgumentError.new('this is my message')
+  migrate do
+    create_table :suites do |t|
+      t.boolean :switch
+      t.string  :name
     end
 
-    def raise_record_invalid_error
-      record = TestAppRecord.new
-      record.errors.add 'foo', 'error one'
-      record.errors.add 'bar', 'error two'
-      raise ActiveRecord::RecordInvalid.new(record)
-    end
-
-    # strong parameters to permit mass-assignment
-    def suite_params
-      params.require(:suite).permit(:name, :switch)
-    end
-
-    # url helper to generate location url
-    def anonymous_path model
-      "/anonymous/#{model.to_param}"
-    end
-  end
-
-  #
-  # Hooks
-  #
-
-  before do
-    @routes.draw do
-      get '/anonymous/raise_argument_error'
-      get '/anonymous/raise_record_invalid_error'
-
-      resources :anonymous, associated: [:cases], remoted: [:odd_cases]
+    create_table :cases, id: false do |t|
+      t.primary_key :test_id
+      t.integer     :suite_id
     end
   end
 
@@ -103,56 +82,56 @@ describe Daylight::APIController, type: :controller do
     end
   end
 
-  migrate do
-    create_table :suites do |t|
-      t.boolean :switch
-      t.string  :name
-    end
-
-    create_table :cases, id: false do |t|
-      t.primary_key :test_id
-      t.integer     :suite_id
-    end
-  end
-
   after :all do
     Rails.application.reload_routes!
   end
 
-  #
-  # Specs
-  #
-
-  describe "rescue from ArgumentError" do
-    it "has status of bad_request" do
-      get :raise_argument_error
-
-      assert_response :bad_request
+  describe "rescues errors" do
+    # rspec's controller temporarily wipes out routes and recreates
+    # routes for the anonymnous controller, we don't want to do that
+    def self.controller_class
+     TestErrorsController
     end
 
-    it "returns the error message as JSON" do
-      get :raise_argument_error
-
-      body = JSON.parse(response.body)
-      body['errors'].should == 'this is my message'
-    end
-  end
-
-  describe "rescue from RecordInvalid" do
-    it "has status of unprocessable_entity" do
-      get :raise_record_invalid_error
-
-      assert_response :unprocessable_entity
+    before do
+      @routes.draw do
+        get '/test_errors/raise_argument_error'
+        get '/test_errors/raise_record_invalid_error'
+      end
     end
 
-    it "returns the record's errors as JSON" do
-      get :raise_record_invalid_error
+    describe "rescue from ArgumentError" do
+      it "has status of bad_request" do
+        get :raise_argument_error
 
-      body = JSON.parse(response.body)
-      body['errors'].count.should == 2
-      body['errors']['foo'].should == ['error one']
-      body['errors']['bar'].should == ['error two']
+        assert_response :bad_request
+      end
+
+      it "returns the error message as JSON" do
+        get :raise_argument_error
+
+        body = JSON.parse(response.body)
+        body['errors'].should == 'this is my message'
+      end
     end
+
+    describe "rescue from RecordInvalid" do
+      it "has status of unprocessable_entity" do
+        get :raise_record_invalid_error
+
+        assert_response :unprocessable_entity
+      end
+
+      it "returns the record's errors as JSON" do
+        get :raise_record_invalid_error
+
+        body = JSON.parse(response.body)
+        body['errors'].count.should == 2
+        body['errors']['foo'].should == ['error one']
+        body['errors']['bar'].should == ['error two']
+      end
+    end
+
   end
 
   describe "default configuration" do
@@ -180,7 +159,7 @@ describe Daylight::APIController, type: :controller do
   end
 
   describe "custom configuration" do
-    let(:controller) { TestsController }
+    let(:controller) { TestCasesController }
 
     it "overrides record name" do
       controller.record_name.should == :results
@@ -204,12 +183,13 @@ describe Daylight::APIController, type: :controller do
   end
 
   describe "API handling" do
-    let(:tests_controller)  { TestsController.new }
     let(:suites_controller) { SuitesController.new }
+    let(:cases_controller)  { TestCasesController.new }
+    let(:errors_controller) { TestErrorsController.new }
 
     it 'handles no API actions by default' do
       Daylight::APIController::API_ACTIONS.each do |action|
-        suites_controller.should_not respond_to(action)
+        errors_controller.should_not respond_to(action)
       end
     end
 
@@ -218,28 +198,40 @@ describe Daylight::APIController, type: :controller do
       denied  = Daylight::APIController::API_ACTIONS.dup - allowed
 
       allowed.each do |action|
-        tests_controller.should respond_to(action)
+        cases_controller.should respond_to(action)
       end
 
       denied.each do |action|
-        tests_controller.should_not respond_to(action)
+        cases_controller.should_not respond_to(action)
       end
     end
 
     it 'handles all API actions' do
       Daylight::APIController::API_ACTIONS.each do |action|
-        @controller.should respond_to(action)
+        suites_controller.should respond_to(action)
       end
     end
   end
 
   describe "common actions" do
+    # rspec's controller temporarily wipes out routes and recreates
+    # routes for the anonymnous controller, we don't want to do that
+    def self.controller_class
+     SuitesController
+    end
+
+    before do
+      @routes.draw do
+        resources :suites, associated: [:cases], remoted: [:odd_cases], controller: :suites
+      end
+    end
+
     let!(:suite1) { create(:suite, switch: true)  }
     let!(:suite2) { create(:suite, switch: false) }
     let!(:suite3) { create(:suite, switch: true)  }
 
     def parse_collection body, root='anonymous'
-      JSON.parse(body)[root].
+      JSON.parse(body).values.first.
         map(&:values).
         map(&:first).
         map(&:with_indifferent_access)
@@ -279,7 +271,7 @@ describe Daylight::APIController, type: :controller do
       result[:name].should   == suite[:name]
       result[:switch].should == suite[:switch]
 
-      response.headers['Location'].should == @controller.anonymous_path(Suite.new(result))
+      response.headers['Location'].should == "/suites/#{result['id']}"
     end
 
     it 'shows a record' do
@@ -318,7 +310,7 @@ describe Daylight::APIController, type: :controller do
     it 'retrieves associated records with refine_by' do
       get :associated, id: suite1.id, associated: 'cases', limit: 1
 
-      results = parse_collection(response.body, 'cases')
+      results = parse_collection(response.body)
       results.size.should == 1
 
       results.first['test_id'].should == suite1.cases.first.id
@@ -327,7 +319,7 @@ describe Daylight::APIController, type: :controller do
     it 'retrieves remoted records' do
       get :remoted, id: suite1.id, remoted: 'odd_cases'
 
-      results = parse_collection(response.body, 'odd_cases')
+      results = parse_collection(response.body)
       results.size.should == 2
 
       odd_case_ids = suite1.odd_cases.map(&:test_id)
