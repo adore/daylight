@@ -5,7 +5,6 @@ require File.expand_path('spec/config/simplecov_rcov')
 
 # load the dummy rails environment
 require File.expand_path("../dummy/config/environment.rb",  __FILE__)
-require 'rails/test_help'
 
 require 'rspec/rails'
 require 'rspec/autorun'
