@@ -15,6 +15,7 @@ describe Daylight::Associations do
     has_many   :things,        class_name: 'RelatedTestClass', through: :associated
     belongs_to :parent,        class_name: 'RelatedTestClass'
     belongs_to :grandparent,   class_name: 'RelatedTestClass', through: :parent
+    has_one    :associate,     class_name: 'RelatedTestClass'
     remote     :remote_stuff,  class_name: 'RelatedTestClass'
 
     def id;        123; end
@@ -197,6 +198,46 @@ describe Daylight::Associations do
       resource.grandparent = RelatedTestClass.new(id: 789, name: 'new grandparent')
 
       resource.attributes['parent_attributes']['grandparent_attributes'].should == resource.grandparent
+    end
+  end
+
+  describe :has_one do
+    before do
+      associated = { id: nil, name: 'Hardy', associate_attributes: { id: 100 } }
+      related    = { id: 100, name: 'Laurel' }
+      FakeWeb.register_uri(:get, %r{#{AssociationsTestClass.element_path(1)}}, body: associated.to_json)
+      # It uses the filter method instead of default ActiveResource behavior
+      # http://daylight.test/v1/related_test_classes?filters%5Bassociations_test_class_id%5D=123&limit=1
+      FakeWeb.register_uri(:get, %r{filters%5Bassociations_test_class_id%5D=123}, body: [related].to_json)
+    end
+
+    it 'still fetches the associate object' do
+      resource = AssociationsTestClass.find(1)
+
+      resource.associate.should_not be_nil
+      resource.associate.id.should == 100
+      resource.associate.name.should == 'Laurel'
+    end
+
+    it 'sets the associate to a new object' do
+      resource = AssociationsTestClass.find(1)
+      resource.associate = RelatedTestClass.new(name: 'Rik Mayall')
+
+      resource.associate.name.should == 'Rik Mayall'
+    end
+
+    it 'sets the associate foreign key' do
+      resource = AssociationsTestClass.find(1)
+      resource.associate = RelatedTestClass.new(id: 333, name: 'Rik Mayall')
+
+      resource.associate.associations_test_class_id.should == resource.id
+    end
+
+    it 'sets the associate directly in the nested attributes hash' do
+      resource = AssociationsTestClass.find(1)
+      resource.associate = RelatedTestClass.new(id: 333, name: 'Rik Mayall')
+
+      resource.attributes['associate_attributes'].should == resource.associate
     end
   end
 
