@@ -156,7 +156,7 @@ module Daylight::Refiners
     # Helper to follow a named association if it exists
     def associated name
       raise ArgumentError, "Unknown association: #{name}" unless self.class.reflection_names.include? name.to_s
-      send(name)
+      public_send(name)
     end
 
     def remoted method
