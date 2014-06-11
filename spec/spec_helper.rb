@@ -14,6 +14,8 @@ require 'rspec/autorun'
 #    but it wrecks havoc with FakeWeb
 WebMock.disable!
 
+FakeWeb.allow_net_connect = false
+
 # Load additional rspec configuration files first
 Dir.glob(File.expand_path('../config/**/*.rb', __FILE__)).each { |f| require f }
 
