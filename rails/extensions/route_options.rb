@@ -18,16 +18,14 @@ module RouteOptions
           get association, to: "#{parent_resource.plural}#associated", defaults: {associated: association}, as: association
         end
 
+        begin
+          controller = "#{parent_resource.name}_controller".classify.constantize
+          model      = controller.respond_to?(:model) ? controller.send(:model) : parent_resource.name.classify.constantize
+        rescue
+        end
+
         remoted.each do |remote|
-
-          begin
-            controller = "#{parent_resource.name}_controller".classify.constantize
-            model      = controller.respond_to?(:model) ? controller.send(:model) : parent_resource.name.classify.constantize
-
-            model.add_remoted(remote)
-          rescue
-          end
-
+          model.add_remoted(remote) if model
           get remote, to: "#{parent_resource.name}#remoted", defaults: {remoted: remote}, as: remote
         end
       end

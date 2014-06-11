@@ -6,7 +6,7 @@ class Suite < ActiveRecord::Base
   has_many :cases
 
   def odd_cases
-    # computational results
+    # computational results used by `remoted`
     cases.select {|c| c.id.odd? }
   end
 end
@@ -33,7 +33,6 @@ class TestCasesController < Daylight::APIController
   self.model_name  = :case
   self.record_name = :results
 end
-
 
 class TestAppRecord < ActiveResource::Base
 end
@@ -182,9 +181,9 @@ describe Daylight::APIController, type: :controller do
   end
 
   describe "API handling" do
-    let(:suites_controller) { SuitesController.new }
-    let(:cases_controller)  { TestCasesController.new }
-    let(:errors_controller) { TestErrorsController.new }
+    let(:suites_controller) { SuitesController.new }     # handles :all
+    let(:cases_controller)  { TestCasesController.new }  # handles some
+    let(:errors_controller) { TestErrorsController.new } # handles none
 
     it 'handles no API actions by default' do
       Daylight::APIController::API_ACTIONS.each do |action|
@@ -296,7 +295,7 @@ describe Daylight::APIController, type: :controller do
     it 'retrieves associated records' do
       get :associated, id: suite1.id, associated: 'cases'
 
-      results = parse_collection(response.body, 'cases')
+      results = parse_collection(response.body)
       results.size.should == 3
 
       test_ids = results.map {|tc| tc['test_id'] }

@@ -3,6 +3,7 @@ PATH
   specs:
     daylight (0.0.0.1)
       actionpack-page_caching (~> 1.0.2)
+      active_model_serializers (~> 0.8.1)
       activeresource (~> 4.0.0)
       haml (~> 4.0.5)
       hanna-bootstrap (~> 0.0.5)
@@ -159,7 +160,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  active_model_serializers
   artifice (~> 0.6)
   daylight!
   factory_girl
