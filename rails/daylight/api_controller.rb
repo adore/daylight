@@ -117,10 +117,6 @@ class Daylight::APIController < ApplicationController
       def inherited api
         api.model_name  = api.controller_name
         api.record_name = api.controller_name
-      rescue => e
-        # for anonymous classes where Class#name is not defined
-        logger.warn "Bypassing default configuration on Daylight::APIController"
-        logger.warn "\t#{e.name}: #{e.message}"
       end
   end
 
