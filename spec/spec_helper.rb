@@ -7,10 +7,13 @@ require File.expand_path('spec/config/simplecov_rcov')
 require File.expand_path("../dummy/config/environment.rb",  __FILE__)
 require 'rails/test_help'
 
-require 'daylight/mock'
-
 require 'rspec/rails'
 require 'rspec/autorun'
+
+# Make sure WebMock is disabled
+# -- is used by Daylight::Mock to route requests to the user's web application
+#    but it wrecks havoc with FakeWeb
+WebMock.disable!
 
 # Load additional rspec configuration files first
 Dir.glob(File.expand_path('../config/**/*.rb', __FILE__)).each { |f| require f }

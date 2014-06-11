@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'daylight/mock'
 
 describe Daylight::Mock do
 
