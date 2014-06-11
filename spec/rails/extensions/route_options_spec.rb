@@ -45,6 +45,7 @@ describe RouteOptions, type: [:controller, :routing] do
   describe 'associated on resources' do
     # rspec's controller temporarily wipes out routes and recreates
     # routes for the anonymnous controller, we don't want to do that
+    # also, rspec-rails does not honor the tests(controller) function
     def self.controller_class
       TestAssociatedRouteController
     end
@@ -136,6 +137,7 @@ describe RouteOptions, type: [:controller, :routing] do
   describe 'associated on resource' do
     # rspec's controller temporarily wipes out routes and recreates
     # routes for the anonymnous controller, we don't want to do that
+    # also, rspec-rails does not honor the tests(controller) function
     def self.controller_class
       TestAssociatedRoutesController
     end
@@ -225,6 +227,7 @@ describe RouteOptions, type: [:controller, :routing] do
   describe "remoted resource" do
     # rspec's controller temporarily wipes out routes and recreates
     # routes for the anonymnous controller, we don't want to do that
+    # also, rspec-rails does not honor the tests(controller) function
     def self.controller_class
       TestMethodRouteController
     end
@@ -264,6 +267,7 @@ describe RouteOptions, type: [:controller, :routing] do
   describe "remoted resource with alternate model" do
     # rspec's controller temporarily wipes out routes and recreates
     # routes for the anonymnous controller, we don't want to do that
+    # also, rspec-rails does not honor the tests(controller) function
     def self.controller_class
       TestMethodRouteAltModelController
     end

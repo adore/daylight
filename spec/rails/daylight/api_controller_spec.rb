@@ -87,8 +87,7 @@ describe Daylight::APIController, type: :controller do
   end
 
   describe "rescues errors" do
-    # rspec's controller temporarily wipes out routes and recreates
-    # routes for the anonymnous controller, we don't want to do that
+    # rspec-rails does not honor the tests(controller) function
     def self.controller_class
      TestErrorsController
     end
@@ -214,8 +213,7 @@ describe Daylight::APIController, type: :controller do
   end
 
   describe "common actions" do
-    # rspec's controller temporarily wipes out routes and recreates
-    # routes for the anonymnous controller, we don't want to do that
+    # rspec-rails does not honor the tests(controller) function
     def self.controller_class
      SuitesController
     end
