@@ -11,12 +11,13 @@ Gem::Specification.new do |s|
   s.summary     = %q{}
   s.description = %q{}
 
-  s.add_runtime_dependency 'rails',                   '~> 4.0.1'
-  s.add_runtime_dependency 'activeresource',          '~> 4.0.0'
-  s.add_runtime_dependency 'haml',                    '~> 4.0.5'
-  s.add_runtime_dependency 'actionpack-page_caching', '~> 1.0.2'
-  s.add_runtime_dependency 'therubyracer',            '~> 0.12.1'
-  s.add_runtime_dependency 'hanna-bootstrap',         '~> 0.0.5'
+  s.add_runtime_dependency 'rails',                    '~> 4.0.1'
+  s.add_runtime_dependency 'activeresource',           '~> 4.0.0'
+  s.add_runtime_dependency 'haml',                     '~> 4.0.5'
+  s.add_runtime_dependency 'actionpack-page_caching',  '~> 1.0.2'
+  s.add_runtime_dependency 'therubyracer',             '~> 0.12.1'
+  s.add_runtime_dependency 'hanna-bootstrap',          '~> 0.0.5'
+  s.add_runtime_dependency 'active_model_serializers', '~> 0.8.1'
 
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'rspec-rails',    '~> 2.14.0'
@@ -24,7 +25,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'fakeweb'
   s.add_development_dependency 'webmock',        '~> 1.16.1'
   s.add_development_dependency 'artifice',       '~> 0.6'
-  s.add_development_dependency 'active_model_serializers'
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'factory_girl'
   s.add_development_dependency 'faker'
