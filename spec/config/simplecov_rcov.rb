@@ -11,10 +11,15 @@ if %w[COVERAGE JENKINS_URL].any? { |switch| ENV.keys.include? switch }
   end
   SimpleCov.formatter = SimpleCov::Formatter::MergedFormatter
 
-  SimpleCov.adapters.define 'api' do
-    load_adapter 'test_frameworks'
+  SimpleCov.profiles.define 'api' do
+    load_profile 'test_frameworks'
 
-    add_group 'Client', 'lib/daylight'
+    add_group 'Client API', 'lib/daylight'
+    add_group 'Server API', 'rails/daylight'
+    add_group 'Rails Exts', 'rails/extensions'
+    add_group 'Doc Engine', 'app'
+
+    add_filter '/config/'
   end
 
   SimpleCov.start 'api'
