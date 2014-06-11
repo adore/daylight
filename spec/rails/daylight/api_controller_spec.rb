@@ -154,6 +154,14 @@ describe Daylight::APIController, type: :controller do
     it 'delegates primary key to model class' do
       controller.send(:primary_key).should == 'id'
     end
+
+    it 'access record ivar' do
+      c = controller.new
+
+      c.send(:record=, 'foo')
+      c.send(:record).should == 'foo'
+      c.instance_variable_get('@suites').should == c.send(:record)
+    end
   end
 
   describe "custom configuration" do
@@ -177,6 +185,14 @@ describe Daylight::APIController, type: :controller do
 
     it 'delegates primary key to determined model class' do
       controller.send(:primary_key).should == 'test_id'
+    end
+
+    it 'access record ivar' do
+      c = controller.new
+
+      c.send(:record=, 'foo')
+      c.send(:record).should == 'foo'
+      c.instance_variable_get('@results').should == c.send(:record)
     end
   end
 
