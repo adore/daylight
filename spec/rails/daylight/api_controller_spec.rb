@@ -38,7 +38,7 @@ class TestAppRecord < ActiveResource::Base
 end
 
 class TestErrorsController < Daylight::APIController
-  self.model_name  = :test_app
+  self.model_name  = :test_app_record
 
   def raise_argument_error
     raise ArgumentError.new('this is my message')
@@ -62,6 +62,7 @@ describe Daylight::APIController, type: :controller do
     create_table :cases, id: false do |t|
       t.primary_key :test_id
       t.integer     :suite_id
+      t.string      :name
     end
   end
 
@@ -77,6 +78,7 @@ describe Daylight::APIController, type: :controller do
       end
 
       factory :case do
+        name { Faker::Name.name }
       end
     end
   end
@@ -130,6 +132,32 @@ describe Daylight::APIController, type: :controller do
       end
     end
 
+    describe "rescue from ForbiddenAttributesError" do
+      def self.controller_class
+       TestCasesController
+      end
+
+      before do
+        @routes.draw do
+          resources :test_cases, only: [:create]
+        end
+      end
+
+      it "has status of unprocessable_entity" do
+        post :create, case: {suite_id: 0}
+
+        assert_response :unprocessable_entity
+      end
+
+      it "returns the record's errors as JSON" do
+        post :create, case: {name: 'unpermitted'}
+
+        assert_response :unprocessable_entity
+
+        body = JSON.parse(response.body)
+        body['errors'].should == 'unpermitted or missing attribute'
+      end
+    end
   end
 
   describe "default configuration" do

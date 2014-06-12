@@ -67,6 +67,13 @@ class Daylight::APIController < ApplicationController
     render json: { errors: e.record.errors }, status: :unprocessable_entity
   end
 
+  ##
+  # Ensure messaging when there unpermitted attributes on save and update
+  rescue_from ActiveModel::ForbiddenAttributesError do |e|
+    render json: { errors: 'unpermitted or missing attribute' }, status: :unprocessable_entity
+  end
+
+
   class << self
     protected
       ##
