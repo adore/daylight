@@ -18,19 +18,23 @@ module RouteOptions
           get association, to: "#{parent_resource.plural}#associated", defaults: {associated: association}, as: association
         end
 
-        begin
-          controller = "#{parent_resource.name}_controller".classify.constantize
-          model      = controller.respond_to?(:model) ? controller.send(:model) : parent_resource.name.classify.constantize
-        rescue
-        end
-
+        remoted_model = get_remoted_model
         remoted.each do |remote|
-          model.add_remoted(remote) if model
+          remoted_model.add_remoted(remote) if remoted_model
           get remote, to: "#{parent_resource.name}#remoted", defaults: {remoted: remote}, as: remote
         end
+
       end
 
     end
+
+    def get_remoted_model
+      controller = "#{parent_resource.name}_controller".classify.constantize rescue nil
+      controller && controller.respond_to?(:model) ? controller.send(:model) : parent_resource.name.classify.constantize
+    rescue
+      Rails.logger.warn "Could not lookup model for #{parent_resource.name} to apply remoted."
+    end
+
   end
 end
 
