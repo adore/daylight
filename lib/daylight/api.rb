@@ -10,11 +10,11 @@
 #
 #     ClientAPI::Post.all
 #     ClientAPI::Post.where(code:'iad1')
-#     ClientAPI::Post.internal                    # scope
-#     ClientAPI::Post.find(1).comments            # associations
-#     ClientAPI::Post.find(1).public_commenters   # remote collection
+#     ClientAPI::Post.internal                   # scope
+#     ClientAPI::Post.find(1).comments           # associations
+#     ClientAPI::Post.find(1).public_commenters  # remote method on model
 #     ClientAPI::Post.find(1).commenters.
-#       where(username: 'reidmix')                # chaining
+#       where(username: 'reidmix')               # chaining
 #
 # Build your client models using Daylight::API, it is a wrapper with extended
 # functionality to ActiveResource::Base
