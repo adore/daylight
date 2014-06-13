@@ -3,6 +3,20 @@
 module Daylight::Refiners
   extend ActiveSupport::Concern
 
+  module Extension
+    extend ActiveSupport::Concern
+
+    module ClassMethods
+      ##
+      # Extends subclasses of ActiveRecord::Base with the Daylight::Refiners features
+      # This hooks into the `inherited` method chain to perform this extension.
+      def inherited active_record
+        active_record.send(:include, Daylight::Refiners)
+        super
+      end
+    end
+  end
+
   ##
   # Helper to determine whether a request to use an attribute is valid or invalid
   # Keeps track of which attributes are part of the request.

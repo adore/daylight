@@ -12,9 +12,7 @@ class TestAssociatedRoutesController < TestAssociatedRouteController
   end
 end
 
-class TestMethodRoute < ActiveRecord::Base
-  include Daylight::Refiners
-end
+class TestMethodRoute < ActiveRecord::Base; end
 
 class TestMethodRouteController < ActionController::Base
   def remoted
@@ -22,9 +20,7 @@ class TestMethodRouteController < ActionController::Base
   end
 end
 
-class TestAltModel < ActiveRecord::Base
-  include Daylight::Refiners
-end
+class TestAltModel < ActiveRecord::Base; end
 
 class TestMethodRouteAltModelController < ActionController::Base
   def self.model

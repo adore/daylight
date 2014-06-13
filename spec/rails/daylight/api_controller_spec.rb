@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 class Suite < ActiveRecord::Base
-  include Daylight::Refiners
-
   has_many :cases
 
   def odd_cases
@@ -20,8 +18,6 @@ class SuitesController < Daylight::APIController
 end
 
 class Case < ActiveRecord::Base
-  include Daylight::Refiners
-
   belongs_to :suite
 end
 

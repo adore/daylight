@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 class RefinerMockActiveRecordBase
+  include Daylight::Refiners::Extension
+
   def self.scope(name, body, &block); end
   def self.where(*args); end
   def self.order(*args); end
@@ -8,8 +10,6 @@ class RefinerMockActiveRecordBase
 end
 
 class RefinersTestClass < RefinerMockActiveRecordBase
-  include Daylight::Refiners
-
   scope :scope_a, -> { 'a' }
   scope :scope_b, -> { 'b' }
 
