@@ -8,11 +8,38 @@
 # designed to be used similarly to ActiveRecord with scopes and the ability to
 # chain queries.
 #
-#     ClientAPI::Zone.all
-#     ClientAPI::Zone.where(code:'iad1')
-#     ClientAPI::Zone.internal # scope
-#     ClientAPI::Zone.find(1).tenants # associations
+#     ClientAPI::Post.all
+#     ClientAPI::Post.where(code:'iad1')
+#     ClientAPI::Post.internal                    # scope
+#     ClientAPI::Post.find(1).comments            # associations
+#     ClientAPI::Post.find(1).public_commenters   # remote collection
+#     ClientAPI::Post.find(1).commenters.
+#       where(username: 'reidmix')                # chaining
 #
+# Build your client models using Daylight::API, it is a wrapper with extended
+# functionality to ActiveResource::Base
+#
+#     class ClientAPI::Post < Daylight::API
+#       scopes :internal
+#
+#       belongs_to :user
+#       has_many   :comments
+#       has_many   :commenters, through: :comments
+#
+#       remote :public_commenters, class_name: 'client_api/user'
+#     end
+#
+# Once all your client models are built, setup your API Client Library and
+# startup via `setup!` (in an intitializer):
+#
+#     require 'client_api'
+#
+#     Daylight::API.setup!({
+#       namespace: 'client_api',
+#       password:  'test',
+#       endpoint:  'http://api.example.org/
+#     })
+
 class Daylight::API < ActiveResource::Base
   include Daylight::Refinements
   include Daylight::Associations
@@ -29,7 +56,40 @@ class Daylight::API < ActiveResource::Base
     }.freeze
 
     ##
-    # Setup and configure the Daylight API. Must be called before use.
+    # Setup and configure the Daylight API. Must be called before Client API use.
+    # Will use the following defaults:
+    #
+    #     Daylight::API.setup!({
+    #       namespace: 'API',
+    #       password:  nil,
+    #       endpoint:  'http://localhost',
+    #       versions:  ['v1'],
+    #       version:   'v1'
+    #       timeout:   60  # in seconds
+    #     })
+    #
+    # Daylight currenly requires that your API is within a module `namespace`
+    #
+    # The `endpoint` sets ActiveResource#site configuration.
+    # The `password` is the HTTP Authentication password.
+    #
+    # Daylight assumes you're versioning your API, you can supply the `versions`
+    # that are supported by your API and which `version` is active.
+    #
+    # By default, ActiveResource#request_root_in_json is set to true.
+    # You can turn this off with the `request_root_in_json` configuration.
+    #
+    # A convenience for versioned APIs is to alias the active Client API models
+    # to versionless constance.  For example
+    #
+    #     ClientAPI::V1::Post
+    #
+    # Aliased to:
+    #
+    #     ClientAPI::Post
+    #
+    # This functionalitity is turned on using the `alias_apis` configuration.
+
     def setup! options={}
       config = options.with_indifferent_access.reverse_merge(DEFAULT_CONFIG)
 
@@ -52,7 +112,10 @@ class Daylight::API < ActiveResource::Base
 
     ##
     # Find a single resource from the default URL
-    # Fixes bug to short-circuit and return nil if scope/id is nil.
+    #
+    # Fixes bug to short-circuit and return `nil` if scope/id is nil.
+    # ActiveResource::Base will perform the call and return with an error.
+
     def find_single(scope, options)
       return if scope.nil?
       super
@@ -60,6 +123,9 @@ class Daylight::API < ActiveResource::Base
 
     ##
     # Whether to show root for the request
+    #
+    # Turned on by default when transmitting JSON requests.
+
     def request_root_in_json?
       request_root_in_json && format.extension == 'json'
     end
@@ -69,7 +135,8 @@ class Daylight::API < ActiveResource::Base
       alias_method :endpoint=, :site=
 
       ##
-      # Set the version and make sure it's appropiate
+      # Set the `version` and make sure it's a member of the supported versions
+
       def version= v
         unless versions.include?(v)
           raise "Unsupported version #{v} is not one of #{versions.join(', ')}"
@@ -82,8 +149,13 @@ class Daylight::API < ActiveResource::Base
       end
 
       ##
-      # Alias the configured version APIs to be references without a version number
-      # ClientAPI::V1::Zone => Daylight::Zone
+      # Alias the configured Client API constants to be references without a
+      # version number for the active version:
+      #
+      # For example, if the active version is 'v1':
+      #
+      #     ClientAPI::Zone   # => Daylight::V1::Zone
+
       def alias_apis
         api_classes.each do |api|
           Daylight.const_set(api, "#{namespace}::#{version}::#{api}".constantize)
@@ -93,7 +165,12 @@ class Daylight::API < ActiveResource::Base
       end
 
       ##
-      # Load and return the APIs for the configured version
+      # Load and return the Client APIs for the configured version.
+      #
+      # Searches in the `lib` directory of the Client API under the namespace
+      # and version.  By default, searches Client models in 'lib/api/v1' and
+      # loads them.
+
       def api_classes
         api_files = File.join(File.dirname(__FILE__), version.downcase, "**/*.rb")
 
@@ -106,12 +183,16 @@ class Daylight::API < ActiveResource::Base
   attr_reader :metadata
 
   ##
-  # Overwriting ActiveResource::Base#initialize
+  # Extends ActiveResource to allow for saving metadata from the responses on
+  # the `meta` key.  Will store this metadata on the `metadata` attribute.
   #---
+  # Does this extension by overwritting ActiveResource::Base#initialize method
   # Concern cannot call `super` from module to base class (we think)
+
   def initialize(attributes={}, persisted = false)
     if Hash === attributes && attributes.has_key?('meta')
-      metadata = (attributes.delete('meta')||{}).with_indifferent_access  # save and strip any metadata supplied in the response
+      # save and strip any metadata supplied in the response
+      metadata = (attributes.delete('meta')||{}).with_indifferent_access
     end
     @metadata = metadata || {}
 
@@ -119,8 +200,12 @@ class Daylight::API < ActiveResource::Base
   end
 
   ##
-  # Get the list of read_only attributes.
+  # Get the list of read_only attributes from the metadata attribute.
   # If there are none then an empty array is supplied.
+  #
+  # See:
+  # metadata
+
   def read_only
     @read_only ||= begin
       metadata[:read_only][self.class.element_name] || []
@@ -129,12 +214,23 @@ class Daylight::API < ActiveResource::Base
     end
   end
 
+  ##
+  # Used to assist `find_or_create_resource_for` to use embedded attributes
+  # to new Daylight::API model objects.
+  #
+  # See:
+  # find_or_create_resource_for
+
   class HashResourcePassthrough
     def self.new(value, _)
       # load values using ActiveResource::Base and extract them as attributes
       Daylight::API.new(value.duplicable? ? value.dup : value).attributes
     end
   end
+
+  ##
+  # When an association is supplied via a hash of `*_attributes` then create
+  # (a set) of new Client API objects instead of leaving as a hash.
 
   def find_or_create_resource_for name
     # if the key is attributes attributes for a configured association
@@ -151,36 +247,52 @@ class Daylight::API < ActiveResource::Base
   #
   # For JSON formatted requests default option is to include the root element
   # depending on the `request_root_in_json` configuration.
+
   def encode(options={})
     super(self.class.request_root_in_json? ? { :root => self.class.element_name }.merge(options) : options)
   end
 
   ##
-  # Adds API specific options when generating json
+  # Adds API specific options when generating json.
+  # Removes read_only attributes for requests.
   #
   # See
   # except_read_only
+
   def as_json(options={})
     super(except_read_only(options))
   end
 
   ##
-  # Adds API specific options when generating xml
+  # Adds API specific options when generating xml.
+  # Removes read_only attributes for requests.
   #
   # See
   # except_read_only
+
   def to_xml(options={})
     super(except_read_only(options))
   end
 
   ##
-  # Writers for read only attributes are not included as methods
+  # Writers for read_only attributes are not included as methods
+  #--
+  # This is how we continue to prevent these read_only attributes to be set
+  # internally by removing ActiveResource's ability to set their values
+
   def respond_to?(method_name, include_priv = false)
     return false if read_only?(method_name)
     super
   end
 
   private
+    ##
+    # Extends `method_missing` to raise an error when attempting to set a
+    # read_only attribute.
+    #
+    # Otherwise it continues with the `ActiveResource::Base#method_missing`
+    # functionality.
+
     def method_missing(method_name, *arguments)
       if read_only?(method_name)
         logger.warn "Cannot set read_only attribute: #{method_name[0...-1]}" if logger
@@ -191,13 +303,15 @@ class Daylight::API < ActiveResource::Base
     end
 
     ##
-    # Ensures that read_only attributes are merged in with :except options.
+    # Ensures that read_only attributes are merged in with `:except` options.
+
     def except_read_only options
       options.merge(except: (options[:except]||[]).push(*read_only))
     end
 
     ##
-    # Determines if `method_name` is writing to a read only attribute.
+    # Determines if `method_name` is writing to a read_only attribute.
+
     def read_only? method_name
       !!(method_name =~ /(?:=)$/ && read_only.include?($`))
     end
