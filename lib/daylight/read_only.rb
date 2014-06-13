@@ -1,3 +1,15 @@
+##
+# Support for read_only attributes.
+#
+# Attributes that are read_only are specified in the metadata from the response
+# from the API.
+#
+# Uses that information to keep from sending those read_only attributes in
+# subsequent requests to the API.
+#
+# This is useful for computational values that are served that do not have
+# corresponding column in the data store.
+
 module Daylight::ReadOnly
   ##
   # Get the list of read_only attributes from the metadata attribute.
