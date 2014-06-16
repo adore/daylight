@@ -38,4 +38,4 @@ These are not hard-and-fast rules and can be reviewed and changed as the need ar
 * A model's **serializer** defines what parts of that model are exposed to the client
 * Rails **controller** defines which actions are performed on the model
 * Rails **routes** defines what APIs are available to the client
-* The client-side model is the **client** representation of the Rails model
+* The **client** model is the local representation of the Rails model
