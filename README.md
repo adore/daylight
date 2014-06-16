@@ -18,8 +18,8 @@ Daylight adds to ActiveResource with chained queries:
 
     API::Post.where(author_id: 1)                      # simple query
     API::Post.where(author_id: 1).first                # chained query
-    API::Post.where(author_id: 1).published            # chained query and scope
-    API::Post.where(author_id: 1).published.recent     # chained query with two scopes
+    API::Post.where(author_id: 1).published            # chained query with scope
+    API::Post.where(author_id: 1).published.recent     # chained query with multiple scopes
     API::Post.where(author_id: 1).limit(10).offset(20) # chained query with limit and offset
     API::Post.where(author_id: 1).order(:date)         # chained query with ordering
 
