@@ -36,11 +36,10 @@ chain queries above can be used to refine searches on associations:
 
 Daylight allows you to return collections from complex queries on your model:
 
-    API::Post.by_popularity                            # complex query called remotely
+    API::Post.by_popularity
 
 Daylight packages API query details in one request when it can to lower
-the network overhead.  More information can be found in the [Developer Guide](doc/guide.md).
-
+the network overhead.
 
 Daylight allows you to query for a record before initializing or creating it
 using ActiveRecord's familiar `first_or_create` and `first_or_initialize`
@@ -54,13 +53,41 @@ The last query to the database uses Rails' `accepts_nested_attributes_for`
 and the `User` could have easily been setup with `find_or_initialize` to
 reduce the number of server-side queries.
 
+More information can be found in the [Users Guide](doc/guide.md).
+
 ## Getting Started
 
+1. Install Daylight both on your server and your client.
 
+        gem install daylight
 
+2. On your server, add a rails initializer:
 
-1. More information can be found on:
+        require 'daylight/server'
+
+3. On your client, setup your API:
+
+        Daylight::API.setup!(endpoint: 'http://localhost/')
+
+4. Use your client models to query your API!
+
+## Development
+
+1. Develop your Rails models, controllers, and routes like you do today.  Add
+   a serializer for each model in the API.  Daylight provides additions to
+   simplify adding features to your controllers and routes.
+
+2. Develop your client models using Daylight's extensions to ActiveResource.
+   Daylight provides Mocks to aid in full stack testing of your client models.
+
+3. Consider versioning your client models and distribute them using a gem.
+   Daylight supports versioned APIs and has facilities available for your
+   development.
+
+4. More information can be found on:
     * [Installation Steps](doc/install.md)
-    * [Developer Guide](doc/guide.md)
+    * [API Users Guide](doc/guide.md)
+    * [Developer Guide](doc/develop.md)
     * [Testing Your API](doc/testing.md)
+    * [Gem Dependencies](doc/dependencies.md)
     * [Guiding Principles](doc/principles.md)
