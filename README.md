@@ -1,6 +1,6 @@
 # Daylight
 
-Daylight extends Rails and ActiveResource to allow your client API to perform more like ActiveRecord
+Daylight extends Rails and ActiveResource to allow your client API to perform akin to ActiveRecord
 
 1. More information can be found on:
     * [Getting Started](doc/install.md)
