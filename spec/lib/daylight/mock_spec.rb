@@ -2,13 +2,14 @@ require 'spec_helper'
 require 'daylight/mock'
 
 describe Daylight::Mock do
+  class MiniTest::Spec ; end
+  class MiniTest::Test ; end
 
   class TestClient < Daylight::API
     has_many :test_client_children, through: :associated, class_name: 'TestClientChild'
   end
 
-  class TestClientChild < Daylight::API
-  end
+  class TestClientChild < Daylight::API ; end
 
   # All clients will do this in their spec_helper.rb/test_helper.rb
   Daylight::Mock.setup
@@ -137,6 +138,19 @@ describe Daylight::Mock do
       end
     end
 
+  end
+
+  describe 'minitest setup' do
+    let(:minitest) { Minitest::Test.new }
+
+    it "adds our mock methods to Minitest::Test" do
+      minitest.should respond_to(:daylight_mock)
+    end
+
+    it "captures API requests" do
+      minitest.should_receive(:stub_request).and_return stub_request(:any, /.*/)
+      minitest.before_setup
+    end
   end
 
 end
