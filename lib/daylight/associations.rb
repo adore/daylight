@@ -90,7 +90,7 @@ module Daylight::Associations
     # #belongs_to_through
     # ActiveResource::Associations#belongs_to
 
-    def belongs_to name, options
+    def belongs_to name, options={}
       return belongs_to_through(name, options) if options.has_key? :through
 
       # continue to let the original do all the work.
