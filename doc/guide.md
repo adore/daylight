@@ -1,4 +1,4 @@
-# Developer Guide
+# Daylight Users Guide
 
 Here, there are 3 queries to the server:
 1. To lookup a `User` with the username 'reidmix'
