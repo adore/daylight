@@ -2,8 +2,9 @@
 
 Daylight extends Rails and ActiveResource to allow your client API to perform more like ActiveRecord
 
-- {Testing}[link:doc/testing.rdoc]
-- {Guiding Principles}[link:doc/principles.rdoc]
+
++ {Testing Your API}[link:doc/testing.rdoc]
++ {Guiding Principles}[link:doc/principles.rdoc]
 
 == Client Setup
 
