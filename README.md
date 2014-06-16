@@ -73,6 +73,8 @@ More information can be found in the [Daylight Users Guide](doc/guide.md).
 
 ## Development
 
+Ah, but we have to develop our API and client models:
+
 1. Develop your Rails models, controllers, and routes like you do today.  Add
    a serializer for each model in the API.  Daylight provides additions to
    simplify adding features to your controllers and routes.
