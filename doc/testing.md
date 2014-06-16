@@ -1,8 +1,8 @@
-= Testing with Daylight
+# Testing with Daylight
 
 Daylight offers a simple mocking framework that simplifies the process of writing tests for your client code.
 
-== Daylight::Mock
+## Daylight::Mock
 
 Works with both Rspec and TestUnit/Minitest.
 
@@ -23,7 +23,7 @@ To get only the last request use:
 
 Supported Calls: *created, updated, associated, indexed, shown, deleted*
 
-==== Each recorded request keeps some data to check against:
+#### Each recorded request keeps some data to check against:
 resource:: The resouce name
 path_parts:: A Struct of the request's path split into resource parts (version, resource, id and associated)
 path:: The request's path
@@ -37,7 +37,7 @@ request:: The raw request object
 response:: The raw response object
 
 
-==== Examples
+#### Examples
 
     daylight_mock.updated(:post).count.must_equal 2
 
