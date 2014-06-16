@@ -23,7 +23,7 @@ These are not hard-and-fast rules and can be reviewed and changed as the need ar
    Example: AutosaveAssociationFix, ActiveResource `has_one`
 
 5. Extend dependent software (gems) by including changes using ActiveSupport::Concerns
-   - Concerns show in ancestor lists and (usually) can chain to original methods via super
+   - Concerns show in ancestor lists and (usually) can chain to original methods via `super`
    - Extensions may be extracted into their own gems and shared by loading them without configuration
    Examples: readonly attributes and metadata (Serializer), ResourceProxy, Refinements (ActiveResource)
 
