@@ -40,7 +40,6 @@ Instead of views, serializers are used to generate JSON/XML.  Routes have a grea
 definition of the API.  And the client becomes the remote proxy for all API requests.
 
 To better undertand Daylight's interactions, we define the following components:
-
 * Rails **model** is the canonical version of the object
 * A **serializer** defines what parts of the model are exposed to the client
 * Rails **controller** defines which actions are performed on the model
