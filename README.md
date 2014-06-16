@@ -28,9 +28,11 @@ Daylight adds to ActiveResource with chained queries:
 Daylight can also chain queries on an ActiveResource's association.  All of the
 chain queries above can be used to refine searches on associations:
 
-    API::Post.find(1).comments                         # lookup and association
-    API::Post.find(1).comments.where(user_id: 2)       # query on lookup's association
-    API::Post.find(1).comments.where(user_id: 2).first # chained query on lookup's association
+    API::Post.first.comments                           # lookup and association
+    API::Post.first.comments.where(user_id: 2)         # query on lookup's association
+    API::Post.first.comments.where(user_id: 2).first   # chained query on
+    API::Post.first.comments.where(user_id: 2).edited  # chained query with scope
+                                                       # etc.
 
 Daylight allows you to return collections from complex queries on your model:
 
