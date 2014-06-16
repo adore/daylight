@@ -1,4 +1,4 @@
-# Installation Details
+# Installation Steps
 
 ## Client Setup
 

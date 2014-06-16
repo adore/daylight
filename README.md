@@ -44,11 +44,13 @@ The last query to the database uses Rails' `accepts_nested_attributes_for`
 and the `User` could have easily been setup with `find_or_initialize` to
 reduce the number of server-side queries to 2.
 
+## Getting Started
+
 
 
 
 1. More information can be found on:
-    * [Getting Started](doc/install.md)
+    * [Installation Steps](doc/install.md)
     * [Developer Guide](doc/guide.md)
     * [Testing Your API](doc/testing.md)
     * [Guiding Principles](doc/principles.md)
