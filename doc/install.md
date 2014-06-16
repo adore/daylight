@@ -1,12 +1,10 @@
-# Getting Started
+# Installation Details
 
 ## Client Setup
 
 Install the gem or add it to your bundler's Gemfile:
 
     gem install daylight
-
-(Or add it to your Bundler Gemfile)
 
 Set up the gem in a Rails initializer on your application:
 
@@ -32,15 +30,6 @@ Install the gem (or add it to your bundler's Gemfile:
 In in an initializer add the Rails extensions and patches:
 
     require 'daylight/server'
-
-## API Client
-
-Unlike typical ActiveResource clients, the Daylight API Client has been designed to be used similarly to ActiveRecord with scopes and the ability to chain queries.
-
-    Daylight::Zone.all
-    Daylight::Zone.where(code:'iad1')
-    Daylight::Zone.internal # scope
-    Daylight::Zone.find(1).tenants # associations
 
 ## Client Documentation Rails Engine
 
