@@ -25,7 +25,8 @@ Daylight adds to ActiveResource with chained queries:
 
     API::Post.find_by(slug: '100-best-albums-2014')    # find_by lookup gets first match
 
-Daylight can also chain queries on an ActiveResource's association:
+Daylight can also chain queries on an ActiveResource's association.  All of the
+chain queries above can be used to refine searches on associations:
 
     API::Post.find(1).comments                         # lookup and association
     API::Post.find(1).comments.where(user_id: 2)       # query on lookup's association
