@@ -10,7 +10,7 @@
 #
 #     ClientAPI::Post.all
 #     ClientAPI::Post.where(code:'iad1')
-#     ClientAPI::Post.internal                   # scope
+#     ClientAPI::Post.published                  # scope
 #     ClientAPI::Post.find(1).comments           # associations
 #     ClientAPI::Post.find(1).public_commenters  # remote method on model
 #     ClientAPI::Post.find(1).commenters.
