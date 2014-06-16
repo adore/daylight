@@ -20,12 +20,12 @@ These are not hard-and-fast rules and can be reviewed and changed as the need ar
 4. Expected behavior of dependent software should not be modified when extended
    - Developers should not be surprised by unexpected results from software they know and love
    - Exception is to fix bugs or expose problems in the underlying software
-   Example: AutosaveAssociationFix, ActiveResource `has_one`
+   Example: `AutosaveAssociationFix`, `ActiveResource::Base#has_one`
 
-5. Extend dependent software (gems) by including changes using ActiveSupport::Concerns
+5. Extend dependent software (gems) by including changes using `ActiveSupport::Concerns`
    - Concerns show in ancestor lists and (usually) can chain to original methods via `super`
    - Extensions may be extracted into their own gems and shared by loading them without configuration
-   Examples: readonly attributes and metadata (Serializer), ResourceProxy, Refinements (ActiveResource)
+   Examples: readonly attributes and metadata on `Serializer`, `ResourceProxy`, `Refinements` (ActiveResource)
 
 6. Behavior driven tests that drive towards integration testing
    - Use ActiveRecord to do the work for retrieving models instead of mocking it out
