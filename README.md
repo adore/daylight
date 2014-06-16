@@ -53,7 +53,7 @@ The last query to the database uses Rails' `accepts_nested_attributes_for`
 and the `User` could have easily been setup with `find_or_initialize` to
 reduce the number of server-side queries.
 
-More information can be found in the [Users Guide](doc/guide.md).
+More information can be found in the [Daylight Users Guide](doc/guide.md).
 
 ## Getting Started
 
@@ -86,8 +86,7 @@ More information can be found in the [Users Guide](doc/guide.md).
 
 4. More information can be found on:
     * [Installation Steps](doc/install.md)
-    * [API Users Guide](doc/guide.md)
-    * [Developer Guide](doc/develop.md)
+    * [Daylight Users Guide](doc/guide.md)
+    * [API Developer Guide](doc/develop.md)
     * [Testing Your API](doc/testing.md)
-    * [Gem Dependencies](doc/dependencies.md)
     * [Guiding Principles](doc/principles.md)
