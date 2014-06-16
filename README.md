@@ -4,9 +4,9 @@ Daylight extends Rails and ActiveResource to allow your client API to perform
 akin to ActiveRecord
 
 Features include those like ActiveRecord such as scopes, `find_by` lookups,
-calling server-side associations, using through associations, and the ability
-to chain queries.  Eases requesting complex queries on your Rails models
-through `remoted` methods.
+calling associations on  server-side models, using through associations, and
+the ability to chain queries.  Eases requesting complex queries on your Rails
+models using `remoted` methods.
 
 Typical ActiveResource functionality:
 
