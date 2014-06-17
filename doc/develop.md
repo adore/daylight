@@ -97,7 +97,8 @@ using the model-based associations, because it:
 * Conditions will not be supplied in the request
 
 > Note: Daylight includes Daylight::Refiners on all models that inheret from
-> ActiveRecord::Base.  At this time there is no way to exclude models.
+> ActiveRecord::Base.  At this time there is no way to exclude this module
+> from any model.
 
 ### Controllers
 
