@@ -91,7 +91,6 @@ Ah, but we have to develop our API and client models:
     * [Daylight Users Guide](doc/guide.md)
     * [API Developer Guide](doc/develop.md)
     * [Testing Your API](doc/testing.md)
-    * [Guiding Principles](doc/principles.md)
 
 ## License
 
