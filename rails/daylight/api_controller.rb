@@ -50,7 +50,7 @@ class Daylight::APIController < ApplicationController
   include VersionedUrlFor
 
   API_ACTIONS = [:index, :create, :show, :update, :destroy, :associated, :remoted].freeze
-  class_attribute :record_name, :model_name
+  class_attribute :record_name, :collection_name, :model_name
 
   ##
   # Ensure messaging when sending unknown attributes or improper SQL
@@ -122,8 +122,11 @@ class Daylight::APIController < ApplicationController
       # See:
       # ActionController::Base.controller_name
       def inherited api
-        api.model_name  = api.controller_name
-        api.record_name = api.controller_name.singularize
+        name = api.controller_name.singularize
+
+        api.model_name      = name
+        api.record_name     = name
+        api.collection_name = 'collection'
       end
   end
 
@@ -143,13 +146,13 @@ class Daylight::APIController < ApplicationController
     ##
     # Retrieves the value for the `record_name` instance variable
     def collection
-      instance_variable_get("@collection")
+      instance_variable_get("@#{collection_name}")
     end
 
     ##
     # Sets the value for the `record_name` instance variable
     def collection= value
-      instance_variable_set("@collection", value)
+      instance_variable_set("@#{collection_name}", value)
     end
 
     ##

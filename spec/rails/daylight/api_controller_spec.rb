@@ -26,8 +26,9 @@ end
 class TestCasesController < Daylight::APIController
   handles :create, :update, :destroy
 
-  self.model_name  = :case
-  self.record_name = :results
+  self.model_name      = :case
+  self.record_name     = :result
+  self.collection_name = :results
 end
 
 class TestAppRecord < ActiveResource::Base
@@ -160,11 +161,15 @@ describe Daylight::APIController, type: :controller do
     let(:controller) { SuitesController }
 
     it "uses controller name for record name" do
-      controller.record_name.should == 'suites'
+      controller.record_name.should == 'suite'
     end
 
     it "uses controller name for model name" do
-      controller.model_name.should == 'suites'
+      controller.model_name.should == 'suite'
+    end
+
+    it "uses 'collection' for collection name" do
+      controller.collection_name.should == 'collection'
     end
 
     it "uses controller name for model key" do
@@ -184,7 +189,15 @@ describe Daylight::APIController, type: :controller do
 
       c.send(:record=, 'foo')
       c.send(:record).should == 'foo'
-      c.instance_variable_get('@suites').should == c.send(:record)
+      c.instance_variable_get('@suite').should == c.send(:record)
+    end
+
+    it 'access collection ivar' do
+      c = controller.new
+
+      c.send(:collection=, %w[foo bar])
+      c.send(:collection).should == %w[foo bar]
+      c.instance_variable_get('@collection').should == c.send(:collection)
     end
   end
 
@@ -192,7 +205,11 @@ describe Daylight::APIController, type: :controller do
     let(:controller) { TestCasesController }
 
     it "overrides record name" do
-      controller.record_name.should == :results
+      controller.record_name.should == :result
+    end
+
+    it "overrides collection name" do
+      controller.collection_name.should == :results
     end
 
     it "overrides model name" do
@@ -216,7 +233,15 @@ describe Daylight::APIController, type: :controller do
 
       c.send(:record=, 'foo')
       c.send(:record).should == 'foo'
-      c.instance_variable_get('@results').should == c.send(:record)
+      c.instance_variable_get('@result').should == c.send(:record)
+    end
+
+    it 'access collection ivar' do
+      c = controller.new
+
+      c.send(:collection=, %w[foo bar])
+      c.send(:collection).should == %w[foo bar]
+      c.instance_variable_get('@results').should == c.send(:collection)
     end
   end
 
