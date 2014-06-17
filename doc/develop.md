@@ -16,7 +16,7 @@ To better undertand Daylight's interactions, we define the following components:
 
 Table of Contents:
 * [Expectations](#expectations)
-* [Building Your API](#development)
+* [Building Your API](#building-api)
   * [Models](#models)
   * [Controllers](#controllers)
   * [Serializers](#serializers)
@@ -36,7 +36,7 @@ Table of Contents:
 * **Versioned APIs**: APIs will be versioned, at the least with `v1` as the current and only version
 * **ActiveModelSerializer**: Serialization occurs via `ActiveModel::Serailizer`, typically in JSON
 
-<a id="development"></a>
+<a id="building-api"></a>
 ## Building Your API
 
 Building your Client from the bottom up you will need to develop your models,
