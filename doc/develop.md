@@ -137,16 +137,17 @@ To turn on multiple actions:
       handles: :create, :show, :update, :destroy
     end
 
-Or you can turn them all (including the Specialized Actions, below):
+Or you can turn them all (including the [Specialized Actions](#specialized)):
 
     class PostController < APIController
       handles: :all
     end
 
 For your reference, you can review the code of the equivalent actions in
-[Controller Actions][actions.md]
+[Controller Actions](actions.md)
 
-#### Specialized Actions
+<a name="specialized"></a>
+####  Specialized Actions
 
 #### Error Handling
 
