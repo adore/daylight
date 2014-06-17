@@ -14,12 +14,29 @@ To better undertand Daylight's interactions, we define the following components:
 * Rails **routes** defines what APIs are available to the client
 * The **client** model is the remote representation of the Rails model
 
+Table of Contents:
+* [Expectations](#expectations)
+* [Building Your API](#development)
+** [Models](#models)
+** [Controllers](#controllers)
+** [Serializers](#serializers)
+** [Routes](#routes)
+** [Client](#client)
+* [Underlying Interaction](#interaction)
+** [Symantic URLs](#symantic-urls)
+** [Request Params](#request-params)
+** [Symantic Data](#symantic-data)
+** [Response Metadata](#metadata)
+* [Framework Links](#framework)
+
+<a id="Expectations"></a>
 ## Expectations
 
 * **Rails 4**: Daylight was built only using the most current version of Rails 4
 * **Versioned APIs**: APIs will be versioned, at the least with `v1` as the current and only version
 * **ActiveModelSerializer**: Serialization occurs via `ActiveModel::Serailizer`, typically in JSON
 
+<a id="development"></a>
 ## Building Your API
 
 Building your Client from the bottom up you will need to develop your models,
@@ -27,6 +44,7 @@ controllers, routes that you are familiar with today.  Add serializers to
 describe the JSON generation of your object.  Finally, build your client models
 based on the API actions available and the response from the server.
 
+<a id="models"></a>
 ### Models
 
 Models are built exactly as they are in Rails, no changes are neccessary.
@@ -84,6 +102,7 @@ model-associations, because it:
 > Note: Daylight includes Daylight::Refiners on all models that inheret from
 > ActiveRecord::Base.  At this time there is no way to exclude models.
 
+<a id="controllers"></a>
 ### Controllers
 
 Controllers can be written without Daylight, but often times you must develop
@@ -146,28 +165,38 @@ Or you can turn them all (including the [Specialized Actions](#specialized)):
 For your reference, you can review the code of the equivalent actions in
 [Controller Actions](actions.md)
 
-<a name="specialized"></a>
+<a id="specialized"></a>
 ####  Specialized Actions
 
+<a id="error-handling"></a>
 #### Error Handling
 
+<a id="serializers"></a>
 ### Serializers
 
+<a id="routes"></a>
 ### Routes
 
+<a id="client"></a>
 ### Client
 
+<a id="interaction"></a>
 ## Underlying Interaction
 
+<a id="symantic-urls"></a>
 ### Symantic URLs
 
+<a id="request-params"></a>
 ### Request Parameters
 
+<a id="symantic-data"></a>
 ### Symantic Data
 
+<a id="metadata"></a>
 ### Resposne Metadata
 
-## Framework
+<a id="framework"></a>
+## Framework Links
 
 To better understand how a framework extends or alters the underlying Rails
 technology.  Here are some additional details on how Daylight was built:
