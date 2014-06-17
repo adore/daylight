@@ -27,7 +27,7 @@ Table of Contents:
   * [Request Params](#request-params)
   * [Symantic Data](#symantic-data)
   * [Response Metadata](#response-metadata)
-* [Framework Links](#framework)
+* [Framework Links](#framework-links)
 
 ## Expectations
 
