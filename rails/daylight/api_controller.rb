@@ -123,7 +123,7 @@ class Daylight::APIController < ApplicationController
       # ActionController::Base.controller_name
       def inherited api
         api.model_name  = api.controller_name
-        api.record_name = api.controller_name
+        api.record_name = api.controller_name.singularize
       end
   end
 
@@ -138,6 +138,18 @@ class Daylight::APIController < ApplicationController
     # Sets the value for the `record_name` instance variable
     def record= value
       instance_variable_set("@#{record_name}", value)
+    end
+
+    ##
+    # Retrieves the value for the `record_name` instance variable
+    def collection
+      instance_variable_get("@collection")
+    end
+
+    ##
+    # Sets the value for the `record_name` instance variable
+    def collection= value
+      instance_variable_set("@collection", value)
     end
 
     ##
@@ -198,7 +210,7 @@ class Daylight::APIController < ApplicationController
     # See:
     # Daylight::Refiners.refine_by
     def index
-      render json: model.refine_by(params)
+      render json: self.collection = model.refine_by(params)
     end
 
     ##
@@ -216,7 +228,7 @@ class Daylight::APIController < ApplicationController
     #     render json: @post, status: :created, location: @post
     #   end
     def create
-      record = model.new(model_params)
+      self.record = model.new(model_params)
       record.save!
 
       render json: record, status: :created, location: record
@@ -237,7 +249,7 @@ class Daylight::APIController < ApplicationController
     #     render json: Post.find(params[Post.primary_key])
     #   end
     def show
-      render json: model.find(params[primary_key])
+      render json: self.record = model.find(params[primary_key])
     end
 
     ##
@@ -257,7 +269,7 @@ class Daylight::APIController < ApplicationController
     #     head :no_content
     #   end
     def update
-      model.find(params[primary_key]).update!(model_params)
+      (self.record = model.find(params[primary_key])).update!(model_params)
 
       head :no_content
     end
@@ -279,7 +291,7 @@ class Daylight::APIController < ApplicationController
     #     head :no_content
     #   end
     def destroy
-      model.find(params[primary_key]).destroy
+      (self.record = model.find(params[primary_key])).destroy
 
       head :no_content
     end
@@ -301,12 +313,12 @@ class Daylight::APIController < ApplicationController
     # Daylight::Helpers.associated_params
     # RouteOptions
     def associated
-      render json: model.associated(params), root: associated_params
+      render json: self.collection = model.associated(params), root: associated_params
     end
 
     ##
-    # Retrieves the collection for the associated records for a `model` with
-    # any refinements in the params passed to `associated`.  Accessed via:
+    # Retrieves the collection returned by the `remoted` method with
+    # any refinements in the params passed to `remoted`.  Accessed via:
     #
     #   GET /posts/1/all_authorized_users.json
     #
@@ -321,6 +333,6 @@ class Daylight::APIController < ApplicationController
     # Daylight::Helpers.remoted_params
     # RouteOptions
     def remoted
-      render json: model.remoted(params), root: remoted_params
+      render json: self.collection = model.remoted(params), root: remoted_params
     end
 end

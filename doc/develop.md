@@ -142,8 +142,9 @@ super) as you see fit:
       handles :show
 
       def show
-        @blog = Blog.find(1)
         super
+
+        @post.update_attributes(:last_viewed_at, Time.now)
       end
     end
 
