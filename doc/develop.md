@@ -14,7 +14,7 @@ To better undertand Daylight's interactions, we define the following components:
 * Rails **routes** defines what APIs are available to the client
 * The **client** model is the remote representation of the Rails model
 
-### Table of Contents:
+#### Table of Contents
 * [Expectations](#expectations)
 * [Building Your API](#building-your-api)
   * [Models](#models)
