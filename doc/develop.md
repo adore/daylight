@@ -55,9 +55,9 @@ Once the client is setup you can do the following:
 > Note: ActiveResource looks up associations using foriegn keys but with
 > Daylight you can call the associations defined on your model directly.
 
-This is especially useful when you wish to preserve the options on your
-associations that are neccessary for your application to function correctly.
-For example:
+This is especially useful when you wish to preserve the richness of options on
+your associations that are neccessary for your application to function
+correctly.  For example:
 
     class Post
       has_many :comments
@@ -89,7 +89,15 @@ model-associations, because it:
 
 ### Client
 
-## Interaction
+## Underlying Interaction
+
+### Symantic URLs
+
+### Request Parameters
+
+### Symantic Data
+
+### Resposne Metadata
 
 ## Framework
 
