@@ -16,7 +16,7 @@ To better undertand Daylight's interactions, we define the following components:
 
 ## Expectations
 
-* **Rails 4**: Daylight was built over the most current version of Rails 4
+* **Rails 4**: Daylight was built only using the most current version of Rails 4
 * **Versioned APIs**: APIs will be versioned, at the least with `v1` as the current and only version
 * **ActiveModelSerializer**: Serialization occurs via `ActiveModel::Serailizer`, typically in JSON
 
