@@ -35,7 +35,7 @@ Through specifiecation on the routes, Daylight allows you to make scopes and
 methods available to the client.
 
 > Note: Daylight expects an model object or a collection when parsing results
-> from a model method.  For more information, see [Guiding Principles][principles.md]
+> from a model method.
 
 You can chose to allow models to be created, updated, and associated through
 a "parent" model using the `accepts_nested_attributes_for` mechansism.
@@ -62,19 +62,16 @@ For example:
     class Post
       has_many :comments
       has_many :author, foreign_key: 'created_by_user_id'
-      has_many :tags, through: taggings
-      has_many :commenters, -> { uniq }, through: :comments
+      has_many :commenters, through: :comments
       has_many :suppressed_comments, -> { where(spam: true) }, class_name: 'Comment'
-
     end
 
 Here we have 4 examples where using the model associations are neccesary.  When
 there is:
 
-1. A configured foreign key as in `author`
-2. A through association as in `tags` and `commenters`
-3. A condindition block as in `commenters` and `suppressed_comments` (eg.
-  `uniq` and `where`)
+1. A configured foreign_key as in `author`
+2. A through association as in `commenters`
+3. A condindition block as `suppressed_comments` (eg. `where`)
 4. A class_name as in `suppressed_comments`
 
 ActiveResource will not be able to resolve these options without using the
