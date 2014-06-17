@@ -33,7 +33,7 @@ To better undertand Daylight's interactions, we define the following components:
 
 * **Rails 4**: Daylight was built only using the most current version of Rails
   4
-* **Namespace APIs**: Client Models are all namespaced, by default under 'API'
+* **Namespace APIs**: Client Models are all namespaced, by default under `API`
   (namespace is customizable)
 * **Versioned APIs**: URLs will be versioned, by default `v1` is the current
   and only version (versions are customizable)
