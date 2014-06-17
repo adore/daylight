@@ -1,4 +1,4 @@
-# Daylight Framework
+# Framework Overview
 
 Daylight alters or extends Rails components.  Generally, there are 5 main parts
 to Daylight:

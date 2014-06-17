@@ -33,11 +33,11 @@ To better undertand Daylight's interactions, we define the following components:
 ### Client
 
 
-## Daylight Framework
+## Framework
 
 To better understand how a framework extends or alters the underlying Rails
 technology.  Here are some additional details on how Daylight was built:
 
 * [Build Environment](environment.md)
-* [Framework Details](framework.md)
+* [Framework Overview](framework.md)
 * [Guiding Principles](principles.md)
