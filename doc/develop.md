@@ -81,7 +81,74 @@ model-associations, because it:
 * Uses the wrong lookup key (in through associations and foreign key option)
 * Conditions will not be supplied in the request
 
+> Note: Daylight includes Daylight::Refiners on all models that inheret from
+> ActiveRecord::Base.  At this time there is no way to exclude models.
+
 ### Controllers
+
+Controllers can be written without Daylight, but often times you must develop
+boilerplate code for index, create, show, update, and delete actions.  Also,
+you may chose controllers that are for the API and controllers that are for
+your application.
+
+Daylight simplifies building API controllers:
+
+    class PostController < APIController
+    end
+
+`APIController` subclasses `ApplicationController`.  Any functionality built in
+`ApplicationController` will be available to your `APIController` subclasses.
+
+You must "turn on" REST actions to allow for functionality.  All actions
+provided by Daylight are turned off by default so what is exposed is determined
+by the developer.
+
+For example, to turn on `show` action:
+
+    class PostController < APIController
+      handles :show
+    end
+
+This is equivalent to;
+
+    class PostController < APIController
+      def show
+        render json: Post.find(params[:id])
+      end
+    end
+
+Daylight uses the name of the controller to determine the related model to use.
+Also, the `primary_key` name is retrived from that determined model.  In fact,
+all of the actions are just ruby methods, so you can overwrite them (and call
+super) as you see fit:
+
+    class PostController < APIController
+      handles :show
+
+      def show
+        @blog = Blog.find(1)
+        super
+      end
+    end
+
+To turn on multiple actions:
+
+    class PostController < APIController
+      handles: :create, :show, :update, :destroy
+    end
+
+Or you can turn them all (including the Specialized Actions, below):
+
+    class PostController < APIController
+      handles: :all
+    end
+
+For your reference, you can review the code of the equivalent actions in
+[Controller Actions][actions.md]
+
+#### Specialized Actions
+
+#### Error Handling
 
 ### Serializers
 
