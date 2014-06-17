@@ -61,8 +61,8 @@ For example:
 
     class Post
       has_many :comments
-      has_many :author, foreign_key: 'created_by_user_id'
-      has_many :commenters, through: :comments
+      has_many :author, foreign_key: 'created_by_user_id', class_name: 'User'
+      has_many :commenters, through: :comments, class_name: 'User'
       has_many :suppressed_comments, -> { where(spam: true) }, class_name: 'Comment'
     end
 
@@ -72,10 +72,13 @@ there is:
 1. A configured foreign_key as in `author`
 2. A through association as in `commenters`
 3. A condindition block as `suppressed_comments` (eg. `where`)
-4. A class_name as in `suppressed_comments`
+4. A class_name in all three `author`, `commenters`, and `suppressed_comments`
 
 ActiveResource will not be able to resolve these options without using the
-model-associations.
+model-associations, because it:
+* Cannot determine endpoint or correct class to instanciate
+* Uses the wrong lookup key (in through associations and foreign key option)
+* Conditions will not be supplied in the request
 
 ### Controllers
 
