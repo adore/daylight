@@ -21,8 +21,7 @@ class DaylightDocumentation::DocumentationController < ActionController::Base
   private
 
   def models
-    # make sure all the models are loaded
-    Dir[Rails.root + 'app/models/**/*.rb'].each {|f| require f }
+    Rails.application.eager_load!
     ActiveRecord::Base.descendants
   end
 end
