@@ -90,8 +90,8 @@ there is:
    and `where`)
 4. A class_name in all three `author`, `commenters`, and `suppressed_comments`
 
-ActiveResource will not be able to resolve these options without using the
-model-associations, because it:
+ActiveResource will not be able to resolve these associations correctly without
+using the model-based associations, because it:
 * Cannot determine endpoint or correct class to instanciate
 * Uses the wrong lookup key (in through associations and foreign key option)
 * Conditions will not be supplied in the request
