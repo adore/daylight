@@ -96,8 +96,8 @@ Daylight simplifies building API controllers:
     class PostController < APIController
     end
 
-`APIController` subclasses `ApplicationController`.  Any functionality built in
-`ApplicationController` will be available to your `APIController` subclasses.
+> Note: Any functionality built in `ApplicationController` will be available to
+> your `APIController` subclasses.
 
 You must "turn on" REST actions to allow for functionality.  All actions
 provided by Daylight are turned off by default so what is exposed is determined
