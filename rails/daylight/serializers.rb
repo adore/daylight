@@ -8,7 +8,8 @@ ActiveSupport.on_load(:after_initialize) do
       klass = Class.new(ActiveModel::Serializer)
       klass.class_eval do
         embed :ids
-        attributes :id
+        attributes(*model_class.column_names)
+        has_one(*model_class.reflection_names)
       end
       Object.const_set "#{model_class.name}Serializer", klass
     end
