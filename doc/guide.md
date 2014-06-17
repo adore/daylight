@@ -1,6 +1,10 @@
 # Daylight Users Guide
 
-## Understanding Request Frequency
+## Optimizations
+
+### Understanding Payload Size
+
+### Understanding Request Frequency
 
 From our example on in the [README](../README.doc) we show creating a `Post`
 and `User` and associating the two:

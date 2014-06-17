@@ -22,7 +22,63 @@ To better undertand Daylight's interactions, we define the following components:
 
 ## Building Your API
 
+Building your Client from the bottom up you will need to develop your models,
+controllers, routes that you are familiar with today.  Add serializers to
+describe the JSON generation of your object.  Finally, build your client models
+based on the API actions available and the response from the server.
+
 ### Models
+
+Models are built exactly as they are in Rails, no changes are neccessary.
+
+Through specifiecation on the routes, Daylight allows you to make scopes and
+methods available to the client.
+
+> Note: Daylight expects an model object or a collection when parsing results
+> from a model method.  For more information, see [Guiding Principles][principles.md]
+
+You can chose to allow models to be created, updated, and associated through
+a "parent" model using the `accepts_nested_attributes_for` mechansism.
+
+      class Post < ActiveRecord::Base
+        has_many :comments
+
+        accepts_nested_attributes_for :comments
+      end
+
+Once the client is setup you can do the following:
+
+    post = API::Post.find(1)
+    post << API::Comment.new(text: "This is an awesome post")
+    post.save
+
+> Note: ActiveResource looks up associations using foriegn keys but with
+> Daylight you can call the associations defined on your model directly.
+
+This is especially useful when you wish to preserve the options on your
+associations that are neccessary for your application to function correctly.
+For example:
+
+    class Post
+      has_many :comments
+      has_many :author, foreign_key: 'created_by_user_id'
+      has_many :tags, through: taggings
+      has_many :commenters, -> { uniq }, through: :comments
+      has_many :suppressed_comments, -> { where(spam: true) }, class_name: 'Comment'
+
+    end
+
+Here we have 4 examples where using the model associations are neccesary.  When
+there is:
+
+1. A configured foreign key as in `author`
+2. A through association as in `tags` and `commenters`
+3. A condindition block as in `commenters` and `suppressed_comments` (eg.
+  `uniq` and `where`)
+4. A class_name as in `suppressed_comments`
+
+ActiveResource will not be able to resolve these options without using the
+model-associations.
 
 ### Controllers
 
@@ -32,12 +88,13 @@ To better undertand Daylight's interactions, we define the following components:
 
 ### Client
 
+## Interaction
 
 ## Framework
 
 To better understand how a framework extends or alters the underlying Rails
 technology.  Here are some additional details on how Daylight was built:
 
-* [Build Environment](environment.md)
 * [Framework Overview](framework.md)
+* [Build Environment](environment.md)
 * [Guiding Principles](principles.md)
