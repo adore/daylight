@@ -280,6 +280,14 @@ In all customizations can use a string, symbol, or constant as the value:
       set_collection_name :results
     end
 
+Lastly, your application may already have an APIController and there could be
+a name collision.  Daylight will not use this constant if it's already defined.
+
+In this case use `Daylight::APIController` to subclass from:
+
+    class PostController < Daylight::APIController
+    end
+
 #### Error Handling
 
 
