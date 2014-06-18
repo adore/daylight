@@ -122,8 +122,11 @@ and most information on how to use and customize it can be found in their
 Serialize only the attributes you want to be public in your API.  This allows
 you to have a separation between the model data and the API data.
 
-For example, `title` and `body` are exposed but there may be other internal
-attributes that do not get serialized:
+> NOTE: Make sure to include `:id` as an attribute so that `Daylight` will be
+> able to make updates to the models correctly.
+
+For example, `id`, `title` and `body` are exposed but there all other
+attributes are not serialized:
 
   ````ruby
     class PostSerializer < ActiveModel::Serializer
@@ -131,10 +134,7 @@ attributes that do not get serialized:
     end
   ````
 
-> NOTE: Make sure to include `:id` as an attribute so that `Daylight` will be
-> able to make updates to the models correctly.
-
-We encourage you to embed only ids to keep payloads down, `Daylight` will make
+We encourage you to embed only ids to keep payloads down. `Daylight` will make
 additional requests for the associated objects when accessed:
 
   ````ruby
@@ -153,7 +153,7 @@ additional requests for the associated objects when accessed:
 
 There isn't any need for you to include your `has_many` associations in
 your serializer.  These collections will be looked up from the `Daylight`
-client in a seperate request.
+client by a seperate request.
 
 The serializer above will generate JSON like:
 
@@ -188,7 +188,9 @@ example if your model has associations setup like so:
 > INFO: Rails does not have `belongs_to :through` associations
 
 To configure the `PostSerializer` to correctly use this through association
-set it up like similarly to your model:
+set it up like similarly to your model.
+
+> NOTE: the `blog` association is changed to a `has_one` in the serializer
 
   ````ruby
     class PostSerializer < ActiveModel::Serializer
@@ -233,14 +235,13 @@ and blog_attributs["id"] are used for different purposes.
 #### Read Only Attributes
 
 There are cases when you want to expose data from the model as read only
-attributes where they cannot be updatedd.  These cases are when the attribute
-is:
+attributes so they cannot be updatedd.  These cases are when the attribute is:
 * Evaluated and not stored in the database
 * Stored into the database only when computed
 * Readable but should not be updated
 
 Here we have a `Post` object that does all three things. Assume there are
-`updated_at` and `created_at` attributes as well.
+`updated_at` and `created_at` immutable attributes as well.
 
   ````ruby
     class Post < ActiveRecord::Base
