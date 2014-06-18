@@ -18,8 +18,8 @@ To better undertand Daylight's interactions, we define the following components:
 * [Expectations](#expectations)
 * [Building Your API](#building-your-api)
   * [Models](#models)
-  * [Controllers](#controllers)
   * [Serializers](#serializers)
+  * [Controllers](#controllers)
   * [Routes](#routes)
   * [Client](#client)
 * [Error Handling](#error-handling)
@@ -110,6 +110,183 @@ using the model-based associations, because it:
 > NOTE: Daylight includes `Daylight::Refiners` on all models that inheret from
 > `ActiveRecord::Base`.  At this time there is no way to exclude this module
 > from any model.
+
+
+### Serializers
+
+Daylight relies heavily on
+[ActiveModelSerializers](https://github.com/rails-api/active_model_serializers)
+and most information on how to use and customize it can be found in their
+[README](https://github.com/rails-api/active_model_serializers/blob/master/README.md).
+
+You can serialize only the attributes you want to be public in your API.
+For example, `title` and `body` are exposed but there may be other internal
+attributes that do not get serialized:
+
+  ````ruby
+    class PostSerializer < ActiveModel::Serializer
+      attributes :id, :title, :body
+    end
+  ````
+
+> NOTE: Make sure to include `:id` as an attribute so that `Daylight` will be
+> able to make updates to the models correctly.
+
+We encourage you to embed only ids to keep payloads down, `Daylight` will make
+additional requests for the associated objects when accessed:
+
+  ````ruby
+    class PostSerializer < ActiveModel::Serializer
+      embed :ids
+
+      attributes :id, :title, :body
+
+      has_one :category
+      has_one :author, key: 'created_by'
+    end
+  ````
+
+> INFO: `belongs_to` associations can be included using `has_one` in your
+> serializer
+
+There isn't any need for you to include your `has_many` associations in
+your serializer.  These collections will be looked up from the `Daylight`
+client in a seperate request.
+
+The serializer above will generate JSON like:
+
+  ````json
+    {
+      "post": {
+        "id": 283,
+        "title": "100 Best Albums of 2014",
+        "body": "Here is my list...",
+        "category_id": 2,
+        "created_by": 101
+      }
+    }
+  ````
+
+There are 2 main additions Daylight adds to `ActiveModelSerializer` to enable
+functionality from the client:
+
+#### Through Associations
+
+In Rails you can setup your model to have a `has_one :through`.  This is a
+special case for `ActiveModelSerializers` and downstream to the `Daylight`
+client.  For example:
+
+  ````ruby
+    class Post < ActiveRecord::Base
+      belongs_to :blog
+      has_one :company, through: :blog
+    end
+  ````
+
+> INFO: Rails does not have `belongs_to :through` associations
+
+To configure the `PostSerializer` to correctly use this through association
+set it up like similarly to your model, like so:
+
+  ````ruby
+    class PostSerializer < ActiveModel::Serializer
+      embed :ids
+
+      attributes :id, :title, :body
+
+      has_one :blog
+      has_one :company, through: :blog
+    end
+  ````
+
+This will create a special embedding in the JSON that the client will be able
+to use to lookup the association:
+
+  ````json
+    {
+      "post": {
+        "id": 283,
+        "title": "100 Best Albums of 2014",
+        "body": "Here is my list...",
+        "blog_id": 4,
+        "blog_attributes": {
+          "id": 4,
+          "company_id": 1
+        },
+      }
+    }
+  ````
+
+There looks like some duplication in the JSON payload, but they are used for
+different purposes.
+
+    ````json
+      API::Post.first.blog      #=> uses "blog_id"
+      API::Post.first.company   #=> uses "blog_attributes"
+    ````
+
+> INFO: `blog_attributes` are also used for `accepts_nested_attributes_for`
+> mechansism.
+
+#### Read Only Attributes
+
+There are cases when you want to expose data from the model as Read Only
+attributes.  These cases are when the attribute is:
+* Evaluated and not stored in the database
+* Computed and stored into the database
+* Readable but should not be updated
+
+Here we have a `Post` object that does all three things assuming there are
+`updated_at` and `created_at` attributes as well.
+
+  ````ruby
+    class Post < ActiveRecord::Base
+      before_create do
+        self.slug = title.downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '')
+      end
+
+      def published?
+        published_at.present?
+      end
+    end
+  ````
+
+To configure the `PostSerializer` to mark these attributes as read only:
+
+  ````ruby
+    class PostSerializer < ActiveModel::Serializer
+      embed :ids
+
+      attributes :id, :title, :body
+      read_only: :created_at, :updated_at, :slug, :published?
+    end
+  ````
+
+These attributes will be marked as read only in the object JSON's
+special [Metadata](#resposne-metadata) section.
+
+The client will be able to read each of these values but will raise a
+`NoMethodError` when attempting to write them.
+
+  ````ruby
+    post = API::Post.first
+    post.created_at #=> "2014-05-02T19:58:09.248Z"
+    post.slug       #=> "100-best-albums-of-2014"
+    post.published? #=> true
+
+    post.slug = '100-best-albums-of-all-time'
+    #=> NoMethodError: Cannot set read_only attribute: display_name
+
+Because these attributes are read only, the client will exclude them from
+being sent when the object is saved.
+
+  ````ruby
+    post.title = "100 Best Albums of All Time"
+    post.save  #=> true
+  ````
+
+In this case `published?`, `slug`, `created_at`, and `updated_at` are never
+sent in the POST or PUT/PATCH.
 
 ### Controllers
 
@@ -327,71 +504,6 @@ In this case use `Daylight::APIController` to subclass from:
     handles :all
   end
   ````
-
-### Serializers
-
-Daylight relies heavily on
-[ActiveModelSerializers](https://github.com/rails-api/active_model_serializers)
-and most information on how to use and customize it can be found in their
-[README](https://github.com/rails-api/active_model_serializers/blob/master/README.md).
-
-You can serialize only the attributes you want to be public in your API.
-For example, `title` and `body` are exposed but there may be other internal
-attributes that do not get serialized:
-
-  ````ruby
-    class PostSerializer < ActiveModel::Serializer
-      attributes :id, :title, :body
-    end
-  ````
-
-> INFO: Make sure to include `:id` as an attribute so that `Daylight` will be
-> able to make updates to the models correctly.
-
-We encourage you to embed only ids to keep payloads down, `Daylight` will make
-additional requests for the associated objects when accessed:
-
-  ````ruby
-    class PostSerializer < ActiveModel::Serializer
-      embed :ids
-
-      attributes :id, :title, :body
-
-      has_one :category
-      has_one :author, key: 'created_by'
-    end
-  ````
-
-> INFO: `belongs_to` associations can be included using `has_one` in your
-> serializer
-
-There isn't any need for you to include your `has_many` associations in
-your serializer.  These collections will be looked up from the `Daylight`
-client in a seperate request.
-
-The serializer above will generate JSON like:
-
-  ````json
-    {
-      "post": {
-        "id": 283,
-        "title": "100 Best Albums of 2014",
-        "body": "Here is my list...",
-        "category_id": 2,
-        "created_by": 101
-      }
-    }
-  ````
-
-There are 2 main additions Daylight adds to `ActiveModelSerializer` to enable
-functionality from the client:
-
-#### Through Associations
-
-
-
-#### Read Only Attributes
-
 
 ### Routes
 
