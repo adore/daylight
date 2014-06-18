@@ -1,4 +1,4 @@
-# API Mock
+# API Testing
 
 Daylight offers a simple mocking framework that simplifies the process of writing tests for your client code.
 
