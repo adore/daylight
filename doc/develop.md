@@ -29,7 +29,9 @@ To better undertand Daylight's interactions, we define the following components:
   * [Symantic Data](#symantic-data)
   * [Response Metadata](#response-metadata)
 
+
 ## Expectations
+
 
 * **Rails 4**: Daylight was built only using the most current version of Rails
   4
@@ -114,11 +116,11 @@ using the model-based associations, because it:
 
 ### Serializers
 
+
 Daylight relies heavily on
 [ActiveModelSerializers](https://github.com/rails-api/active_model_serializers)
 and most information on how to use and customize it can be found in their
 [README](https://github.com/rails-api/active_model_serializers/blob/master/README.md).
-
 Serialize only the attributes you want to be public in your API.  This allows
 you to have a separation between the model data and the API data.
 
@@ -170,7 +172,8 @@ The serializer above will generate JSON like:
   ````
 
 There are 2 main additions Daylight adds to `ActiveModelSerializer` to enable
-functionality for the client.
+functionality for the client.  They are through associations and read only
+attributes.
 
 #### Through Associations
 
@@ -293,7 +296,9 @@ being sent when the object is saved.
 In this case `published?`, `slug`, `created_at`, and `updated_at` are never
 sent in a PUT update.
 
+
 ### Controllers
+
 
 Controllers can be written without Daylight, but often times you must develop
 boilerplate code for `index`, `create`, `show`, `update`, and `delete` actions.
@@ -511,6 +516,9 @@ In this case use `Daylight::APIController` to subclass from:
   ````
 
 ### Routes
+
+
+
 
 ### Client
 
