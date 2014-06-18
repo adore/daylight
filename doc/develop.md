@@ -172,15 +172,19 @@ For your reference, you can review the code of the equivalent actions in
 
 Much of Daylight's features are offered through specialized controller actions.
 These specialized actions are what enables:
-* query refinements
-* model associations
-* remote method execution
+* [Query Refinements](#index)
+* [Model Associations)(#associated)
+* [Remote Methods](#remoted)
 
-You can refine queries of a resources collection by scopes, conditions (called
-filters in Daylight), order, limit, and offset.
+##### Index
+
+You can refine queries of a resources collection by scopes, conditions, order,
+limit, and offset.
 
 This is accomplished with a method called `refine_by` which is added to your
-models added by `Daylight::Refiners` You can see it called by the `index` action:
+models added by `Daylight::Refiners`
+
+On the controller, see it called by the `index` action:
 
     class PostController < APIController
       def index
@@ -188,22 +192,54 @@ models added by `Daylight::Refiners` You can see it called by the `index` action
       end
     end
 
+##### Associated
+
 Associations called on the model is accomplished using a method called
-`associated` added by `Daylight::Refiners`.
-Which associations are allowed are defined in your [Routes](#routes)
+`associated` added by `Daylight::Refiners`.  Which associations allowed are
+defined in your [Routes](#routes).
 
-This is done with a helper method called `associated`
+On the controller, see it called by the (similarly named) `associated` action:
 
-You can see `associated:
-
-    def associated
-      render json: self.collection = model.associated(params), root: associated_params
+    class PostController < APIController
+      def associated
+        render json: Post.associated(params), root: associated_params
+      end
     end
+
+Associations can also be refined like `index` where you can specify scopes,
+conditions, order, limit, and offset.
+
+##### Remoted
+
+Any method is allowed to be called on the model by use of the `remoted` method
+added by `Daylight::Refiners`.  Which methods are allowed are defined in your
+[Routes](#routes).
+
+Remoted methods should return a record or collections of records so that they
+may be instanciated correctly and act as a proxy back to the API.
+
+On the controller, see it called by the (similarly named) `remoted` action:
+
+    class PostController < APIController
+      def remoted
+        render json: Post.remoted(params), root: remoted_params
+      end
+    end
+
+All of the specialize actions can be enabled on your controller like the REST
+actions:
+
+    class PostController < APIController
+      handles :index, :associated, :remoted
+    end
+
+These are also included when specifying `handles :all`.
+
+> Note: To understand how `root` option is being used in both `assoicated`
+> and `remoted` please refer to the section on [Symantic Data](#symantic-data)
 
 You can find more information on how to use these refinements in the
 [Daylight Users Guide](guide.md)
-
-
 
 #### Customization
 
