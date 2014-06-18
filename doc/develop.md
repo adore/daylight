@@ -243,10 +243,9 @@ They are also included when specifying `handles :all`.
 
 #### Customization
 
-Behind the scenes, all the controller actions are looking up models based on
-its controller name by looking up the model based on the substring prior to
-the word 'Controller' (ie. when `PostController` is the controller name it
-determines the model name is `Post`).
+Behind the scenes, the controller actions look up models based on its controller
+name.  The portion before the word _Controller_ (ie. when `PostController` is
+the controller name it determines the model name to be `Post`).
 
 You may specify a different model to use:
 
