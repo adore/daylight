@@ -286,6 +286,7 @@ a name collision.  Daylight will not use this constant if it's already defined.
 In this case use `Daylight::APIController` to subclass from:
 
     class PostController < Daylight::APIController
+      handles :all
     end
 
 #### Error Handling
