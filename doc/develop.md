@@ -173,7 +173,7 @@ For your reference, you can review the code of the equivalent actions in
 Much of Daylight's features are offered through specialized controller actions.
 These specialized actions are what enables:
 * [Query Refinements](#index)
-* [Model Associations)(#associated)
+* [Model Associations](#associated)
 * [Remote Methods](#remoted)
 
 ##### Index
