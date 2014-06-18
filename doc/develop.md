@@ -178,8 +178,11 @@ attributes_.
 #### Through Associations
 
 In Rails you can setup your model to have a `has_one :through`.  This is a
-special case for `ActiveModelSerializers` and for the `Daylight` client.  For
-example if your model has associations setup like so:
+special case for `ActiveModelSerializers` and for the `Daylight` client.
+
+> NOTE: Rails does not have `belongs_to :through` associations.
+
+For example, if your model has associations setup like so:
 
   ````ruby
     class Post < ActiveRecord::Base
@@ -188,12 +191,8 @@ example if your model has associations setup like so:
     end
   ````
 
-> INFO: Rails does not have `belongs_to :through` associations
-
 To configure the `PostSerializer` to correctly use this through association
 set it up like similarly to your model.
-
-> NOTE: the `blog` association is changed to a `has_one` in the serializer
 
   ````ruby
     class PostSerializer < ActiveModel::Serializer
@@ -201,7 +200,7 @@ set it up like similarly to your model.
 
       attributes :id, :title, :body
 
-      has_one :blog
+      has_one :blog # `has_one` in a serializer
       has_one :company, through: :blog
     end
   ````
