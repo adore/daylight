@@ -181,7 +181,7 @@ class Daylight::API < ActiveResource::Base
       end
   end
 
-  attr_reader :metadata, :remote_errors
+  attr_reader :metadata
 
   ##
   # Extends ActiveResource to allow for saving metadata from the responses on

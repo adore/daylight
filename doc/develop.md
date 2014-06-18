@@ -386,7 +386,7 @@ For example, given the same `Post` model above:
   post = API::Post.new(foo: 'bar')
   post.save
   #=> ActiveResource::BadRequest: Failed.  Response code = 400.
-      Response message = Bad Request.  Root Cause = unknown attribute: foo
+  #   Response message = Bad Request.  Root Cause = unknown attribute: foo
   ````
 
 Similarly, Daylight raises errors on unknown keys, associations, scopes,
@@ -397,14 +397,14 @@ For example, when providing an incorrect condition:
   ````
   API::Post.find_by(foo: 'bar')
   #=> ActiveResource::BadRequest: Failed.  Response code = 400.
-      Response message = Bad Request.  Root Cause = unknown key: foo
+  #   Response message = Bad Request.  Root Cause = unknown key: foo
   ````
 If invalid statements are issued server-side they will be raised:
 
   ````ruby
   API::Post.find(1).limit(:foo)
   #=> ActiveResource::BadRequest: Failed.  Response code = 400.
-      Response message = Bad Request.  Root Cause = invalid value for Integer(): "foo"
+  #   Response message = Bad Request.  Root Cause = invalid value for Integer(): "foo"
   ````
 
 This is also useful developing and detecting errors in your client models
@@ -425,15 +425,15 @@ server-side, errors will be raised.
   ````ruby
   API::Post.published
   #=> ActiveResource::BadRequest: Failed.  Response code = 400.
-      Response message = Bad Request.  Root Cause = unknown scope: published
+  #   Response message = Bad Request.  Root Cause = unknown scope: published
 
   API::Post.by_popularirty
   #=> ActiveResource::BadRequest: Failed.  Response code = 400.
-      Response message = Bad Request.  Root Cause = unknown remote: by_popularity
+  #   Response message = Bad Request.  Root Cause = unknown remote: by_popularity
 
   API::Post.find(1).author
   #=> ActiveResource::BadRequest: Failed.  Response code = 400.
-      Response message = Bad Request.  Root Cause = unknown association: author
+  #   Response message = Bad Request.  Root Cause = unknown association: author
   ````
 
 ## Underlying Interaction
