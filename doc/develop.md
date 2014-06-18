@@ -174,9 +174,11 @@ super) as you see fit:
 
 To turn on multiple actions:
 
-    class PostController < APIController
-      handles: :create, :show, :update, :destroy
-    end
+````ruby
+  class PostController < APIController
+    handles: :create, :show, :update, :destroy
+  end
+````
 
 Or you can turn them all (including the [Specialized Actions](#specialized-actions)):
 
