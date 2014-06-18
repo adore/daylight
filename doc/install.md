@@ -41,3 +41,4 @@ Add this to +config\application.rb+:
 And mount it in your routes:
     mount Daylight::Documentation => '/docs/api'
 
+You will also need to include your client models in your application through Bundler or some other method.
