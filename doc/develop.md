@@ -86,7 +86,7 @@ correctly.  For example:
   ````ruby
   class Post
     has_many :comments
-    has_many :author, foreign_key: 'created_by_user_id', class_name: 'User'
+    has_many :author, foreign_key: 'created_by', class_name: 'User'
     has_many :commenters, -> { uniq }, through: :comments, class_name: 'User'
     has_many :suppressed_comments, -> { where(spam: true) }, class_name: 'Comment'
   end
@@ -329,6 +329,56 @@ In this case use `Daylight::APIController` to subclass from:
   ````
 
 ### Serializers
+
+Daylight relies heavily on
+[ActiveModelSerializers](https://github.com/rails-api/active_model_serializers)
+and most information on how to use and customize it can be found in their
+[README](https://github.com/rails-api/active_model_serializers/blob/master/README.md).
+
+You can serialize only the attributes you want to be public in your API.
+For example, `title` and `body` are exposed but there may be other internal
+attributes that do not get serialized:
+
+  ````ruby
+    class PostSerializer < ActiveModel::Serializer
+      attributes :title, :body
+    end
+  ````
+
+We encourage you to embed only ids to keep payloads down, `Daylight` will make
+additional requests for the associated objects when accessed:
+
+  ````ruby
+    class PostSerializer < ActiveModel::Serializer
+      embed :ids
+
+      attributes :title, :body
+
+      has_one :category
+      has_one :author, key: 'created_by'
+    end
+  ````
+
+> NOTE: `belongs_to` associations can be included using `has_one` in your
+> serializer
+
+There isn't any need for you to include your `has_many` associations in
+your serializer.  These collections will be looked up from the `Daylight`
+client in a seperate request.
+
+The serializer above will generate JSON like:
+
+  ````json
+    {
+      "post": {
+        "id": 283
+        "title": "100 Best Albums of 2014",
+        "body": "Here is my list...",
+        "category_id": 2
+        "created_by": 123
+      }
+    }
+  ````
 
 ### Routes
 
