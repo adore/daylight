@@ -12,6 +12,7 @@ to boldly go where we have not gone before.
 To better understand how a framework extends or alters the underlying Rails
 technology.  Here are some additional details on how `Daylight` was built:
 
-* [Framework Overview](framework.md)
-* [Build Environment](environment.md)
 * [Guiding Principles](principles.md)
+* [Build Environment](environment.md)
+* [Framework Overview](framework.md)
+* [Daylight Benchmarks](benchmarks.md)
