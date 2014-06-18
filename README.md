@@ -74,13 +74,13 @@ More information can be found in the [Daylight Users Guide](doc/guide.md).
 2. On your server, add a rails initializer:
 
     ````ruby
-        require 'daylight/server'
+    require 'daylight/server'
     ````
 
 3. On your client, setup your API:
 
     ````ruby
-      Daylight::API.setup!(endpoint: 'http://localhost/')
+    Daylight::API.setup!(endpoint: 'http://localhost/')
     ````
 
 4. Use your client models to query your API!
