@@ -76,7 +76,7 @@ Once the client is setup you can do the following:
   post.save
   ````
 
-> NOTE: ActiveResource looks up associations using foriegn keys but with
+> INFO: ActiveResource looks up associations using foriegn keys but with
 > Daylight you can call the associations defined on your model directly.
 
 This is especially useful when you wish to preserve the richness of options on
@@ -269,7 +269,7 @@ actions:
 
 They are also included when specifying `handles :all`.
 
-> NOTE: To understand how `root` option is being used in both `assoicated`
+> INFO: To understand how `root` option is being used in both `assoicated`
 > and `remoted` please refer to the section on [Symantic Data](#symantic-data)
 
 #### Customization
@@ -341,9 +341,12 @@ attributes that do not get serialized:
 
   ````ruby
     class PostSerializer < ActiveModel::Serializer
-      attributes :title, :body
+      attributes :id, :title, :body
     end
   ````
+
+> INFO: Make sure to include `:id` as an attribute so that `Daylight` will be
+> able to make updates to the models correctly.
 
 We encourage you to embed only ids to keep payloads down, `Daylight` will make
 additional requests for the associated objects when accessed:
@@ -352,14 +355,14 @@ additional requests for the associated objects when accessed:
     class PostSerializer < ActiveModel::Serializer
       embed :ids
 
-      attributes :title, :body
+      attributes :id, :title, :body
 
       has_one :category
       has_one :author, key: 'created_by'
     end
   ````
 
-> NOTE: `belongs_to` associations can be included using `has_one` in your
+> INFO: `belongs_to` associations can be included using `has_one` in your
 > serializer
 
 There isn't any need for you to include your `has_many` associations in
@@ -379,6 +382,16 @@ The serializer above will generate JSON like:
       }
     }
   ````
+
+There are 2 main additions Daylight adds to `ActiveModelSerializer` to enable
+functionality from the client:
+
+#### Through Associations
+
+
+
+#### Read Only Attributes
+
 
 ### Routes
 
