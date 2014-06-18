@@ -28,7 +28,6 @@ To better undertand Daylight's interactions, we define the following components:
   * [Request Params](#request-params)
   * [Symantic Data](#symantic-data)
   * [Response Metadata](#response-metadata)
-* [Framework Links](#framework-links)
 
 ## Expectations
 
