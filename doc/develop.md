@@ -22,7 +22,7 @@ To better undertand Daylight's interactions, we define the following components:
   * [Serializers](#serializers)
   * [Routes](#routes)
   * [Client](#client)
-* [Error Exposure](#error-exposure)
+* [Error Handling](#error-handling)
 * [Underlying Interaction](#underlying-interaction)
   * [Symantic URLs](#symantic-urls)
   * [Request Params](#request-params)
@@ -335,11 +335,11 @@ In this case use `Daylight::APIController` to subclass from:
 
 ### Client
 
-## Error Exposure
+## Error Handling
 
 A goal of Daylight is to offer better handling and messaging to the client when
 expected errors occur.  This will aid in development of both the API and when
-users of that API is having issues.
+users of that API are having issues.
 
 ### Validation Errors
 
@@ -368,10 +368,10 @@ unpermitted or missing attributes will be detected.
 > Future: it would be nice to know which paramter and if it was a required
 > parameter or an unpermitted one.
 
-Lets say created at is not permitted on the `PostController`:
+Lets say `created_at` is not permitted on the `PostController`:
   ````ruby
   post = API::Post.new(created_at: Time.now)
-  post.save             # false
+  post.save             # => false
   post.errors.messages  # => {:base=>["Unpermitted or missing attribute"]}
   ````
 
@@ -385,7 +385,8 @@ For example, given the same `Post` model above:
   ````ruby
   post = API::Post.new(foo: 'bar')
   post.save
-  #=> ActiveResource::BadRequest: Failed.  Response code = 400.  Response message = Bad Request.  Root Cause = unknown attribute: foo
+  #=> ActiveResource::BadRequest: Failed.  Response code = 400.
+      Response message = Bad Request.  Root Cause = unknown attribute: foo
   ````
 
 Similarly, Daylight raises errors on unknown keys, associations, scopes,
@@ -395,13 +396,15 @@ issued, not just on `save` actions.
 For example, when providing an incorrect condition:
   ````
   API::Post.find_by(foo: 'bar')
-  #=> ActiveResource::BadRequest: Failed.  Response code = 400.  Response message = Bad Request.  Root Cause = unknown key: foo
+  #=> ActiveResource::BadRequest: Failed.  Response code = 400.
+      Response message = Bad Request.  Root Cause = unknown key: foo
   ````
 If invalid statements are issued server-side they will be raised:
 
   ````ruby
   API::Post.find(1).limit(:foo)
-  #=> ActiveResource::BadRequest: Failed.  Response code = 400.  Response message = Bad Request.  Root Cause = invalid value for Integer(): "foo"
+  #=> ActiveResource::BadRequest: Failed.  Response code = 400.
+      Response message = Bad Request.  Root Cause = invalid value for Integer(): "foo"
   ````
 
 This is also useful developing and detecting errors in your client models
@@ -421,13 +424,16 @@ server-side, errors will be raised.
 
   ````ruby
   API::Post.published
-  #=> ActiveResource::BadRequest: Failed.  Response code = 400.  Response message = Bad Request.  Root Cause = unknown scope: published
+  #=> ActiveResource::BadRequest: Failed.  Response code = 400.
+      Response message = Bad Request.  Root Cause = unknown scope: published
 
   API::Post.by_popularirty
-  #=> ActiveResource::BadRequest: Failed.  Response code = 400.  Response message = Bad Request.  Root Cause = unknown remote: published
+  #=> ActiveResource::BadRequest: Failed.  Response code = 400.
+      Response message = Bad Request.  Root Cause = unknown remote: by_popularity
 
   API::Post.find(1).author
-  #=> ActiveResource::BadRequest: Failed.  Response code = 400.  Response message = Bad Request.  Root Cause = unknown association: author
+  #=> ActiveResource::BadRequest: Failed.  Response code = 400.
+      Response message = Bad Request.  Root Cause = unknown association: author
   ````
 
 ## Underlying Interaction
