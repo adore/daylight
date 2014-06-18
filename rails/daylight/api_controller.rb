@@ -52,6 +52,10 @@ class Daylight::APIController < ApplicationController
   API_ACTIONS = [:index, :create, :show, :update, :destroy, :associated, :remoted].freeze
   class_attribute :record_name, :collection_name, :model_name
 
+  alias_method :set_record_name,     :record_name=      #:nodoc:
+  alias_method :set_collection_name, :collection_name=  #:nodoc:
+  alias_method :set_model_name,      :model_name=       #:nodoc:
+
   ##
   # Ensure messaging when sending unknown attributes or improper SQL
   rescue_from ArgumentError,

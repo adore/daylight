@@ -108,9 +108,9 @@ using the model-based associations, because it:
 ### Controllers
 
 Controllers can be written without Daylight, but often times you must develop
-boilerplate code for index, create, show, update, and delete actions.  Also,
-you may chose controllers that are for the API and controllers that are for
-your application.
+boilerplate code for `index`, `create`, `show`, `update`, and `delete` actions.
+Also, you may chose controllers that are for the API and controllers that are
+for your application.
 
 Daylight simplifies building API controllers:
 
@@ -214,12 +214,12 @@ You can find more information on how to use these refinements in the
 
 ##### Remoted
 
-Any method is allowed to be called on the model by use of the `remoted` method
-added by `Daylight::Refiners`.  Which methods are allowed are defined in your
-[Routes](#routes).
+Any public method is allowed to be called on the model instance by use of the
+`remoted` method added by `Daylight::Refiners`.  Which public methods are
+allowed are defined in your [Routes](#routes).
 
 Remoted methods should return a record or collections of records so that they
-may be instanciated correctly and act as a proxy back to the API.
+may be instanciated correctly by the client and act as a proxy back to the API.
 
 On the controller, see it called by the (similarly named) `remoted` action:
 
@@ -229,20 +229,58 @@ On the controller, see it called by the (similarly named) `remoted` action:
       end
     end
 
-All of the specialize actions can be enabled on your controller like the REST
+All of the specialized actions can be enabled on your controller like the REST
 actions:
 
     class PostController < APIController
       handles :index, :associated, :remoted
     end
 
-These are also included when specifying `handles :all`.
+They are also included when specifying `handles :all`.
 
 > Note: To understand how `root` option is being used in both `assoicated`
 > and `remoted` please refer to the section on [Symantic Data](#symantic-data)
 
-
 #### Customization
+
+Behind the scenes, all the controller actions are looking up models based on
+its controller name by looking up the model based on the substring prior to
+the word 'Controller' (ie. when `PostController` is the controller name it
+determines the model name is `Post`).
+
+You may specify a different model to use:
+
+    class WelcomeController
+      set_model_name :post
+    end
+
+Member lookup and changes are saved in an instance variable based on the model
+name (ie. when `PostController` is the controller name the instance variable is
+called `@post`).  Use this instance variable in `create`, `show`, `update` and
+`destroy` actions.
+
+Collection lookups are saved in an instance varaible simply called
+`@collection`.  Use this instance variable in the specialized actions `index`,
+`associated`, and `remoted` actions.
+
+Both of these instance variables may be customized:
+
+    class PostController
+      set_record_name :result
+      set_collection_name :results
+    end
+
+> Note: Daylight calls the instance variables for collections of object
+> `@collection` because in the cases of `associated` and `remoted` actions the
+> may be any type of model instances.
+
+In all customizations can use a string, symbol, or constant as the value:
+
+    class PostController
+      set_model_name Post
+      set_record_name 'result'
+      set_collection_name :results
+    end
 
 #### Error Handling
 
