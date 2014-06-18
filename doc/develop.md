@@ -22,6 +22,7 @@ To better undertand Daylight's interactions, we define the following components:
   * [Serializers](#serializers)
   * [Routes](#routes)
   * [Client](#client)
+* [Error Exposure](#error-exposure)
 * [Underlying Interaction](#underlying-interaction)
   * [Symantic URLs](#symantic-urls)
   * [Request Params](#request-params)
@@ -209,13 +210,13 @@ models added by `Daylight::Refiners`
 
 On the controller, see it called on the `index` action:
 
-````ruby
+  ````ruby
   class PostController < APIController
     def index
       render json: Post.refine_by(params)
     end
   end
-````
+  ````
 
 ##### Associated
 
@@ -225,13 +226,13 @@ are defined in your [Routes](#routes).
 
 On the controller, see it called by the (similarly named) `associated` action:
 
-````ruby
+  ````ruby
   class PostController < APIController
     def associated
       render json: Post.associated(params), root: associated_params
     end
   end
-````
+  ````
 
 Associations can also be refined similarly to `index` where you can specify
 scopes, conditions, order, limit, and offset.
@@ -250,22 +251,22 @@ may be instanciated correctly by the client and act as a proxy back to the API.
 
 On the controller, see it called by the (similarly named) `remoted` action:
 
-````ruby
+  ````ruby
   class PostController < APIController
     def remoted
       render json: Post.remoted(params), root: remoted_params
     end
   end
-````
+  ````
 
 All of the specialized actions can be enabled on your controller like the REST
 actions:
 
-````ruby
+  ````ruby
   class PostController < APIController
     handles :index, :associated, :remoted
   end
-````
+  ````
 
 They are also included when specifying `handles :all`.
 
@@ -280,11 +281,11 @@ the controller name it determines the model name to be `Post`).
 
 You may specify a different model to use:
 
-````ruby
+  ````ruby
   class WelcomeController
     set_model_name :post
   end
-````
+  ````
 
 In `create`, `show`, `update` and `destroy` actions (member) results are stored
 in an instance variable.  The instance variable name is based on the model
@@ -296,12 +297,12 @@ in an instance variable simply called `@collection`
 
 Both of these instance variables may be customized:
 
-````ruby
+  ````ruby
   class PostController
     set_record_name :result
     set_collection_name :results
   end
-````
+  ````
 
 > Note: Daylight calls the instance variables for specialized actions
 >`@collection` because in `associated` and `remoted` actions the results may be
@@ -309,34 +310,125 @@ Both of these instance variables may be customized:
 
 In all customizations can use a string, symbol, or constant as the value:
 
-````ruby
+  ````ruby
   class PostController
     set_model_name Post
     set_record_name 'result'
     set_collection_name :results
   end
-````
+  ````
 
 Lastly, your application may already have an APIController and there could be
 a name collision.  Daylight will not use this constant if it's already defined.
 
 In this case use `Daylight::APIController` to subclass from:
 
-````ruby
+  ````ruby
   class PostController < Daylight::APIController
     handles :all
   end
-````
-
-#### Error Handling
-
-
+  ````
 
 ### Serializers
 
 ### Routes
 
 ### Client
+
+## Error Exposure
+
+A goal of Daylight is to offer better handling and messaging to the client when
+expected errors occur.  This will aid in development of both the API and when
+users of that API is having issues.
+
+### Validation Errors
+
+Daylight exposes validation errors on creates and updates.  Given a validation
+on a model:
+
+  ````ruby
+  class Post < ActiveRecord::Base
+    validates :title, presence: true
+  end
+  ````
+
+When saving this model from the client errors will be exposed similar to
+`ActiveRecord`:
+
+  ````ruby
+  post = API::Post.new
+  post.save             # => false
+  post.errors.messages  # => {:base=>["Title can't be blank"]}
+  ````
+
+With the introduction of and use of
+[Strong Parameters](http://guides.rubyonrails.org/action_controller_overview.html#strong-parameters)
+unpermitted or missing attributes will be detected.
+
+> Future: it would be nice to know which paramter and if it was a required
+> parameter or an unpermitted one.
+
+Lets say created at is not permitted on the `PostController`:
+  ````ruby
+  post = API::Post.new(created_at: Time.now)
+  post.save             # false
+  post.errors.messages  # => {:base=>["Unpermitted or missing attribute"]}
+  ````
+
+### Bad Requests
+
+Daylight will raise an error on unknown attributes.  This differes from
+`ActiveRecord` where it will be raised immediately because the error is
+detected by `APIController` during a `save` action.
+
+For example, given the same `Post` model above:
+  ````ruby
+  post = API::Post.new(foo: 'bar')
+  post.save
+  #=> ActiveResource::BadRequest: Failed.  Response code = 400.  Response message = Bad Request.  Root Cause = unknown attribute: foo
+  ````
+
+Similarly, Daylight raises errors on unknown keys, associations, scopes,
+or remoted methods.  The error will be raise as soon as the request is
+issued, not just on `save` actions.
+
+For example, when providing an incorrect condition:
+  ````
+  API::Post.find_by(foo: 'bar')
+  #=> ActiveResource::BadRequest: Failed.  Response code = 400.  Response message = Bad Request.  Root Cause = unknown key: foo
+  ````
+If invalid statements are issued server-side they will be raised:
+
+  ````ruby
+  API::Post.find(1).limit(:foo)
+  #=> ActiveResource::BadRequest: Failed.  Response code = 400.  Response message = Bad Request.  Root Cause = invalid value for Integer(): "foo"
+  ````
+
+This is also useful developing and detecting errors in your client models
+Given the client model:
+
+  ````ruby
+  class API::V1::Post < Daylight::API
+    scopes :published
+    remote :by_popularity
+
+    has_many :author, through: :associated
+  end
+  ````
+
+If neither `published`, `by_popularity`, nor `author` are not setup on the
+server-side, errors will be raised.
+
+  ````ruby
+  API::Post.published
+  #=> ActiveResource::BadRequest: Failed.  Response code = 400.  Response message = Bad Request.  Root Cause = unknown scope: published
+
+  API::Post.by_popularirty
+  #=> ActiveResource::BadRequest: Failed.  Response code = 400.  Response message = Bad Request.  Root Cause = unknown remote: published
+
+  API::Post.find(1).author
+  #=> ActiveResource::BadRequest: Failed.  Response code = 400.  Response message = Bad Request.  Root Cause = unknown association: author
+  ````
 
 ## Underlying Interaction
 
