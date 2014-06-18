@@ -71,13 +71,14 @@
                 %a{title: reflection.klass.name, href: "#{reflection.klass.name.downcase}.html"}= reflection.name
 
           - reflections = @model.reflection_names.grep /s$/
-          %h4 API Examples
-          %pre
-            ==/v1/#{@model.name.underscore.pluralize}/1/#{reflections.first}.json
+          - if reflections.present?
+            %h4 API Examples
+            %pre
+              ==/v1/#{@model.name.underscore.pluralize}/1/#{reflections.first}.json
 
-          %h4 Client Examples
-          %pre
-            == zone.#{reflections.first}
+            %h4 Client Examples
+            %pre
+              ==#{@model.name.underscore}.#{reflections.first}
 
       #client-examples.panel.panel-default
         .panel-heading
