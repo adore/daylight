@@ -44,7 +44,8 @@ mock.status
 #==> 201
 ```
 
-#### Each recorded request keeps some data to check against:
+Each recorded request keeps some data to check against:
+
 | Attribute       | Description                                                                                     |
 |-----------------|-------------------------------------------------------------------------------------------------|
 | resource        | The resouce name                                                                                |
