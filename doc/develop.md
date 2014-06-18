@@ -394,7 +394,7 @@ or remoted methods.  The error will be raise as soon as the request is
 issued, not just on `save` actions.
 
 For example, when providing an incorrect condition:
-  ````
+  ````ruby
   API::Post.find_by(foo: 'bar')
   #=> ActiveResource::BadRequest: Failed.  Response code = 400.
   #   Response message = Bad Request.  Root Cause = unknown key: foo
