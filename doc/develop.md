@@ -55,7 +55,7 @@ Models are built exactly as they are in Rails, no changes are neccessary.
 Through specifiecation on the routes, Daylight allows you to make scopes and
 methods available to the client.
 
-> Note: Daylight expects an model object or a collection when parsing results
+> NOTE: Daylight expects an model object or a collection when parsing results
 > from a model method.
 
 You can chose to allow models to be created, updated, and associated through
@@ -77,7 +77,7 @@ Once the client is setup you can do the following:
   post.save
   ````
 
-> Note: ActiveResource looks up associations using foriegn keys but with
+> NOTE: ActiveResource looks up associations using foriegn keys but with
 > Daylight you can call the associations defined on your model directly.
 
 This is especially useful when you wish to preserve the richness of options on
@@ -108,7 +108,7 @@ using the model-based associations, because it:
 * Uses the wrong lookup key (in through associations and foreign key option)
 * Conditions will not be supplied in the request
 
-> Note: Daylight includes `Daylight::Refiners` on all models that inheret from
+> NOTE: Daylight includes `Daylight::Refiners` on all models that inheret from
 > `ActiveRecord::Base`.  At this time there is no way to exclude this module
 > from any model.
 
@@ -126,7 +126,7 @@ Daylight simplifies building API controllers:
   end
   ````
 
-> Note: Any functionality built in `ApplicationController` will be available to
+> NOTE: Any functionality built in `ApplicationController` will be available to
 > your `APIController` subclasses.
 
 Since your controller is a subclass of `ActiveController::Base` continue to add
@@ -270,7 +270,7 @@ actions:
 
 They are also included when specifying `handles :all`.
 
-> Note: To understand how `root` option is being used in both `assoicated`
+> NOTE: To understand how `root` option is being used in both `assoicated`
 > and `remoted` please refer to the section on [Symantic Data](#symantic-data)
 
 #### Customization
@@ -304,7 +304,7 @@ Both of these instance variables may be customized:
   end
   ````
 
-> Note: Daylight calls the instance variables for specialized actions
+> NOTE: Daylight calls the instance variables for specialized actions
 >`@collection` because in `associated` and `remoted` actions the results may be
 > any type of model instances.
 
@@ -365,7 +365,7 @@ With the introduction of and use of
 [Strong Parameters](http://guides.rubyonrails.org/action_controller_overview.html#strong-parameters)
 unpermitted or missing attributes will be detected.
 
-> Future: it would be nice to know which paramter and if it was a required
+> FUTURE: it would be nice to know which paramter and if it was a required
 > parameter or an unpermitted one.
 
 Lets say `created_at` is not permitted on the `PostController`:
