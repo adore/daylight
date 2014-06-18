@@ -172,8 +172,8 @@ The serializer above will generate JSON like:
   ````
 
 There are 2 main additions Daylight adds to `ActiveModelSerializer` to enable
-functionality for the client.  They are through associations and read only
-attributes.
+functionality for the client.  They are _through associations_ and _read only
+attributes_.
 
 #### Through Associations
 
