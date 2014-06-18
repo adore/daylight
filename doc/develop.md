@@ -101,8 +101,8 @@ using the model-based associations, because it:
 * Uses the wrong lookup key (in through associations and foreign key option)
 * Conditions will not be supplied in the request
 
-> Note: Daylight includes Daylight::Refiners on all models that inheret from
-> ActiveRecord::Base.  At this time there is no way to exclude this module
+> Note: Daylight includes `Daylight::Refiners` on all models that inheret from
+> `ActiveRecord::Base`.  At this time there is no way to exclude this module
 > from any model.
 
 ### Controllers
@@ -169,6 +169,43 @@ For your reference, you can review the code of the equivalent actions in
 [Controller Actions](actions.md)
 
 ####  Specialized Actions
+
+Much of Daylight's features are offered through specialized controller actions.
+These specialized actions are what enables:
+* query refinements
+* model associations
+* remote method execution
+
+You can refine queries of a resources collection by scopes, conditions (called
+filters in Daylight), order, limit, and offset.
+
+This is accomplished with a method called `refine_by` which is added to your
+models added by `Daylight::Refiners` You can see it called by the `index` action:
+
+    class PostController < APIController
+      def index
+        render json: Post.refine_by(params)
+      end
+    end
+
+Associations called on the model is accomplished using a method called
+`associated` added by `Daylight::Refiners`.
+Which associations are allowed are defined in your [Routes](#routes)
+
+This is done with a helper method called `associated`
+
+You can see `associated:
+
+    def associated
+      render json: self.collection = model.associated(params), root: associated_params
+    end
+
+You can find more information on how to use these refinements in the
+[Daylight Users Guide](guide.md)
+
+
+
+#### Customization
 
 #### Error Handling
 

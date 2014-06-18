@@ -90,7 +90,7 @@ Ah, but we have to develop our API and client models:
     * [Installation Steps](doc/install.md)
     * [Daylight Users Guide](doc/guide.md)
     * [API Developer Guide](doc/develop.md)
-    * [Testing Your API](doc/testing.md)
+    * [Testing Your API](doc/api_mock.md)
 
 ## License
 
