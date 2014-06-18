@@ -6,22 +6,43 @@ Daylight offers a simple mocking framework that simplifies the process of writin
 
 Works with both Rspec and TestUnit/Minitest.
 
-To start add this to your test_helper.rb or spec_helper.rb:
+To start add this to your +test_helper.rb+ or +spec_helper.rb+:
 
-    Daylight::Mock.setup
+```ruby
+Daylight::Mock.setup
+```
 
-The mock will simulate responses to calls so you don't have to stub out anything, especially not the HTTP calls themselves.
+The mock will simulate valid JSON responses to calls so you don't have to stub out anything, especially not the HTTP calls themselves.
 At the end of the test you can examine the calls that were made by calling *daylight_mock*.
 
-For example, this call returns a list of all the updated calls made on a *Host* object:
+For example, say you want to test code that updates a User object.
 
-    daylight_mock.updated(:host)
+```ruby
+user = API::V1::User.find(1)
+user.title = 'Grand Poobah'
+user.save
+```
 
-To get only the last request use:
+This call to +daylight_mock+ returns a list of all the update calls made on a *User* object:
+```ruby
+daylight_mock.updated(:user)
+```
 
-    daylight_mock.last_updated(:host)
+To get only the last update use:
+```ruby
+daylight_mock.last_updated(:user)
+```
 
-Supported Calls: *created, updated, associated, indexed, shown, deleted*
+Here's some things you can do with the recorded request:
+```ruby
+mock = daylight_mock.last_updated(:user)
+
+mock.post_data
+#==> {"user"=>{"id"=>1, "title"=>"Grand Poobah"}}
+
+mock.status
+#==> 201
+```
 
 #### Each recorded request keeps some data to check against:
 resource:: The resouce name
@@ -36,11 +57,15 @@ target_object:: The target object response if available (e.g. the response objec
 request:: The raw request object
 response:: The raw response object
 
+Supported Calls: *created, updated, associated, indexed, shown, deleted*
 
-#### Examples
 
-    daylight_mock.updated(:post).count.must_equal 2
+#### More Examples
 
-    daylight_mock.last_updated(:post).target_object.node_type.must_equal 'wibble'
+```ruby
+daylight_mock.updated(:post).count.must_equal 2
 
-    daylight_mock.last_created(:user).status.must_equal 201
+daylight_mock.last_updated(:post).target_object.node_type.must_equal 'wibble'
+
+daylight_mock.last_created(:user).status.must_equal 201
+```
