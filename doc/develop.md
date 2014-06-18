@@ -253,14 +253,13 @@ You may specify a different model to use:
       set_model_name :post
     end
 
-Member lookup and changes are saved in an instance variable based on the model
+In `create`, `show`, `update` and `destroy` actions (member) results are stored
+in an instance variable.  The instance variable name is based on the model
 name (ie. when `PostController` is the controller name the instance variable is
-called `@post`).  Use this instance variable in `create`, `show`, `update` and
-`destroy` actions.
+called `@post`).
 
-Collection lookups are saved in an instance varaible simply called
-`@collection`.  Use this instance variable in the specialized actions `index`,
-`associated`, and `remoted` actions.
+In `index`, `associated`, and `remoted` specialized actions results are stored
+in an instance variable simply called `@collection`
 
 Both of these instance variables may be customized:
 
@@ -269,9 +268,9 @@ Both of these instance variables may be customized:
       set_collection_name :results
     end
 
-> Note: Daylight calls the instance variables for collections of object
-> `@collection` because in the cases of `associated` and `remoted` actions the
-> may be any type of model instances.
+> Note: Daylight calls the instance variables for specialized actions
+>`@collection` because in `associated` and `remoted` actions the results may be
+> any type of model instances.
 
 In all customizations can use a string, symbol, or constant as the value:
 
@@ -282,6 +281,8 @@ In all customizations can use a string, symbol, or constant as the value:
     end
 
 #### Error Handling
+
+
 
 ### Serializers
 
