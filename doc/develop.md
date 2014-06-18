@@ -445,12 +445,3 @@ server-side, errors will be raised.
 ### Symantic Data
 
 ### Resposne Metadata
-
-## Framework Links
-
-To better understand how a framework extends or alters the underlying Rails
-technology.  Here are some additional details on how Daylight was built:
-
-* [Framework Overview](framework.md)
-* [Build Environment](environment.md)
-* [Guiding Principles](principles.md)
