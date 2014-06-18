@@ -9,13 +9,13 @@ describe Daylight::Collection do
   end
 
   before do
-    FakeWeb.register_uri(:get, %r{#{CollectionTestClass.site}}, body: [].to_json)
+    stub_request(:get, %r{#{CollectionTestClass.site}}).to_return(body: [].to_json)
   end
 
   describe :metadata do
     before do
       data = { collection: [{name: 'one'}, {name: 'two'}], meta: {data: 'baz'} }
-      FakeWeb.register_uri(:get, %r{#{CollectionTestClass.site}}, body: data.to_json)
+      stub_request(:get, %r{#{CollectionTestClass.site}}).to_return(body: data.to_json)
     end
 
     it 'is retrieved before parsing' do
@@ -37,7 +37,7 @@ describe Daylight::Collection do
     describe 'with results' do
       before do
         data = [{name: 'one'}, {name: 'two'}]
-        FakeWeb.register_uri(:get, %r{#{CollectionTestClass.site}}, body: data.to_json)
+        stub_request(:get, %r{#{CollectionTestClass.site}}).to_return(body: data.to_json)
       end
 
       it 'returns the first result' do
@@ -106,7 +106,7 @@ describe Daylight::Collection do
     describe 'with results' do
       before do
         data = [{name: 'one'}, {name: 'two'}]
-        FakeWeb.register_uri(:get, %r{#{CollectionTestClass.site}}, body: data.to_json)
+        stub_request(:get, %r{#{CollectionTestClass.site}}).to_return(body: data.to_json)
       end
 
       it 'returns the first result' do
@@ -119,7 +119,7 @@ describe Daylight::Collection do
     describe 'with errors' do
       before do
         errors = {errors: {status: ["can't be blank", "is not included in the list"]} }
-        FakeWeb.register_uri(:post, %r{#{CollectionTestClass.site}}, body: errors.to_json, status: 422)
+        stub_request(:post, %r{#{CollectionTestClass.site}}).to_return(body: errors.to_json, status: 422)
       end
 
       it 'returns an unsaved instance with errors' do
@@ -142,7 +142,7 @@ describe Daylight::Collection do
     describe 'with create' do
       before do
         resource = {id: 1, name: 'one'}
-        FakeWeb.register_uri(:post, %r{#{CollectionTestClass.site}}, body: resource.to_json, status: 201)
+        stub_request(:post, %r{#{CollectionTestClass.site}}).to_return(body: resource.to_json, status: 201)
       end
 
       it 'returns a saved instance' do

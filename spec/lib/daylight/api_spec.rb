@@ -95,7 +95,7 @@ describe Daylight::API do
         }
       }
 
-      FakeWeb.register_uri(:get, %r{#{TestDescendant.site}}, body: data.to_json)
+      stub_request(:get, %r{#{TestDescendant.site}}).to_return(body: data.to_json)
     end
 
     it "does not objectify a known reflection's attributes" do
@@ -127,7 +127,7 @@ describe Daylight::API do
         meta: { read_only: { test_descendant: ["immutable"] } }
       }
 
-      FakeWeb.register_uri(:get, %r{#{TestDescendant.site}}, body: data.to_json)
+      stub_request(:get, %r{#{TestDescendant.site}}).to_return(body: data.to_json)
     end
 
     it "is accessible" do

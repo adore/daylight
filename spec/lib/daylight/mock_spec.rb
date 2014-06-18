@@ -14,18 +14,6 @@ describe Daylight::Mock do
   # All clients will do this in their spec_helper.rb/test_helper.rb
   Daylight::Mock.setup
 
-  # Fakeweb and Webmock conflict with each other, so we only enable
-  # WebMock durning these tests.
-  WebMock.disable!
-
-  before do
-    WebMock.enable!
-  end
-
-  after do
-    WebMock.disable!
-  end
-
   describe 'return values' do
     describe 'show' do
       it "returns a single object of the correct type" do

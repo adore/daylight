@@ -28,7 +28,7 @@ describe Daylight::ResourceProxy do
   before do
     data = [{name: 'one'}, {name: 'two'}]
     [RelatedProxyTestClass, ProxyTestClass].each do |clazz|
-      FakeWeb.register_uri(:get, %r{#{clazz.site}}, body: data.to_json)
+      stub_request(:get, %r{#{clazz.site}}).to_return(body: data.to_json)
     end
   end
 
@@ -78,16 +78,16 @@ describe Daylight::ResourceProxy do
   end
 
   it "can reload the records" do
-    FakeWeb.clean_registry
+    WebMock.reset!
     data = [{name: 'one'}, {name: 'two'}]
-    FakeWeb.register_uri(:get, %r{#{ProxyTestClass.site}}, :body => data.to_json)
+    stub_request(:get, %r{#{ProxyTestClass.site}}).to_return(body: data.to_json)
 
     proxy = ProxyTestClass.foo
     results = ProxyTestClass.foo.load
 
-    FakeWeb.clean_registry
+    WebMock.reset!
     data = [{name: 'one'}, {name: 'two'}, {name: 'three'}]
-    FakeWeb.register_uri(:get, %r{#{ProxyTestClass.site}}, :body => data.to_json)
+    stub_request(:get, %r{#{ProxyTestClass.site}}).to_return(body: data.to_json)
 
     results.should_not == proxy.reload
     results.count.should == 2

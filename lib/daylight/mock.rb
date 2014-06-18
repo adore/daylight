@@ -1,5 +1,4 @@
 require 'rack'
-require 'fakeweb'
 
 ##
 # Simple mocking framework that simplifies the process of writing tests for code that uses the Daylight client library.

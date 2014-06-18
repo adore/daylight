@@ -27,7 +27,7 @@ describe Daylight::Associations do
     before do
       data = [{name: 'one'}, {name: 'two'}]
       [RelatedTestClass, AssociationsTestClass].each do |clazz|
-        FakeWeb.register_uri(:get, %r{#{clazz.site}}, body: data.to_json)
+        stub_request(:get, %r{#{clazz.site}}).to_return(body: data.to_json)
       end
     end
 
@@ -49,7 +49,7 @@ describe Daylight::Associations do
     it "hits the association api endpoint" do
       AssociationsTestClass.new.related_test_classes.load
 
-      FakeWeb.last_request.path.should == "/v1/associations_test_classes/123/related_test_classes.json"
+      a_request(:get, "http://daylight.test/v1/associations_test_classes/123/related_test_classes.json").should have_been_made
     end
 
     it "caches the results of the association" do
@@ -98,7 +98,7 @@ describe Daylight::Associations do
     before do
       data = { parent: {name: 'three'}}
       [RelatedTestClass, AssociationsTestClass].each do |clazz|
-        FakeWeb.register_uri(:get, %r{#{clazz.site}}, body: data.to_json)
+        stub_request(:get, %r{#{clazz.site}}).to_return(body: data.to_json)
       end
     end
 
@@ -156,10 +156,10 @@ describe Daylight::Associations do
 
       related_data = {id: nil, name: 'related'}
 
-      FakeWeb.register_uri(:get, %r{#{AssociationsTestClass.element_path(1)}}, body: association_data.to_json)
-      FakeWeb.register_uri(:get, %r{#{AssociationsTestClass.element_path(2)}}, body: embedded_data.to_json)
-      FakeWeb.register_uri(:get, %r{#{RelatedTestClass.element_path(456)}},    body: related_data.merge(id: 456).to_json)
-      FakeWeb.register_uri(:get, %r{#{RelatedTestClass.element_path(3)}},      body: related_data.merge(id: 3).to_json)
+      stub_request(:get, %r{#{AssociationsTestClass.element_path(1)}}).to_return(body: association_data.to_json)
+      stub_request(:get, %r{#{AssociationsTestClass.element_path(2)}}).to_return(body: embedded_data.to_json)
+      stub_request(:get, %r{#{RelatedTestClass.element_path(456)}}).to_return(body: related_data.merge(id: 456).to_json)
+      stub_request(:get, %r{#{RelatedTestClass.element_path(3)}}).to_return(body: related_data.merge(id: 3).to_json)
     end
 
     it 'still fetches the parent object' do
@@ -205,10 +205,10 @@ describe Daylight::Associations do
     before do
       associated = { id: nil, name: 'Hardy', associate_attributes: { id: 100 } }
       related    = { id: 100, name: 'Laurel' }
-      FakeWeb.register_uri(:get, %r{#{AssociationsTestClass.element_path(1)}}, body: associated.to_json)
+      stub_request(:get, %r{#{AssociationsTestClass.element_path(1)}}).to_return(body: associated.to_json)
       # It uses the filter method instead of default ActiveResource behavior
       # http://daylight.test/v1/related_test_classes?filters%5Bassociations_test_class_id%5D=123&limit=1
-      FakeWeb.register_uri(:get, %r{filters%5Bassociations_test_class_id%5D=123}, body: [related].to_json)
+      stub_request(:get, %r{filters%5Bassociations_test_class_id%5D=123}).to_return(body: [related].to_json)
     end
 
     it 'still fetches the associate object' do
@@ -244,7 +244,7 @@ describe Daylight::Associations do
   describe :remote do
 
     def respond_with(data)
-      FakeWeb.register_uri(:get, %r{#{AssociationsTestClass.site}}, body: data.to_json)
+      stub_request(:get, %r{#{AssociationsTestClass.site}}).to_return(body: data.to_json)
     end
 
     let(:subject) { AssociationsTestClass.new }

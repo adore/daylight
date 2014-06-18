@@ -10,7 +10,7 @@ describe Daylight do
 
   before do
     data = [{name: 'one'}, {name: 'two'}]
-    FakeWeb.register_uri(:get, %r{#{RefinementTestClass.site}}, :body => data.to_json)
+    stub_request(:get, %r{#{RefinementTestClass.site}}).to_return(body: data.to_json)
   end
 
   describe Daylight::Refinements do
