@@ -371,11 +371,11 @@ The serializer above will generate JSON like:
   ````json
     {
       "post": {
-        "id": 283
+        "id": 283,
         "title": "100 Best Albums of 2014",
         "body": "Here is my list...",
-        "category_id": 2
-        "created_by": 123
+        "category_id": 2,
+        "created_by": 101
       }
     }
   ````
