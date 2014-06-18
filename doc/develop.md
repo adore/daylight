@@ -119,7 +119,9 @@ Daylight relies heavily on
 and most information on how to use and customize it can be found in their
 [README](https://github.com/rails-api/active_model_serializers/blob/master/README.md).
 
-You can serialize only the attributes you want to be public in your API.
+Serialize only the attributes you want to be public in your API.  This allows
+you to have a separation between the model data and the API data.
+
 For example, `title` and `body` are exposed but there may be other internal
 attributes that do not get serialized:
 
@@ -168,13 +170,13 @@ The serializer above will generate JSON like:
   ````
 
 There are 2 main additions Daylight adds to `ActiveModelSerializer` to enable
-functionality from the client:
+functionality for the client.
 
 #### Through Associations
 
 In Rails you can setup your model to have a `has_one :through`.  This is a
-special case for `ActiveModelSerializers` and downstream to the `Daylight`
-client.  For example:
+special case for `ActiveModelSerializers` and for the `Daylight` client.  For
+example if your model has associations setup like so:
 
   ````ruby
     class Post < ActiveRecord::Base
@@ -186,7 +188,7 @@ client.  For example:
 > INFO: Rails does not have `belongs_to :through` associations
 
 To configure the `PostSerializer` to correctly use this through association
-set it up like similarly to your model, like so:
+set it up like similarly to your model:
 
   ````ruby
     class PostSerializer < ActiveModel::Serializer
@@ -217,26 +219,27 @@ to use to lookup the association:
     }
   ````
 
-There looks like some duplication in the JSON payload, but they are used for
-different purposes.
+There looks like some duplication in the JSON payload, but blog_id
+and blog_attributs["id"] are used for different purposes.
 
-    ````json
-      API::Post.first.blog      #=> uses "blog_id"
-      API::Post.first.company   #=> uses "blog_attributes"
-    ````
+  ````ruby
+    API::Post.first.blog      #=> uses "blog_id"
+    API::Post.first.company   #=> uses "blog_attributes"
+  ````
 
 > INFO: `blog_attributes` are also used for `accepts_nested_attributes_for`
 > mechansism.
 
 #### Read Only Attributes
 
-There are cases when you want to expose data from the model as Read Only
-attributes.  These cases are when the attribute is:
+There are cases when you want to expose data from the model as read only
+attributes where they cannot be updatedd.  These cases are when the attribute
+is:
 * Evaluated and not stored in the database
-* Computed and stored into the database
+* Stored into the database only when computed
 * Readable but should not be updated
 
-Here we have a `Post` object that does all three things assuming there are
+Here we have a `Post` object that does all three things. Assume there are
 `updated_at` and `created_at` attributes as well.
 
   ````ruby
@@ -258,24 +261,25 @@ To configure the `PostSerializer` to mark these attributes as read only:
       embed :ids
 
       attributes :id, :title, :body
-      read_only: :created_at, :updated_at, :slug, :published?
+      read_only :created_at, :updated_at, :slug, :published?
     end
   ````
 
-These attributes will be marked as read only in the object JSON's
-special [Metadata](#resposne-metadata) section.
+These attributes will be marked as read only in a special
+[Metadata](#resposne-metadata) section in the object's JSON.
 
 The client will be able to read each of these values but will raise a
-`NoMethodError` when attempting to write them.
+`NoMethodError` when attempting to write to them.
 
   ````ruby
     post = API::Post.first
-    post.created_at #=> "2014-05-02T19:58:09.248Z"
-    post.slug       #=> "100-best-albums-of-2014"
-    post.published? #=> true
+    post.created_at       #=> "2014-05-02T19:58:09.248Z"
+    post.slug             #=> "100-best-albums-of-2014"
+    post.published?       #=> true
 
     post.slug = '100-best-albums-of-all-time'
     #=> NoMethodError: Cannot set read_only attribute: display_name
+  ````
 
 Because these attributes are read only, the client will exclude them from
 being sent when the object is saved.
@@ -286,7 +290,7 @@ being sent when the object is saved.
   ````
 
 In this case `published?`, `slug`, `created_at`, and `updated_at` are never
-sent in the POST or PUT/PATCH.
+sent in a PUT update.
 
 ### Controllers
 
