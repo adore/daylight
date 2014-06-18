@@ -1,56 +1,56 @@
 # Controller Actions
 
 ````ruby
-    class PostController < APIController
+class PostController < APIController
 
-      # GET /posts.json
-      #
-      def index
-        render json: Post.refine_by(params)
-      end
+  # GET /posts.json
+  #
+  def index
+    render json: Post.refine_by(params)
+  end
 
 
-      # POST /posts.json
-      #
-      def create
-        @post = Post.new(params[:post])
-        @post.save!
+  # POST /posts.json
+  #
+  def create
+    @post = Post.new(params[:post])
+    @post.save!
 
-        render json: @post, status: :created, location: @post
-      end
+    render json: @post, status: :created, location: @post
+  end
 
-      # GET /posts/1.json
-      #
-      def show
-        render json: Post.find(params[:id])
-      end
+  # GET /posts/1.json
+  #
+  def show
+    render json: Post.find(params[:id])
+  end
 
-      # PATCH/PUT /posts/1.json
-      #
-      def update
-        Post.find(params[:id]).update!(params[:post])
+  # PATCH/PUT /posts/1.json
+  #
+  def update
+    Post.find(params[:id]).update!(params[:post])
 
-        head :no_content
-      end
+    head :no_content
+  end
 
-      # DELETE /posts/1.json
-      #
-      def destroy
-        Post.find(params[:id]).destroy
+  # DELETE /posts/1.json
+  #
+  def destroy
+    Post.find(params[:id]).destroy
 
-        head :no_content
-      end
+    head :no_content
+  end
 
-      # GET /posts/1/comments.json
-      #
-      def associated
-        render json: Post.associated(params), root: associated_params
-      end
+  # GET /posts/1/comments.json
+  #
+  def associated
+    render json: Post.associated(params), root: associated_params
+  end
 
-      # GET /posts/1/all_authorized_users.json
-      #
-      def remoted
-        render json: Post.remoted(params), root: remoted_params
-      end
-    end
+  # GET /posts/1/all_authorized_users.json
+  #
+  def remoted
+    render json: Post.remoted(params), root: remoted_params
+  end
+end
 ````

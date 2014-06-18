@@ -60,17 +60,21 @@ methods available to the client.
 You can chose to allow models to be created, updated, and associated through
 a "parent" model using the `accepts_nested_attributes_for` mechansism.
 
-      class Post < ActiveRecord::Base
-        has_many :comments
+````ruby
+  class Post < ActiveRecord::Base
+    has_many :comments
 
-        accepts_nested_attributes_for :comments
-      end
+    accepts_nested_attributes_for :comments
+  end
+````
 
 Once the client is setup you can do the following:
 
-    post = API::Post.find(1)
-    post << API::Comment.new(text: "This is an awesome post")
-    post.save
+````ruby
+  post = API::Post.find(1)
+  post << API::Comment.new(text: "This is an awesome post")
+  post.save
+````
 
 > Note: ActiveResource looks up associations using foriegn keys but with
 > Daylight you can call the associations defined on your model directly.
@@ -79,12 +83,14 @@ This is especially useful when you wish to preserve the richness of options on
 your associations that are neccessary for your application to function
 correctly.  For example:
 
-    class Post
-      has_many :comments
-      has_many :author, foreign_key: 'created_by_user_id', class_name: 'User'
-      has_many :commenters, -> { uniq }, through: :comments, class_name: 'User'
-      has_many :suppressed_comments, -> { where(spam: true) }, class_name: 'Comment'
-    end
+````ruby
+  class Post
+    has_many :comments
+    has_many :author, foreign_key: 'created_by_user_id', class_name: 'User'
+    has_many :commenters, -> { uniq }, through: :comments, class_name: 'User'
+    has_many :suppressed_comments, -> { where(spam: true) }, class_name: 'Comment'
+  end
+````
 
 Here we have 4 examples where using the model associations are neccesary.  When
 there is:
@@ -114,8 +120,10 @@ for your application.
 
 Daylight simplifies building API controllers:
 
-    class PostController < APIController
-    end
+````ruby
+  class PostController < APIController
+  end
+````
 
 > Note: Any functionality built in `ApplicationController` will be available to
 > your `APIController` subclasses.
@@ -131,32 +139,38 @@ turned off by default so what is exposed is determined by the developer.
 
 For example, to turn on `show` action:
 
-    class PostController < APIController
-      handles :show
-    end
+````ruby
+  class PostController < APIController
+    handles :show
+  end
+````
 
 This is equivalent to;
 
-    class PostController < APIController
-      def show
-        render json: Post.find(params[:id])
-      end
+````ruby
+  class PostController < APIController
+    def show
+      render json: Post.find(params[:id])
     end
+  end
+````
 
 Daylight uses the name of the controller to determine the related model to use.
 Also, the `primary_key` name is retrived from that determined model.  In fact,
 all of the actions are just ruby methods, so you can overwrite them (and call
 super) as you see fit:
 
-    class PostController < APIController
-      handles :show
+````ruby
+  class PostController < APIController
+    handles :show
 
-      def show
-        super
+    def show
+      super
 
-        @post.update_attributes(:last_viewed_at, Time.now)
-      end
+      @post.update_attributes(:last_viewed_at, Time.now)
     end
+  end
+````
 
 To turn on multiple actions:
 
@@ -166,9 +180,11 @@ To turn on multiple actions:
 
 Or you can turn them all (including the [Specialized Actions](#specialized-actions)):
 
-    class PostController < APIController
-      handles: :all
-    end
+````ruby
+  class PostController < APIController
+    handles: :all
+  end
+````
 
 For your reference, you can review the code of the equivalent actions in
 [Controller Actions](actions.md)
@@ -191,11 +207,13 @@ models added by `Daylight::Refiners`
 
 On the controller, see it called on the `index` action:
 
-    class PostController < APIController
-      def index
-        render json: Post.refine_by(params)
-      end
+````ruby
+  class PostController < APIController
+    def index
+      render json: Post.refine_by(params)
     end
+  end
+````
 
 ##### Associated
 
@@ -205,11 +223,13 @@ are defined in your [Routes](#routes).
 
 On the controller, see it called by the (similarly named) `associated` action:
 
-    class PostController < APIController
-      def associated
-        render json: Post.associated(params), root: associated_params
-      end
+````ruby
+  class PostController < APIController
+    def associated
+      render json: Post.associated(params), root: associated_params
     end
+  end
+````
 
 Associations can also be refined similarly to `index` where you can specify
 scopes, conditions, order, limit, and offset.
@@ -228,18 +248,22 @@ may be instanciated correctly by the client and act as a proxy back to the API.
 
 On the controller, see it called by the (similarly named) `remoted` action:
 
-    class PostController < APIController
-      def remoted
-        render json: Post.remoted(params), root: remoted_params
-      end
+````ruby
+  class PostController < APIController
+    def remoted
+      render json: Post.remoted(params), root: remoted_params
     end
+  end
+````
 
 All of the specialized actions can be enabled on your controller like the REST
 actions:
 
-    class PostController < APIController
-      handles :index, :associated, :remoted
-    end
+````ruby
+  class PostController < APIController
+    handles :index, :associated, :remoted
+  end
+````
 
 They are also included when specifying `handles :all`.
 
@@ -254,9 +278,11 @@ the controller name it determines the model name to be `Post`).
 
 You may specify a different model to use:
 
-    class WelcomeController
-      set_model_name :post
-    end
+````ruby
+  class WelcomeController
+    set_model_name :post
+  end
+````
 
 In `create`, `show`, `update` and `destroy` actions (member) results are stored
 in an instance variable.  The instance variable name is based on the model
@@ -268,10 +294,12 @@ in an instance variable simply called `@collection`
 
 Both of these instance variables may be customized:
 
-    class PostController
-      set_record_name :result
-      set_collection_name :results
-    end
+````ruby
+  class PostController
+    set_record_name :result
+    set_collection_name :results
+  end
+````
 
 > Note: Daylight calls the instance variables for specialized actions
 >`@collection` because in `associated` and `remoted` actions the results may be
@@ -279,20 +307,24 @@ Both of these instance variables may be customized:
 
 In all customizations can use a string, symbol, or constant as the value:
 
-    class PostController
-      set_model_name Post
-      set_record_name 'result'
-      set_collection_name :results
-    end
+````ruby
+  class PostController
+    set_model_name Post
+    set_record_name 'result'
+    set_collection_name :results
+  end
+````
 
 Lastly, your application may already have an APIController and there could be
 a name collision.  Daylight will not use this constant if it's already defined.
 
 In this case use `Daylight::APIController` to subclass from:
 
-    class PostController < Daylight::APIController
-      handles :all
-    end
+````ruby
+  class PostController < Daylight::APIController
+    handles :all
+  end
+````
 
 #### Error Handling
 
