@@ -184,7 +184,7 @@ limit, and offset.
 This is accomplished with a method called `refine_by` which is added to your
 models added by `Daylight::Refiners`
 
-On the controller, see it called by the `index` action:
+On the controller, see it called on the `index` action:
 
     class PostController < APIController
       def index
@@ -194,9 +194,9 @@ On the controller, see it called by the `index` action:
 
 ##### Associated
 
-Associations called on the model is accomplished using a method called
-`associated` added by `Daylight::Refiners`.  Which associations allowed are
-defined in your [Routes](#routes).
+Associations called through the model instance is accomplished using a method
+called `associated` added by `Daylight::Refiners`.  Which associations allowed
+are defined in your [Routes](#routes).
 
 On the controller, see it called by the (similarly named) `associated` action:
 
@@ -206,8 +206,11 @@ On the controller, see it called by the (similarly named) `associated` action:
       end
     end
 
-Associations can also be refined like `index` where you can specify scopes,
-conditions, order, limit, and offset.
+Associations can also be refined similarly to `index` where you can specify
+scopes, conditions, order, limit, and offset.
+
+You can find more information on how to use these refinements in the
+[Daylight Users Guide](guide.md)
 
 ##### Remoted
 
@@ -238,8 +241,6 @@ These are also included when specifying `handles :all`.
 > Note: To understand how `root` option is being used in both `assoicated`
 > and `remoted` please refer to the section on [Symantic Data](#symantic-data)
 
-You can find more information on how to use these refinements in the
-[Daylight Users Guide](guide.md)
 
 #### Customization
 
