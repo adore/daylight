@@ -120,9 +120,14 @@ Daylight simplifies building API controllers:
 > Note: Any functionality built in `ApplicationController` will be available to
 > your `APIController` subclasses.
 
-You must "turn on" REST actions to allow for functionality.  All actions
-provided by Daylight are turned off by default so what is exposed is determined
-by the developer.
+Since your controller is a subclass of `ActiveController::Base` continue to add
+your own actions and routes for them as you do today in Rails.
+
+There are predefined actions provided by Daylight, that handle both REST
+actions and some specialized cases.
+
+You must "turn on" these prede actions.  Actions provided by Daylight are
+turned off by default so what is exposed is determined by the developer.
 
 For example, to turn on `show` action:
 
