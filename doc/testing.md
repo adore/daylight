@@ -45,17 +45,18 @@ mock.status
 ```
 
 #### Each recorded request keeps some data to check against:
-resource:: The resouce name
-path_parts:: A Struct of the request's path split into resource parts (version, resource, id and associated)
-path:: The request's path
-response_body:: Daylight::Mock's response to the request
-post_data:: The request's POST data
-params:: The request's parsed parameters
-action:: The request's action (:created, :updated, :associated...)
-status:: Response status
-target_object:: The target object response if available (e.g. the response object to a find(1) call)
-request:: The raw request object
-response:: The raw response object
+|---------------|------------------
+| resource      | The resouce name
+| path_parts    | A Struct of the request's path split into resource parts (version, resource, id and associated)
+| path          | The request's path
+| response_body | Daylight::Mock's response to the request
+| post_data     | The request's POST data
+| params        | The request's parsed parameters
+| action        | The request's action (:created, :updated, :associated...)
+| status        | Response status
+| target_object | The target object response if available (e.g. the response object to a find(1) call)
+| request       | The raw request object
+| response      | The raw response object
 
 Supported Calls: *created, updated, associated, indexed, shown, deleted*
 
