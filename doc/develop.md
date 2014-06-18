@@ -60,21 +60,21 @@ methods available to the client.
 You can chose to allow models to be created, updated, and associated through
 a "parent" model using the `accepts_nested_attributes_for` mechansism.
 
-````ruby
+  ````ruby
   class Post < ActiveRecord::Base
     has_many :comments
 
     accepts_nested_attributes_for :comments
   end
-````
+  ````
 
 Once the client is setup you can do the following:
 
-````ruby
+  ````ruby
   post = API::Post.find(1)
   post << API::Comment.new(text: "This is an awesome post")
   post.save
-````
+  ````
 
 > Note: ActiveResource looks up associations using foriegn keys but with
 > Daylight you can call the associations defined on your model directly.
@@ -83,14 +83,14 @@ This is especially useful when you wish to preserve the richness of options on
 your associations that are neccessary for your application to function
 correctly.  For example:
 
-````ruby
+  ````ruby
   class Post
     has_many :comments
     has_many :author, foreign_key: 'created_by_user_id', class_name: 'User'
     has_many :commenters, -> { uniq }, through: :comments, class_name: 'User'
     has_many :suppressed_comments, -> { where(spam: true) }, class_name: 'Comment'
   end
-````
+  ````
 
 Here we have 4 examples where using the model associations are neccesary.  When
 there is:
@@ -120,10 +120,10 @@ for your application.
 
 Daylight simplifies building API controllers:
 
-````ruby
+  ````ruby
   class PostController < APIController
   end
-````
+  ````
 
 > Note: Any functionality built in `ApplicationController` will be available to
 > your `APIController` subclasses.
@@ -139,28 +139,28 @@ turned off by default so what is exposed is determined by the developer.
 
 For example, to turn on `show` action:
 
-````ruby
+  ````ruby
   class PostController < APIController
     handles :show
   end
-````
+  ````
 
 This is equivalent to;
 
-````ruby
+  ````ruby
   class PostController < APIController
     def show
       render json: Post.find(params[:id])
     end
   end
-````
+  ````
 
 Daylight uses the name of the controller to determine the related model to use.
 Also, the `primary_key` name is retrived from that determined model.  In fact,
 all of the actions are just ruby methods, so you can overwrite them (and call
 super) as you see fit:
 
-````ruby
+  ````ruby
   class PostController < APIController
     handles :show
 
@@ -170,23 +170,23 @@ super) as you see fit:
       @post.update_attributes(:last_viewed_at, Time.now)
     end
   end
-````
+  ````
 
 To turn on multiple actions:
 
-````ruby
+  ````ruby
   class PostController < APIController
     handles: :create, :show, :update, :destroy
   end
-````
+  ````
 
 Or you can turn them all (including the [Specialized Actions](#specialized-actions)):
 
-````ruby
+  ````ruby
   class PostController < APIController
     handles: :all
   end
-````
+  ````
 
 For your reference, you can review the code of the equivalent actions in
 [Controller Actions](actions.md)
