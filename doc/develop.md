@@ -223,8 +223,8 @@ to use to lookup the association:
     }
   ````
 
-There looks like some duplication in the JSON payload, but blog_id
-and blog_attributs["id"] are used for different purposes.
+There's duplication in the JSON payload, but `post["blog_id"]` and
+`post["blog_attributs"]["id"]` are used for different purposes.
 
   ````ruby
     API::Post.first.blog      #=> uses "blog_id"
