@@ -40,6 +40,10 @@ module DaylightDocumentation::DocumentationHelper
     }
   end
 
+  def client_namespace
+    Daylight::API.namespace
+  end
+
   private
 
     def route_verb(route)

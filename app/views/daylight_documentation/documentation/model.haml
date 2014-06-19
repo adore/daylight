@@ -1,4 +1,4 @@
-- content_for :title, "#{Daylight::API.namespace} :: #{@model.name} API"
+- content_for :title, "#{client_namespace} :: #{@model.name} API"
 
 .container
 
@@ -34,7 +34,7 @@
 
           %h4 Client Examples
           %pre
-            == #{Daylight::API.namespace}::#{@model.name}.where(#{attribute}: 'foo')
+            == #{client_namespace}::#{@model.name}.where(#{attribute}: 'foo')
 
       - scopes = @model.registered_scopes
       - if scopes.present?
@@ -56,10 +56,10 @@
 
             %h4 Client Examples
             %pre
-              == #{Daylight::API.namespace}::#{@model.name}.#{scopes.first}
+              == #{client_namespace}::#{@model.name}.#{scopes.first}
               - if scopes.count > 1
                 %br<>
-                == #{Daylight::API.namespace}::#{@model.name}.#{scopes.first}.#{scopes.last}
+                == #{client_namespace}::#{@model.name}.#{scopes.first}.#{scopes.last}
 
       #associations.panel.panel-default
         .panel-heading
@@ -85,20 +85,20 @@
           %h3.panel-title Other Client Examples
         .panel-body
           %pre
-            #{Daylight::API.namespace}::#{@model.name}.first
+            #{client_namespace}::#{@model.name}.first
             %br<>
-            #{Daylight::API.namespace}::#{@model.name}.find(1)
+            #{client_namespace}::#{@model.name}.find(1)
             - reflection = @model.reflections.values.find {|ref| ref.macro == :has_many }
             - if reflection
               %br<>
-              #{Daylight::API.namespace}::#{@model.name}.find(1).#{reflection.name}
+              #{client_namespace}::#{@model.name}.find(1).#{reflection.name}
               %br<>
-              #{Daylight::API.namespace}::#{@model.name}.find(1).#{reflection.name} &lt;&lt; #{Daylight::API.namespace}::#{reflection.klass.name}.find(2)
+              #{client_namespace}::#{@model.name}.find(1).#{reflection.name} &lt;&lt; #{client_namespace}::#{reflection.klass.name}.find(2)
               - filter = reflection.klass.attribute_names.last
               %br<>
-              #{Daylight::API.namespace}::#{@model.name}.find(1).#{reflection.name}.where(#{filter}: filter_value)
+              #{client_namespace}::#{@model.name}.find(1).#{reflection.name}.where(#{filter}: filter_value)
               %br<>
-              #{Daylight::API.namespace}::#{@model.name}.find(1).#{reflection.name}.where(#{filter}: filter_value).first_or_create
+              #{client_namespace}::#{@model.name}.find(1).#{reflection.name}.where(#{filter}: filter_value).first_or_create
 
     #navigation.col-md-3
       %ul.nav.nav-pills.nav-stacked.affix
