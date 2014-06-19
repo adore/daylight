@@ -72,3 +72,13 @@ daylight_mock.last_updated(:post).target_object.node_type.must_equal 'wibble'
 
 daylight_mock.last_created(:user).status.must_equal 201
 ```
+
+## Integration Testing
+
+Keeping client and server code in sync is vitally important. It's all too easy for updates on the server to accidently break client integration. Any changes that are not backwards-compatible should induce a version change in the API. Though sometimes it is difficult to recognize when a change breaks some client endpoint.
+
+This is where integration testing comes in. We want to write tests that call methods on the client models, hit the rails application and eventually call the database, then all the way back up the chain.
+
+In the project that eventually spawned Daylight, we did this without spawning the rails application by using [Artifice](https://github.com/wycats/artifice). Artifice routes all Net::HTTP calls to a Rack application. Rails is a rack application! So now with one line of code, any call we make to our Daylight client library hits the Rails application without having to spin up a server.
+
+This requires the client and server code to reside in the same place, or you can include your client gem, or directory using Bundler as a test dependency.
