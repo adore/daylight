@@ -30,7 +30,7 @@
           - attribute = @model.attribute_names.second
           %h4 API Examples
           %pre
-            == /v1/#{@model.name.underscore.pluralize}.json?filters[#{attribute}]=foo
+            == /#{api_version}/#{@model.name.underscore.pluralize}.json?filters[#{attribute}]=foo
 
           %h4 Client Examples
           %pre
@@ -49,10 +49,10 @@
 
             %h4 API Examples
             %pre
-              ==/v1/#{@model.name.underscore.pluralize}.json?scopes[]=#{scopes.first}
+              ==/#{api_version}/#{@model.name.underscore.pluralize}.json?scopes[]=#{scopes.first}
               - if scopes.count > 1
                 %br<>
-                == /v1/#{@model.name.underscore.pluralize}.json?scopes[]=#{scopes.first}&scopes[]=#{scopes.last}
+                == /#{api_version}/#{@model.name.underscore.pluralize}.json?scopes[]=#{scopes.first}&scopes[]=#{scopes.last}
 
             %h4 Client Examples
             %pre
@@ -74,7 +74,7 @@
           - if reflections.present?
             %h4 API Examples
             %pre
-              ==/v1/#{@model.name.underscore.pluralize}/1/#{reflections.first}.json
+              ==/#{api_version}/#{@model.name.underscore.pluralize}/1/#{reflections.first}.json
 
             %h4 Client Examples
             %pre

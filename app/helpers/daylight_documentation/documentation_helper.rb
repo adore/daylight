@@ -44,6 +44,10 @@ module DaylightDocumentation::DocumentationHelper
     Daylight::API.namespace
   end
 
+  def api_version
+    Daylight::API.version.downcase
+  end
+
   private
 
     def route_verb(route)
