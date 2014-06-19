@@ -433,8 +433,9 @@ Any public method is allowed to be called on the model instance by use of the
 `remoted` method added by `Daylight::Refiners`.  Which public methods are
 allowed are defined in your [Routes](#routes).
 
-> FUTURE #4: It would be nice to allow public methods on the model class to
-> be exposed and called against the collection.
+> FUTURE [#4](https://github.com/att-cloud/daylight/issues/4):
+> It would be nice to allow public methods on the model class to be exposed and
+> called against the collection.
 
 Remoted methods should return a record or collections of records so that they
 may be instanciated correctly by the client and act as a proxy back to the API.
@@ -551,9 +552,10 @@ You can modify the actions on each reasource as you see fit, matching your
 To expose model assoications, you can do that with Daylight additions to
 routing options.
 
-> FUTURE #7: The cliento only supports model associations on `has_many`
-> relationships.  We will need to evaluate the need to support model
-> associations on `has_one` and `has_many` (as we never had a case for it)
+> FUTURE [#7](https://github.com/att-cloud/daylight/issues/7):
+> The cliento only supports model associations on `has_many` relationships.  We
+> will need to evaluate the need to support model associations on `has_one` and
+> `has_many` (as we never had a case for it)
 
   ````ruby
     API::Application.routes.draw do
@@ -629,9 +631,10 @@ will not need to update all of the constants in their code base from
 `API::V1::Post` to `API::V2::Post` after they migrate and can focus on the
 differences provided in the new API version.
 
-> FUTURE #2: It may be possible to have different versions of a client model to
-> run concurrently.  This would aid end users of the API to move/keep some
-> classes on a particular version.
+> FUTURE [#2](https://github.com/att-cloud/daylight/issues/2):
+> It may be possible to have different versions of a client model to run
+> concurrently.  This would aid end users of the API to move/keep some classes
+> on a particular version.
 
 Second, Daylight will lookup association classes using the same module as your
 client model.  This simplifies setting up your relationships becaause you do
@@ -761,7 +764,8 @@ Given the `ActiveRecord` model setup:
 Remoted methods are available once the [remoted](#remoted) method is turned on in
 its controller and the method name is included in your [routes](#routes).
 
-> FUTURE #6: Scopes may need to be whitelisted like remoted methods.
+> FUTURE [#6](https://github.com/att-cloud/daylight/issues/6):
+> Scopes may need to be whitelisted like remoted methods.
 
 Then you can setup the your client model:
 
@@ -812,8 +816,9 @@ With the introduction of and use of
 [Strong Parameters](http://guides.rubyonrails.org/action_controller_overview.html#strong-parameters)
 unpermitted or missing attributes will be detected.
 
-> FUTURE #8: it would be nice to know which parameter and if it was a required
-> parameter or an unpermitted one.
+> FUTURE [#8](https://github.com/att-cloud/daylight/issues/8):
+> Would be nice to know which parameter is raising the error and if it was a
+> _required_ parameter or an _unpermitted_ one.
 
 Lets say `created_at` is not permitted on the `PostController`:
   ````ruby

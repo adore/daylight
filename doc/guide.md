@@ -38,8 +38,9 @@ Then you can re-associate the  `Company` on the `Post` itself:
     post.company.id #=> 2
   ````
 
-> FUTURE #5: Updates on the `has_one` and `belongs_to` association do not get
-> propagated and should be.  Currently, only re-associations are propagated.
+> FUTURE [#5](https://github.com/att-cloud/daylight/issues/5):
+> Updates on the `has_one` and `belongs_to` association do not get propagated
+> and should be.  Currently, only re-associations are propagated.
 
 Saving the parent class doesn't save updates to the associations.  You can
 save these associated instances directly:
