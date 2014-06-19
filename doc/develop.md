@@ -604,6 +604,10 @@ subclass from `Daylight::API` classes.
 
 > INFO: `Daylight::API` subclasses `ActiveResource::Base` and extends it
 
+You can build your client model as you do today as an `ActiveResource::Base`
+as all functionality performs the same out of the box. (Only when using
+Daylight features is when Daylight additions to `ActiveResource` enabled)
+
   ````ruby
     class API::V1::Post < Daylight::API
     end
