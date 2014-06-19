@@ -561,7 +561,7 @@ routing options.
   ````
 
 Any of the rich `has_many` relationships setup may be exposed as a model
-association.  We can expose these associations as well:
+associations, choose which ones to expose:
 
   ````ruby
     API::Application.routes.draw do
