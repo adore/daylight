@@ -63,11 +63,11 @@ You can chose to allow models to be created, updated, and associated through
 a "parent" model using the `accepts_nested_attributes_for` mechansism.
 
   ````ruby
-  class Post < ActiveRecord::Base
-    has_many :comments
+    class Post < ActiveRecord::Base
+      has_many :comments
 
-    accepts_nested_attributes_for :comments
-  end
+      accepts_nested_attributes_for :comments
+    end
   ````
 
 Once the client is setup you can do the following:
@@ -86,12 +86,12 @@ your associations that are neccessary for your application to function
 correctly.  For example:
 
   ````ruby
-  class Post
-    has_many :comments
-    has_many :authors, foreign_key: 'created_by', class_name: 'User'
-    has_many :commenters, -> { uniq }, through: :comments, class_name: 'User'
-    has_many :suppressed_comments, -> { where(spam: true) }, class_name: 'Comment'
-  end
+    class Post
+      has_many :comments
+      has_many :authors, foreign_key: 'created_by', class_name: 'User'
+      has_many :commenters, -> { uniq }, through: :comments, class_name: 'User'
+      has_many :suppressed_comments, -> { where(spam: true) }, class_name: 'Comment'
+    end
   ````
 
 Here we have 4 examples where using the model associations are neccesary.  When
@@ -124,7 +124,7 @@ and most information on how to use and customize it can be found in their
 Serialize only the attributes you want to be public in your API.  This allows
 you to have a separation between the model data and the API data.
 
-> NOTE: Make sure to include `:id` as an attribute so that `Daylight` will be
+> NOTE: Make sure to include `:id` as an attribute so that Daylight will be
 > able to make updates to the models correctly.
 
 For example, `id`, `title` and `body` are exposed but there all other
@@ -136,7 +136,7 @@ attributes are not serialized:
     end
   ````
 
-We encourage you to embed only ids to keep payloads down. `Daylight` will make
+We encourage you to embed only ids to keep payloads down. Daylight will make
 additional requests for the associated objects when accessed:
 
   ````ruby
@@ -149,12 +149,13 @@ additional requests for the associated objects when accessed:
       has_one :author, key: 'created_by'
     end
   ````
+> NOTE: Make sure to use `key` option in serializers, not `foreign_key`
 
 > INFO: `belongs_to` associations can be included using `has_one` in your
 > serializer
 
 There isn't any need for you to include your `has_many` associations in
-your serializer.  These collections will be looked up from the `Daylight`
+your serializer.  These collections will be looked up from the Daylight
 client by a seperate request.
 
 The serializer above will generate JSON like:
@@ -175,10 +176,10 @@ There are 2 main additions Daylight adds to `ActiveModelSerializer` to enable
 functionality for the client.  They are _through associations_ and _read only
 attributes_.
 
-#### Through Associations
+#### `has_one :through`
 
 In Rails you can setup your model to have a `has_one :through`.  This is a
-special case for `ActiveModelSerializers` and for the `Daylight` client.
+special case for `ActiveModelSerializers` and for the Daylight client.
 
 > NOTE: Rails does not have `belongs_to :through` associations.
 
@@ -307,8 +308,8 @@ for your application.
 Daylight simplifies building API controllers:
 
   ````ruby
-  class PostController < APIController
-  end
+    class PostController < APIController
+    end
   ````
 
 > NOTE: Any functionality built in `ApplicationController` will be available to
@@ -326,19 +327,19 @@ turned off by default so what is exposed is determined by the developer.
 For example, to turn on `show` action:
 
   ````ruby
-  class PostController < APIController
-    handles :show
-  end
+    class PostController < APIController
+      handles :show
+    end
   ````
 
 This is equivalent to;
 
   ````ruby
-  class PostController < APIController
-    def show
-      render json: Post.find(params[:id])
+    class PostController < APIController
+      def show
+        render json: Post.find(params[:id])
+      end
     end
-  end
   ````
 
 Daylight uses the name of the controller to determine the related model to use.
@@ -347,31 +348,31 @@ all of the actions are just ruby methods, so you can overwrite them (and call
 super) as you see fit:
 
   ````ruby
-  class PostController < APIController
-    handles :show
+    class PostController < APIController
+      handles :show
 
-    def show
-      super
+      def show
+        super
 
-      @post.update_attributes(:last_viewed_at, Time.now)
+        @post.update_attributes(:last_viewed_at, Time.now)
+      end
     end
-  end
   ````
 
 To turn on multiple actions:
 
   ````ruby
-  class PostController < APIController
-    handles: :create, :show, :update, :destroy
-  end
+    class PostController < APIController
+      handles: :create, :show, :update, :destroy
+    end
   ````
 
 Or you can turn them all (including the [Specialized Actions](#specialized-actions)):
 
   ````ruby
-  class PostController < APIController
-    handles: :all
-  end
+    class PostController < APIController
+      handles: :all
+    end
   ````
 
 For your reference, you can review the code of the equivalent actions in
@@ -396,11 +397,11 @@ models added by `Daylight::Refiners`
 On the controller, see it called on the `index` action:
 
   ````ruby
-  class PostController < APIController
-    def index
-      render json: Post.refine_by(params)
+    class PostController < APIController
+      def index
+        render json: Post.refine_by(params)
+      end
     end
-  end
   ````
 
 ##### Associated
@@ -412,18 +413,19 @@ are defined in your [Routes](#routes).
 On the controller, see it called by the (similarly named) `associated` action:
 
   ````ruby
-  class PostController < APIController
-    def associated
-      render json: Post.associated(params), root: associated_params
+    class PostController < APIController
+      def associated
+        render json: Post.associated(params), root: associated_params
+      end
     end
-  end
   ````
 
 Associations can also be refined similarly to `index` where you can specify
-scopes, conditions, order, limit, and offset.
+scopes, conditions, order, limit, and offset.  The associated action is
+setup in [Through Associations](#through-associations) on the client model.
 
-You can find more information on how to use these refinements in the
-[Daylight Users Guide](guide.md)
+> NOTE: You can find more information on how to use these refinements in
+> the [Daylight Users Guide](guide.md)
 
 ##### Remoted
 
@@ -437,20 +439,20 @@ may be instanciated correctly by the client and act as a proxy back to the API.
 On the controller, see it called by the (similarly named) `remoted` action:
 
   ````ruby
-  class PostController < APIController
-    def remoted
-      render json: Post.remoted(params), root: remoted_params
+    class PostController < APIController
+      def remoted
+        render json: Post.remoted(params), root: remoted_params
+      end
     end
-  end
   ````
 
 All of the specialized actions can be enabled on your controller like the REST
 actions:
 
   ````ruby
-  class PostController < APIController
-    handles :index, :associated, :remoted
-  end
+    class PostController < APIController
+      handles :index, :associated, :remoted
+    end
   ````
 
 They are also included when specifying `handles :all`.
@@ -467,9 +469,9 @@ the controller name it determines the model name to be `Post`).
 You may specify a different model to use:
 
   ````ruby
-  class WelcomeController
-    set_model_name :post
-  end
+    class WelcomeController
+      set_model_name :post
+    end
   ````
 
 In `create`, `show`, `update` and `destroy` actions (member) results are stored
@@ -483,10 +485,10 @@ in an instance variable simply called `@collection`
 Both of these instance variables may be customized:
 
   ````ruby
-  class PostController
-    set_record_name :result
-    set_collection_name :results
-  end
+    class PostController
+      set_record_name :result
+      set_collection_name :results
+    end
   ````
 
 > NOTE: Daylight calls the instance variables for specialized actions
@@ -496,11 +498,11 @@ Both of these instance variables may be customized:
 In all customizations can use a string, symbol, or constant as the value:
 
   ````ruby
-  class PostController
-    set_model_name Post
-    set_record_name 'result'
-    set_collection_name :results
-  end
+    class PostController
+      set_model_name Post
+      set_record_name 'result'
+      set_collection_name :results
+    end
   ````
 
 Lastly, your application may already have an APIController and there could be
@@ -509,14 +511,14 @@ a name collision.  Daylight will not use this constant if it's already defined.
 In this case use `Daylight::APIController` to subclass from:
 
   ````ruby
-  class PostController < Daylight::APIController
-    handles :all
-  end
+    class PostController < Daylight::APIController
+      handles :all
+    end
   ````
 
 ### Routes
 
-Setup your routes as you do in Rails today.  Since `Daylight` assumes that
+Setup your routes as you do in Rails today.  Since Daylight assumes that
 your API is versioned, make sure to employ `namespace` in routes or use
 a simple, powerful tool like
 [Versionist](https://github.com/bploetz/versionist).
@@ -543,7 +545,7 @@ You can modify the actions on each reasource as you see fit, matching your
   ````
 
 
-To expose model assoications, you can do that with `Daylight` additions to
+To expose model assoications, you can do that with Daylight additions to
 routing options.
 
 > FUTURE: The cliento only supports model associations on `has_many`
@@ -573,7 +575,7 @@ associations, choose which ones to expose:
     end
   ````
 
-To expose remoted methods, you can do that with `Daylight` additions to
+To expose remoted methods, you can do that with Daylight additions to
 routing options.
 
   ````ruby
@@ -581,7 +583,7 @@ routing options.
       namespace :v1 do
         resources :users,     associated: [:comments, :posts]
         resources :posts,     associated: [:authors, :comments, :commenters],
-                                 remoted: [:by_popularity]
+                                 remoted: [:top_comments]
         resources :comments,      except: [:index, :destroy]
       end
     end
@@ -592,9 +594,142 @@ specification of what is exposed to the client.
 
 ### Client
 
-The client is where all our server setup is put together.  The client models
+The client is where all our server setup is put together.  Client models
+subclass from `Daylight::API` classes.
 
-#### Foreign Keys
+> INFO: `Daylight::API` subclasses `ActiveResource::Base` and extends it
+
+  ````ruby
+    class API::V1::Post < Daylight::API
+    end
+  ````
+
+Here again, we encourage you to namespace and version your client models.
+You can do this using module names and Daylight will offer several
+conviniences.
+
+First, Daylight will _alias_ to the current version defined in your `setup!`.
+Assuming you've have two versions of your client models:
+
+  ````ruby
+    Daylight::API.setup!(version: 'v1`, versions: %w[v1 v2])
+    API::Post  #=> API::V1::Post
+
+    reload!
+
+    Daylight::API.setup!(version: 'v2')
+    API::Post  #=> API::V2::Post
+  ````
+
+Second, Daylight will lookup association classes using the same module as your
+client model.  This simplifies setting up your relationships becaause you do
+not need to define your `class_name` on each association:
+
+  ````ruby
+    class API::V1::Post < Daylight::API
+      belongs_to :blog
+
+      has_many :comments
+    end
+  ````
+
+Once all client models are setup, associationed models will be fetched and
+initialized:
+
+  ````ruby
+    post = Daylight::Post.first
+
+    post.blog       #=> #<API::V1::Blog:0x007fd8ca4717d8 ...>
+    post.comments   #=> [#<API::V1::Comment:0x007fd8ca538ce8...>, ...]
+  ````
+
+There are times when you will need to specify a client model just like you do
+in `ActiveRecord`:
+
+  ````ruby
+    class API::V1::Post < Daylight::API
+      belongs_to :author, class_name: 'api/v1/user', foreign_key: 'created_by'
+      belongs_to :blog
+
+      has_many :comments
+    end
+  ````
+
+> NOTE: The foreign key needs to match the same key in your serailizer and the
+> `foreign_key` in your `ActiveRecord` model.
+
+The `User` will be correctly retrieved for the `author` association:
+
+  ````ruby
+    Daylight::Post.first.author   #=> #<API::V1::User:0x007fd8ca543e90 ...>
+  ````
+
+#### Through Associations
+
+There are two types of Through Associations in Daylight:
+* `has_one :through`
+* `has_many :through`
+
+Once you've setup your [`has_one :through`](#has_one-through) association in
+your model and serializer.  You can use it in the client model.  This is
+setup similar to the `ActiveRecord` model:
+
+  ````ruby
+    class API::V1::Post < Daylight::API
+      belongs_to :blog
+      has_one    :company, through: :blog
+    end
+  ````
+
+The associations will be available:
+
+  ````ruby
+    post = API::Post.first
+    post.blog     #=> #<API::V1::Blog:0x007fd8ca4717d8 ...>
+    post.company  #=> #<API::V1::Company:0x007f8f83f30b28 ...>
+  ````
+
+Once the `has_many :through` associations are exposed in the [Routes](#routes)
+you can them up in the client model:
+
+  ````ruby
+    class API::V1::Post < Daylight::API
+      has_many 'comments'
+      has_many 'commenters', through: :association
+    end
+  ````
+
+The value is always `:association` and is a directive to Daylight to use the
+[associated](#associated) action on the `PostController`.
+
+The associations will be available:
+
+  ````ruby
+    post = API::Post.first
+    post.comments    #=> [#<API::V1::Comment:0x007f8f83f91c20 ...>, ...]
+    post.commenters  #=> [#<API::V1::Company:0x007f8f83fe1f40 ...>, ...]
+  ````
+
+Here we can see a typical `ActiveResource` association for `comments`is used
+along-side our `has_many :through`.  If there is no reason to use the model
+assoication, the flexibility is up to you.  You can review the reasons to use
+[Model Association](#models).
+
+
+You could setup both to use model associations:
+  ````ruby
+    class API::V1::Post < Daylight::API
+      has_many 'comments', through: association
+      has_many 'commenters', through: :association
+    end
+  ````
+
+
+Refer to the [Daylight Users Guide](guide.md) to see how to use work with these
+associations.
+
+#### Scopes and Remoted Methods
+
 
 ## Error Handling
 
@@ -674,13 +809,13 @@ Given the client model:
   ````ruby
   class API::V1::Post < Daylight::API
     scopes :published
-    remote :by_popularity
+    remote :top_comments
 
     has_many :author, through: :associated
   end
   ````
 
-If neither `published`, `by_popularity`, nor `author` are not setup on the
+If neither `published`, `top_comments`, nor `author` are not setup on the
 server-side, errors will be raised.
 
   ````ruby
@@ -690,7 +825,7 @@ server-side, errors will be raised.
 
   API::Post.by_popularirty
   #=> ActiveResource::BadRequest: Failed.  Response code = 400.
-  #   Response message = Bad Request.  Root Cause = unknown remote: by_popularity
+  #   Response message = Bad Request.  Root Cause = unknown remote: top_comments
 
   API::Post.find(1).author
   #=> ActiveResource::BadRequest: Failed.  Response code = 400.
