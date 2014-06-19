@@ -621,6 +621,15 @@ Assuming you've have two versions of your client models:
     API::Post  #=> API::V2::Post
   ````
 
+Using the aliased versions of your API is practical for your end users.  They
+will not need to update all of the constants in their code base from
+`API::V1::Post` to `API::V2::Post` after they migrate and can focus on the
+differences provided in the new API version.
+
+> FUTURE: It may be possible to have different versions of a client model to
+> run concurrently.  This would aid end users of the API to move/keep some
+> classes on a particular version.
+
 Second, Daylight will lookup association classes using the same module as your
 client model.  This simplifies setting up your relationships becaause you do
 not need to define your `class_name` on each association:
