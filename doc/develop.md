@@ -354,7 +354,7 @@ super) as you see fit:
       def show
         super
 
-        @post.update_attributes(:last_viewed_at, Time.now)
+        @post.update_attributes(:view_count, @post.view_count+1)
       end
     end
   ````
@@ -432,6 +432,9 @@ setup in [Through Associations](#through-associations) on the client model.
 Any public method is allowed to be called on the model instance by use of the
 `remoted` method added by `Daylight::Refiners`.  Which public methods are
 allowed are defined in your [Routes](#routes).
+
+> FUTURE #4: It would be nice to allow public methods on the model class to
+> be exposed and called against the collection.
 
 Remoted methods should return a record or collections of records so that they
 may be instanciated correctly by the client and act as a proxy back to the API.
@@ -548,7 +551,7 @@ You can modify the actions on each reasource as you see fit, matching your
 To expose model assoications, you can do that with Daylight additions to
 routing options.
 
-> FUTURE: The cliento only supports model associations on `has_many`
+> FUTURE #7: The cliento only supports model associations on `has_many`
 > relationships.  We will need to evaluate the need to support model
 > associations on `has_one` and `has_many` (as we never had a case for it)
 
@@ -626,7 +629,7 @@ will not need to update all of the constants in their code base from
 `API::V1::Post` to `API::V2::Post` after they migrate and can focus on the
 differences provided in the new API version.
 
-> FUTURE: It may be possible to have different versions of a client model to
+> FUTURE #2: It may be possible to have different versions of a client model to
 > run concurrently.  This would aid end users of the API to move/keep some
 > classes on a particular version.
 
@@ -734,12 +737,49 @@ You can setup both to use model associations:
     end
   ````
 
-
 Refer to the [Daylight Users Guide](guide.md) to see how to use work with these
 associations.
 
 #### Scopes and Remoted Methods
 
+Adding adding scopes and remoted methods are very simple.
+
+
+Given the `ActiveRecord` model setup:
+
+  ````ruby
+    class Post < ActiveRecord::Base
+      scope :published,     -> { where(published: true) }
+      scope :by_popularity, -> { order_by(:view_count) }
+
+      def top_comments
+        comments.order_by(:like_count)
+      end
+    end
+  ````
+
+Remoted methods are available once the [remoted](#remoted) method is turned on in
+its controller and the method name is included in your [routes](#routes).
+
+> FUTURE #6: Scopes may need to be whitelisted like remoted methods.
+
+Then you can setup the your client model:
+
+  ````ruby
+    class API::V1::Post < Daylight::API
+      scopes :published, :by_popularity
+      remote :top_comments
+    end
+  ````
+And used like so:
+
+
+  ````ruby
+    API::Post.published.by_popularity #=> [#<API::V1::Post:0x007f8f890219b0 ...>, ...]
+    API::Post.top_comments            #=> [#<API::V1::Comment:0x007f8f89050da0 ...>, ...]
+  ````
+
+> FUTURE #9: Remote methods cannot be further refined like associations
 
 ## Error Handling
 
@@ -771,7 +811,7 @@ With the introduction of and use of
 [Strong Parameters](http://guides.rubyonrails.org/action_controller_overview.html#strong-parameters)
 unpermitted or missing attributes will be detected.
 
-> FUTURE: it would be nice to know which paramter and if it was a required
+> FUTURE #8: it would be nice to know which parameter and if it was a required
 > parameter or an unpermitted one.
 
 Lets say `created_at` is not permitted on the `PostController`:
