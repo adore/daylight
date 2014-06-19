@@ -592,7 +592,7 @@ specification of what is exposed to the client.
 
 ### Client
 
-
+The client is where all our server setup is put together.  The client models
 
 #### Foreign Keys
 

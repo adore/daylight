@@ -1,7 +1,8 @@
 # Framework Overview
 
-Daylight alters or extends Rails components.  Generally, there are 5 main parts
-to Daylight:
+`Daylight` alters or extends Rails components.  The framework are tiny
+extensions on the shoulders of giants.  See [stats](#loc-statistics).
+Generally, there are 5 main parts to `Daylight`:
 
 | Directory        | Function         |                                                                 |
 | ---------------- | ---------------- | --------------------------------------------------------------- |
@@ -11,8 +12,7 @@ to Daylight:
 | app, config      | Documentation    | `Rails::Engine` to provide documentation of the API             |
 | spec, test       | Mock Testing     | Mock to assist API testing in either RSpec or TestUnit/MiniTest |
 
-In addition, in `lib` there is a `Daylight::Mock` to assist testing client
-models and client API usage.
+`Daylight` is a tiny extension on the shoulders of giants and wouldn't be possible without
 
 ## Client Modules
 
@@ -60,3 +60,17 @@ We use [actionpack-page_caching](https://github.com/rails/actionpack-page_cachin
 ```ruby
 require 'daylight/mock'
 ```
+
+
+## LOC Statistics
+
+As an exercise we look at the lines of code at the time of writing this
+documentation.  Excluding comments and empty lines, `Daylight` is really
+tiny:
+
+| Where  |  LOC |
+| ------ | ---: |
+| Client |  490 |
+| Server |  507 |
+| Mock   |  174 |
+| Total  | 1171 |
