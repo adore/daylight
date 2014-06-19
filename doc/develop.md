@@ -615,9 +615,9 @@ Assuming you've have two versions of your client models:
     Daylight::API.setup!(version: 'v1', versions: %w[v1 v2])
     API::Post  #=> API::V1::Post
 
+    Daylight::API.setup!(version: 'v2')
     reload!
 
-    Daylight::API.setup!(version: 'v2')
     API::Post  #=> API::V2::Post
   ````
 
