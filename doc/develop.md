@@ -710,8 +710,9 @@ Second, once the `has_many :through` associations are exposed in the
   ````
 
 The value is always `:association` and is a directive to Daylight to use the
-[associated](#associated) action on the `PostController`. Then, the
-associations will be available:
+[associated](#associated) action on the `PostController`.
+
+The associations will be available:
 
   ````ruby
     post = API::Post.first
@@ -725,7 +726,7 @@ assoication, the flexibility is up to you.  You can review the reasons to use
 [Model Association](#models).
 
 
-You could setup both to use model associations:
+You can setup both to use model associations:
   ````ruby
     class API::V1::Post < Daylight::API
       has_many 'comments', through: association
