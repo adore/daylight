@@ -567,7 +567,7 @@ associations, choose which ones to expose:
     API::Application.routes.draw do
       namespace :v1 do
         resources :users,     associated: [:comments, :posts]
-        resources :posts,     associated: [:authors, :comments, :commenters, :suppressed_comments]
+        resources :posts,     associated: [:authors, :comments, :commenters]
         resources :comments,      except: [:index, :destroy]
       end
     end
@@ -580,7 +580,7 @@ routing options.
     API::Application.routes.draw do
       namespace :v1 do
         resources :users,     associated: [:comments, :posts]
-        resources :posts,     associated: [:authors, :comments, :commenters, :suppressed_comments],
+        resources :posts,     associated: [:authors, :comments, :commenters],
                                  remoted: [:by_popularity]
         resources :comments,      except: [:index, :destroy]
       end
