@@ -779,7 +779,8 @@ And used like so:
     API::Post.top_comments            #=> [#<API::V1::Comment:0x007f8f89050da0 ...>, ...]
   ````
 
-FUTURE: Remote methods cannot be further refined like associations [#9](daylight#9)
+> FUTURE [#9](https://github.com/att-cloud/daylight/issues/9):
+> Remote methods cannot be further refined like associations
 
 ## Error Handling
 
