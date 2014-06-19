@@ -43,7 +43,7 @@ chain queries above can be used to refine searches on associations:
 Daylight allows you to return collections from complex queries on your model:
 
   ````ruby
-  API::Post.by_popularity
+  API::Post.first.top_comments
   ````
 
 Daylight packages API query details in one request when it can to lower
