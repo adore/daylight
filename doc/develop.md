@@ -526,7 +526,21 @@ a simple tool like [Versionist](https://github.com/bploetz/versionist).
       namespace :v1 do
         resources :users, :posts, :comments
       end
+    end
   ````
+
+You can modify the actions on each reasource as you see fit, matching your
+`APIController` actions:
+
+  ````ruby
+    API::Application.routes.draw do
+      namespace :v1 do
+        resources :users, :posts
+        resources :comments, except: [:index, :destroy]
+      end
+    end
+  ````
+
 
 To expose model assoications, you can do that with `Daylight` additions to
 routing options.
@@ -538,10 +552,11 @@ routing options.
   ````ruby
     API::Application.routes.draw do
       namespace :v1 do
-        resources :users      associated: [:posts, :comments]
-        resources :posts      associated: [:comments]
-        resources :comments
+        resources :users,     associated: [:posts, :comments]
+        resources :posts,     associated: [:comments]
+        resources :comments,      except: [:index, :destroy]
       end
+    end
   ````
 
 Any of the rich `has_many` relationships setup may be exposed as a model
@@ -550,10 +565,11 @@ association.  We can expose these associations as well:
   ````ruby
     API::Application.routes.draw do
       namespace :v1 do
-        resources :users      associated: [:comments, :posts]
-        resources :posts      associated: [:authors, :comments, :commenters, :suppressed_comments]
-        resources :comments
+        resources :users,     associated: [:comments, :posts]
+        resources :posts,     associated: [:authors, :comments, :commenters, :suppressed_comments]
+        resources :comments,      except: [:index, :destroy]
       end
+    end
   ````
 
 To expose remoted methods, you can do that with `Daylight` additions to
@@ -562,11 +578,12 @@ routing options.
   ````ruby
     API::Application.routes.draw do
       namespace :v1 do
-        resources :users      associated: [:comments, :posts]
-        resources :posts      associated: [:authors, :comments, :commenters, :suppressed_comments],
+        resources :users,     associated: [:comments, :posts]
+        resources :posts,     associated: [:authors, :comments, :commenters, :suppressed_comments],
                                  remoted: [:by_popularity]
-        resources :comments
+        resources :comments,      except: [:index, :destroy]
       end
+    end
   ````
 
 As you can see when you develop your API, the routes file becomes a
