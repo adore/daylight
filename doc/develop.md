@@ -612,7 +612,7 @@ First, Daylight will _alias_ to the current version defined in your `setup!`.
 Assuming you've have two versions of your client models:
 
   ````ruby
-    Daylight::API.setup!(version: 'v1`, versions: %w[v1 v2])
+    Daylight::API.setup!(version: 'v1', versions: %w[v1 v2])
     API::Post  #=> API::V1::Post
 
     reload!
