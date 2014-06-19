@@ -67,4 +67,16 @@ describe DaylightDocumentation::DocumentationHelper do
         "Calls test model's remote method baz"
     end
   end
+
+  describe :client_namespace do
+    it "returns the client namespace" do
+      helper.client_namespace.should == 'API'
+    end
+  end
+
+  describe :api_version do
+    it "returns the api version" do
+      helper.api_version.should == 'v1'
+    end
+  end
 end
