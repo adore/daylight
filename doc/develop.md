@@ -627,9 +627,9 @@ Assuming you've have two versions of your client models:
   ````
 
 Using the aliased versions of your API is practical for your end users.  They
-will not need to update all of the constants in their code base from
-`API::V1::Post` to `API::V2::Post` after they migrate and can focus on the
-differences provided in the new API version.
+will not need to update all of the constants in their codebase from
+`API::V1::Post` to `API::V2::Post` after they migrate. Instead they can focus
+on differences provided in the new API version.
 
 > FUTURE [#2](https://github.com/att-cloud/daylight/issues/2):
 > It may be possible to have different versions of a client model to run
@@ -728,19 +728,19 @@ The associations will be available:
 
 Here we can see a typical `ActiveResource` association for `comments`is used
 along-side our `has_many :through`.  If there is no reason to use the model
-assoication, the flexibility is up to you.  You can review the reasons to use
+assoication, the flexibility is up to you.  Please review the reasons to use
 [Model Association](#models).
 
 
 You can setup both to use model associations:
   ````ruby
     class API::V1::Post < Daylight::API
-      has_many 'comments', through: association
+      has_many 'comments',   through: :association
       has_many 'commenters', through: :association
     end
   ````
 
-Refer to the [Daylight Users Guide](guide.md) to see how to use work with these
+Refer to the [Daylight Users Guide](guide.md) to see how to further work
 associations.
 
 #### Scopes and Remoted Methods
@@ -761,8 +761,8 @@ Given the `ActiveRecord` model setup:
     end
   ````
 
-Remoted methods are available once the [remoted](#remoted) method is turned on in
-its controller and the method name is included in your [routes](#routes).
+Remoted methods are available once the [remoted](#remoted) action is handled
+by the controller and the method name is included in your [routes](#routes).
 
 > FUTURE [#6](https://github.com/att-cloud/daylight/issues/6):
 > Scopes may need to be whitelisted like remoted methods.
