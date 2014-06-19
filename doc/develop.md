@@ -518,7 +518,8 @@ In this case use `Daylight::APIController` to subclass from:
 
 Setup your routes as you do in Rails today.  Since `Daylight` assumes that
 your API is versioned, make sure to employ `namespace` in routes or use
-a simple tool like [Versionist](https://github.com/bploetz/versionist).
+a simple, powerful tool like
+[Versionist](https://github.com/bploetz/versionist).
 
 
   ````ruby
@@ -590,6 +591,8 @@ As you can see when you develop your API, the routes file becomes a
 specification of what is exposed to the client.
 
 ### Client
+
+
 
 #### Foreign Keys
 
