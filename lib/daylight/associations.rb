@@ -87,12 +87,9 @@ module Daylight::Associations
     #    comment.creator = current_user
     #
     # See:
-    # #belongs_to_through
     # ActiveResource::Associations#belongs_to
 
     def belongs_to name, options={}
-      return belongs_to_through(name, options) if options.has_key? :through
-
       # continue to let the original do all the work.
       super.tap do |reflection|
 
@@ -108,10 +105,10 @@ module Daylight::Associations
     end
 
     ##
-    # Adds getter and setter methods for `belongs_to` associations that are
-    # through another `belongs_to` association.  Assumes that the information
-    # about the association is generated in the nested attributes by a
-    # HasOneThrough serializer.
+    # Adds getter and setter methods for `has_one` associations that are
+    # through a `belongs_to` association.  Assumes that the information about
+    # the association is generated in the nested attributes by a HasOneThrough
+    # serializer.
     #
     # In this example, if we did not go through the identity association the
     # primary keys would be generated, but upon save, an error would be thrown
@@ -120,23 +117,22 @@ module Daylight::Associations
     #
     # For example, consider `user_id` and `zone_id` primary keys:
     #
-    #   class KeyPairSerializer < ActiveModel::Serializer
+    #   class PostSerializer < ActiveModel::Serializer
     #     embed :ids
     #
-    #     has_one :identity
-    #     has_one :user, :zone through: :identity
+    #     has_one :blog
+    #     has_one :company, :zone through: :blog
     #    end
     #
     # It will generate the following json:
     #
     #    {
-    #      "key_pair": {
+    #      "post": {
     #        "id": 1,
-    #        "identity_id": 2,
-    #        "identity_attributes": {
+    #        "blog_id": 2,
+    #        "blog_attributes": {
     #          "id": 2,
-    #          "user_id": 3,
-    #          "zone_id": 2
+    #          "company_id": 3
     #        }
     #      }
     #    }
@@ -144,28 +140,26 @@ module Daylight::Associations
     # An ActiveResource can define `belongs_to` with :through to read from
     # nested attributes for fetching by primary_key or setting to save.
     #
-    #   class KeyPair < ActiveResource::Base
-    #     belongs_to :identity
-    #     belongs_to :user, through: :identity
-    #     belongs_to :zone, through: :identity
+    #   class Post < Daylight::API
+    #     belongs_to :blog
+    #     has_one    :company, through: :blog
     #   end
     #
     #  So that:
     #
-    #   kp = KeyPair.find(1)
-    #   kp.identity  # => #<Identity @attributes={"id"=>1}>
-    #   kp.user      # => #<User @attributes={"id"=>3}>
-    #   kp.zone      # => #<Zone @attributes={"id"=>2}>
+    #   p = Post.find(1)
+    #   p.blog      # => #<Blog @attributes={"id"=>1}>
+    #   p.company   # => #<Company @attributes={"id"=>3}>
     #
     #  And setting these associations will work with passing validations:
     #
-    #   kp.user = User.find(1)
-    #   kp.save                 # => true
+    #   p.company = Company.find(1)
+    #   p.save  # => true
 
-    def belongs_to_through name, options
+    def has_one_through name, options
       through = options.delete(:through).to_s
 
-      create_reflection(:belongs_to, name, options).tap do |reflection|
+      create_reflection(:has_one, name, options).tap do |reflection|
         nested_attributes_key  = "#{reflection.name}_attributes"
         through_attributes_key = "#{through}_attributes"
 
@@ -186,8 +180,15 @@ module Daylight::Associations
     ##
     # Fix bug in has_one that is not creating the request correctly.
     # Use `where` functionality as it peforms the function that is needed
+    #
+    # Allows the has_one :through association.
+    #
+    # See:
+    # has_one_through
 
     def has_one(name, options = {})
+      return has_one_through(name, options) if options.has_key? :through
+
       create_reflection(:has_one, name, options).tap do |reflection|
         define_cached_method reflection.name do
           reflection.klass.where(:"#{self.class.element_name}_id" => self.id).first
@@ -206,7 +207,7 @@ module Daylight::Associations
     #
     # Example:
     #
-    #   remote :all_members, class_name: 'user'
+    #   remote :posts_by_popularity, class_name: 'post'
     #
 
     def remote name, options

@@ -14,7 +14,7 @@ describe Daylight::Associations do
     has_many   :related_test_classes, through: :associated
     has_many   :things,        class_name: 'RelatedTestClass', through: :associated
     belongs_to :parent,        class_name: 'RelatedTestClass'
-    belongs_to :grandparent,   class_name: 'RelatedTestClass', through: :parent
+    has_one    :grandparent,   class_name: 'RelatedTestClass', through: :parent
     has_one    :associate,     class_name: 'RelatedTestClass'
     remote     :remote_stuff,  class_name: 'RelatedTestClass'
 
