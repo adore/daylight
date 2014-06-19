@@ -79,7 +79,7 @@ Once the client is setup you can do the following:
   ````
 
 > INFO: ActiveResource looks up associations using foriegn keys but with
-> Daylight you can call the associations defined on your model directly.
+> `Daylight` you can call the associations defined on your model directly.
 
 This is especially useful when you wish to preserve the richness of options on
 your associations that are neccessary for your application to function
@@ -88,7 +88,7 @@ correctly.  For example:
   ````ruby
   class Post
     has_many :comments
-    has_many :author, foreign_key: 'created_by', class_name: 'User'
+    has_many :authors, foreign_key: 'created_by', class_name: 'User'
     has_many :commenters, -> { uniq }, through: :comments, class_name: 'User'
     has_many :suppressed_comments, -> { where(spam: true) }, class_name: 'Comment'
   end
@@ -97,7 +97,7 @@ correctly.  For example:
 Here we have 4 examples where using the model associations are neccesary.  When
 there is:
 
-1. A configured foreign_key as in `author`
+1. A configured foreign_key as in `authors`
 2. A through association as in `commenters`
 3. A condindition block as `commenters` and `suppressed_comments` (eg. `uniq`
    and `where`)
@@ -516,10 +516,65 @@ In this case use `Daylight::APIController` to subclass from:
 
 ### Routes
 
+Setup your routes as you do in Rails today.  Since `Daylight` assumes that
+your API is versioned, make sure to employ `namespace` in routes or use
+a simple tool like [Versionist](https://github.com/bploetz/versionist).
 
 
+  ````ruby
+    API::Application.routes.draw do
+      namespace :v1 do
+        resources :users, :posts, :comments
+      end
+  ````
+
+To expose model assoications, you can do that with `Daylight` additions to
+routing options.
+
+> FUTURE: The cliento only supports model associations on `has_many`
+> relationships.  We will need to evaluate the need to support model
+> associations on `has_one` and `has_many` (as we never had a case for it)
+
+  ````ruby
+    API::Application.routes.draw do
+      namespace :v1 do
+        resources :users      associated: [:posts, :comments]
+        resources :posts      associated: [:comments]
+        resources :comments
+      end
+  ````
+
+Any of the rich `has_many` relationships setup may be exposed as a model
+association.  We can expose these associations as well:
+
+  ````ruby
+    API::Application.routes.draw do
+      namespace :v1 do
+        resources :users      associated: [:comments, :posts]
+        resources :posts      associated: [:authors, :comments, :commenters, :suppressed_comments]
+        resources :comments
+      end
+  ````
+
+To expose remoted methods, you can do that with `Daylight` additions to
+routing options.
+
+  ````ruby
+    API::Application.routes.draw do
+      namespace :v1 do
+        resources :users      associated: [:comments, :posts]
+        resources :posts      associated: [:authors, :comments, :commenters, :suppressed_comments],
+                                 remoted: [:by_popularity]
+        resources :comments
+      end
+  ````
+
+As you can see when you develop your API, the routes file becomes a
+specification of what is exposed to the client.
 
 ### Client
+
+#### Foreign Keys
 
 ## Error Handling
 
