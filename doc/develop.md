@@ -679,11 +679,10 @@ There are two types of Through Associations in Daylight:
 * `has_one :through`
 * `has_many :through`
 
-#####  `has_one :through` Association
 
-Once you've setup your [`has_one :through`](#has_one-through) association in
-your model and serializer.  You can use it in the client model.  This is
-setup similar to the `ActiveRecord` model:
+First, once you've setup your [`has_one :through`](#has_one-through)
+association in your model and serializer.  You can use it in the client model.
+This is setup similar to the `ActiveRecord` model:
 
   ````ruby
     class API::V1::Post < Daylight::API
@@ -700,10 +699,8 @@ The associations will be available:
     post.company  #=> #<API::V1::Company:0x007f8f83f30b28 ...>
   ````
 
-#####  `has_many :through` Association
-
-Once the `has_many :through` associations are exposed in the [Routes](#routes)
-you can them up in the client model:
+Second, once the `has_many :through` associations are exposed in the
+[Routes](#routes) you can them up in the client model:
 
   ````ruby
     class API::V1::Post < Daylight::API
