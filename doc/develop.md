@@ -779,7 +779,7 @@ And used like so:
     API::Post.top_comments            #=> [#<API::V1::Comment:0x007f8f89050da0 ...>, ...]
   ````
 
-FUTURE: Remote methods cannot be further refined like associations #9
+FUTURE: Remote methods cannot be further refined like associations daylight#9
 
 ## Error Handling
 
