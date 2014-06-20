@@ -16,11 +16,11 @@ Set up the gem in a Rails initializer on your application:
     })
 ```
 
-`namespace` the module to which you wish ActiveResource object to belong
+`namespace` is the module to which you wish ActiveResource object to belong
 
-`endpoint` the ActiveResource#site URL where your server is setup
+`endpoint` is the `ActiveResource#site` URL where your server is setup
 
-`version` you can have versioned APIs, this is the active version
+`version` is the active version of your API.
 
 Daylight assumes you're versioning your API, you can supply the `versions`
 that are supported by your API and which `version` is active. `versions` defaults to `['v1']`.
@@ -28,13 +28,11 @@ that are supported by your API and which `version` is active. `versions` default
 ## Server Setup
 
 Install the gem (or add it to your bundler's Gemfile):
-
 ```ruby
     gem install daylight
 ```
 
 In an initializer add the Rails extensions and patches:
-
 ```ruby
     require 'daylight/server'
 ```
