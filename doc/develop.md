@@ -981,9 +981,9 @@ refinements are applied.  For example:
 
     HTTP       URL                                                       # ACTION               TARGET
 
-    GET        /v1/posts.json?order=created_at                           # index                All Posts
-    GET        /v1/posts/1/comments.json?order_created_at                # associated           All Comments for Post id=1
+    GET        /v1/posts.json?order=created_at                           # index                Orders all Posts
+    GET        /v1/posts/1/comments.json?order_created_at                # associated           Orders all Comments for Post id=1
 
 ### Symantic Data
 
-### Resposne Metadata
+### Response Metadata
