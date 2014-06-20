@@ -935,7 +935,8 @@ The difference is in the response:
 
 > FUTURE: Can this be consolidated?  Is there any reason why `remoted` couldn't
 > just be an `associated` from the client point of view?  We can detect if it
-> is a collection vs. a single record.
+> is a collection vs. a single record.  Maybe `remoted` is only for class level
+> (collection) methods like `/v1/posts/by_popularity` ?
 
 ### Request Parameters
 
