@@ -906,19 +906,34 @@ triaging bugs, but also can help examining requests and responses.
 Daylight strives to continue to keep its API URLs symantic and RESTful.
 `ActiveResource` does most of the work:
 
-    GET        /v1/posts.json                 # index
-    POST       /v1/posts.json                 # create
-    GET        /v1/posts/1.json               # show
-    PATCH/PUT  /v1/posts/1.json               # update
-    DELETE     /v1/posts/1.json               # destroy
+| Action               | Client Example                   | HTTP      | URL               |
+| -------------------- | -------------------------------- | --------- | ----------------- |
+| index                | `API::Post.all`                  | GET       | /v1/posts.json    |
+| create               | `API::Post.create({})`           | POST      | /v1/posts.json    |
+| show                 | `API::Post.find(1)`              | GET       | /v1/posts/1.json  |
+| update               | `API::Post.find(1).comments`     | PATCH/PUT | /v1/posts/1.json  |
+| delete               | `API::Post.find(1).delete`       | DELETE    | /v1/posts/1.json  |
+
+    GET        /v1/posts.json                 # index                 API::Post.all
+    POST       /v1/posts.json                 # create                API::Post.create({})
+    GET        /v1/posts/1.json               # show                  API::Post.find(1)
+    PATCH/PUT  /v1/posts/1.json               # update                API::Post.first.update_attributes({})
+    DELETE     /v1/posts/1.json               # destroy               API::Post.first.delete
 
 
 Daylight adds to these symantic URLs with the `associated` and `remoted`
 actions.  In fact, they look similar to nested URLs:
 
-    GET        /v1/posts/1/comments.json      # associated
-    GET        /v1/posts/1/top_comments.json  # remoted (collection)
-    GET        /v1/posts/1/statistics.json    # remoted (record)
+| Action               | Client Example                   | HTTP      | URL                           |
+| -------------------- | -------------------------------- | --------- | ----------------------------- |
+| associated           | `API::Post.find(1).comments`     | GET       | /v1/posts/1/comments.json     |
+| remoted (collection) | `API::Post.find(1).top_comments` | GET       | /v1/posts/1/top_comments.json |
+| remoted (record)     | `API::Post.find(1).statistics`   | GET       | /v1/posts/1/statistics.json   |
+
+
+    GET        /v1/posts/1/comments.json      # associated            API::Post.first.comments
+    GET        /v1/posts/1/top_comments.json  # remoted (collection)  API::Post.first.top_comments
+    GET        /v1/posts/1/statistics.json    # remoted (record)      API::Post.first.statistics
 
 By URL alone, there's no way to distinguish between `associated` and `remoted`
 requests (they are not RESTful per se).  For all intents and purposes they
@@ -938,6 +953,25 @@ The difference is in the response:
 > client point of view?
 
 ### Request Parameters
+
+Daylight supports scopes, conditions, order, limit, and offset.  Together these
+are called refinements.  All of these refiniments are supplied through request
+parameters.  None, one, or any combination of refinements can be supplied in
+the request.
+
+Refinements are supported only on the `index` and `associated` actions because
+these are requests for collections (as opposed to manipulating individual
+members).
+
+The only difference between `index` and `associated` is the target which the
+refinements are applied.  For example:
+
+    ACTION                                             TARGET
+
+    GET  /v1/posts.json?order=created_at               # All Post
+    GET  /v1/posts/1/comments.json?order_created_at    # All Comments for Post id=1
+
+
 
 ### Symantic Data
 

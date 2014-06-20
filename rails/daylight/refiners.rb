@@ -137,6 +137,7 @@ module Daylight::Refiners
         self.
           find(params[:id]).
           associated(helper.associated_params).
+          scoped_by(helper.scoped_params).
           filter_by(helper.filter_params).
           order_by(helper.order_params).
           limit(helper.limit_params).
