@@ -917,7 +917,8 @@ Daylight adds to these symantic URLs with the `associated` and `remoted`
 actions.  In fact, they look similar to nested URLs:
 
     GET        /v1/posts/1/comments.json      # associated
-    GET        /v1/posts/1/top_comments.json  # remoted
+    GET        /v1/posts/1/top_comments.json  # remoted (collection)
+    GET        /v1/posts/1/statistics.json    # remoted (record)
 
 By URL alone, there's no way to distinguish between `associated` and `remoted`
 requests (they are not RESTful per se).  For all intents and purposes they
@@ -930,11 +931,11 @@ setting up `remote` and `scopes`
 
 The difference is in the response:
 * `associated` is always a collection
-* `remoted` may be either a member or a collection
+* `remoted` may be a single record or a collection
 
 > FUTURE: Can this be consolidated?  Is there any reason why `remoted` couldn't
 > just be an `associated` from the client point of view?  We can detect if it
-> is a collection vs. a member.
+> is a collection vs. a single record.
 
 ### Request Parameters
 
