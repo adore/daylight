@@ -933,7 +933,7 @@ The difference is in the response:
 * `associated` is always a collection
 * `remoted` may be a single record or a collection
 
-FUTURE att-cloud/daylight#4
+> FUTURE [#4](https://github.com/att-cloud/daylight/issues/4):
 > Is there any reason why `remoted` couldn't just be an `associated` from the
 > client point of view?
 
