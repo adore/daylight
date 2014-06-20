@@ -894,7 +894,48 @@ server-side, errors will be raised.
 
 ## Underlying Interaction
 
+This section is to help  understanding what the client is doing so you can
+access your API server directly through your browers.  This is useful for
+triaging bugs, but also can help examining requests and responses.
+
+> NOTE: This information can be used for when a client would need to be
+> built in another platform or language but wishes to use the server API.
+
 ### Symantic URLs
+
+Daylight strives to continue to keep its API URLs symantic and RESTful.
+`ActiveResource` does most of the work:
+
+    GET        /v1/posts.json    # index
+    POST       /v1/posts.json    # create
+    GET        /v1/posts/1.json  # show
+    PATCH/PUT  /v1/posts/1.json  # update
+    DELETE     /v1/posts/1.json  # destroy
+
+
+Daylight adds to these symantic URLs with the `associated` and `remoted`
+actions.  In fact, they look similar to nested URLs:
+
+    GET  /v1/posts/1/comments.json      # associated
+    GET  /v1/posts/1/top_comments.json  # remoted
+    GET  /v1/posts/1/top_comments.json  # remoted
+
+By URL alone, there's no way to distinguish between `associated` and `remoted`
+requests (they are not RESTful per se).  For all intents and purposes they
+both are an associated data nested in a member of a `Post`.
+
+To treat them differently, both the client and the server need to have
+knowledge about what kind of specialized action they are.  On the server this
+is done through [Routes](#routes).  On the client model, this is done by
+setting up `remote` and `scopes`
+
+The difference is in the response:
+* `associated` is always a collection
+* `remoted` may be either a member or a collection
+
+> FUTURE: Can this be consolidated?  Is there any reason why remoted couldn't
+> just be an associated from the client point of view?  We can detect if it
+> is a collection vs. a memember.
 
 ### Request Parameters
 
