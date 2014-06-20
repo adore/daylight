@@ -906,34 +906,23 @@ triaging bugs, but also can help examining requests and responses.
 Daylight strives to continue to keep its API URLs symantic and RESTful.
 `ActiveResource` does most of the work:
 
-| Action               | Client Example                   | HTTP      | URL               |
-| -------------------- | -------------------------------- | --------- | ----------------- |
-| index                | `API::Post.all`                  | GET       | /v1/posts.json    |
-| create               | `API::Post.create({})`           | POST      | /v1/posts.json    |
-| show                 | `API::Post.find(1)`              | GET       | /v1/posts/1.json  |
-| update               | `API::Post.find(1).comments`     | PATCH/PUT | /v1/posts/1.json  |
-| delete               | `API::Post.find(1).delete`       | DELETE    | /v1/posts/1.json  |
+    HTTP       URL                                                      # ACTION                CLIENT EXAMPLE
 
-    GET        /v1/posts.json                 # index                 API::Post.all
-    POST       /v1/posts.json                 # create                API::Post.create({})
-    GET        /v1/posts/1.json               # show                  API::Post.find(1)
-    PATCH/PUT  /v1/posts/1.json               # update                API::Post.first.update_attributes({})
-    DELETE     /v1/posts/1.json               # destroy               API::Post.first.delete
+    GET        /v1/posts.json                                           # index                 API::Post.all
+    POST       /v1/posts.json                                           # create                API::Post.create({})
+    GET        /v1/posts/1.json                                         # show                  API::Post.find(1)
+    PATCH/PUT  /v1/posts/1.json                                         # update                API::Post.find(1).update_attributes({})
+    DELETE     /v1/posts/1.json                                         # destroy               API::Post.find(1).delete
 
 
 Daylight adds to these symantic URLs with the `associated` and `remoted`
 actions.  In fact, they look similar to nested URLs:
 
-| Action               | Client Example                   | HTTP      | URL                           |
-| -------------------- | -------------------------------- | --------- | ----------------------------- |
-| associated           | `API::Post.find(1).comments`     | GET       | /v1/posts/1/comments.json     |
-| remoted (collection) | `API::Post.find(1).top_comments` | GET       | /v1/posts/1/top_comments.json |
-| remoted (record)     | `API::Post.find(1).statistics`   | GET       | /v1/posts/1/statistics.json   |
+    HTTP       URL                                                      # ACTION                CLIENT EXAMPLE
 
-
-    GET        /v1/posts/1/comments.json      # associated            API::Post.first.comments
-    GET        /v1/posts/1/top_comments.json  # remoted (collection)  API::Post.first.top_comments
-    GET        /v1/posts/1/statistics.json    # remoted (record)      API::Post.first.statistics
+    GET        /v1/posts/1/comments.json                                # associated            API::Post.find(1).comments
+    GET        /v1/posts/1/top_comments.json                            # remoted (collection)  API::Post.find(1).top_comments
+    GET        /v1/posts/1/statistics.json                              # remoted (record)      API::Post.find(1).statistics
 
 By URL alone, there's no way to distinguish between `associated` and `remoted`
 requests (they are not RESTful per se).  For all intents and purposes they
@@ -956,8 +945,32 @@ The difference is in the response:
 
 Daylight supports scopes, conditions, order, limit, and offset.  Together these
 are called refinements.  All of these refiniments are supplied through request
-parameters.  None, one, or any combination of refinements can be supplied in
-the request.
+parameters.
+
+    HTTP       URL                                                      # PARAMETER TYPE        CLIENT EXAMPLE
+
+    GET        /v1/posts.json?order=created_at                          # Literal               API::Post.order(:created_at)
+    GET        /v1/posts.json?limit=10                                  # Literal               API::Post.limit(10)
+    GET        /v1/posts.json?offset=30                                 # Literal               API::Post.offset(30)
+    GET        /v1/posts.json?scopes=published                          # Literal               API::Post.published
+    GET        /v1/posts.json?scopes[]=published&scopes[]=by_popularity # Array                 API::Post.published.by_popularity
+    GET        /v1/posts.json?filters[tag]=music                        # Hash                  API::Post.where(tag: "music")
+    GET        /v1/posts.json?filters[tag][]=music&[tag][]=best-of      # Hash of Array         API::Post.where(tag: %w[music best-of])
+
+
+None, one, or any combination of refinements can be supplied in
+the request.  Combining all of the examples above:
+
+  ````ruby
+    API::Post.published.by_popularity.where(tag: %w[music best-of]).order(:created_at).limit(10).offset(30)
+  ````
+
+Will yield the following URL:
+
+    /v1/posts.json?scopes[]=published&scopes[]=by_popularity&filters[tag][]=music&[tag][]=best-of&order=created_at&offset=30&limit=10
+
+> NOTE: Collection of these parameters is how single requests to the server are
+> are made by the client
 
 Refinements are supported only on the `index` and `associated` actions because
 these are requests for collections (as opposed to manipulating individual
@@ -966,12 +979,10 @@ members).
 The only difference between `index` and `associated` is the target which the
 refinements are applied.  For example:
 
-    ACTION                                             TARGET
+    HTTP       URL                                                       # ACTION               TARGET
 
-    GET  /v1/posts.json?order=created_at               # All Post
-    GET  /v1/posts/1/comments.json?order_created_at    # All Comments for Post id=1
-
-
+    GET        /v1/posts.json?order=created_at                           # index                All Posts
+    GET        /v1/posts/1/comments.json?order_created_at                # associated           All Comments for Post id=1
 
 ### Symantic Data
 
