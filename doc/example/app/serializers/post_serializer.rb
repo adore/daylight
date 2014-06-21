@@ -1,5 +1,7 @@
 class PostSerializer < ActiveModel::Serializer
   embed :ids
 
-  attributes :id
+  attributes :id, :title, :content
+
+  has_one :blog
 end

@@ -1,5 +1,7 @@
 class CommentSerializer < ActiveModel::Serializer
   embed :ids
 
-  attributes :id
+  attributes :id, :name, :content
+
+  has_one :post
 end

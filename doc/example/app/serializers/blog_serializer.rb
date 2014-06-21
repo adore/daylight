@@ -1,5 +1,5 @@
 class BlogSerializer < ActiveModel::Serializer
   embed :ids
 
-  attributes :id
+  attributes :id, :name, :description
 end
