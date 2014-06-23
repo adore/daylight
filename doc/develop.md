@@ -1180,6 +1180,7 @@ For example:
 It is retrieved using the `metadata` hash on the client model.
 
   ````ruby
+    # example metadata that could specify when a Post cannot be updated
     Post.find(1).metadata[:frozen] #=> true
   ````
 
