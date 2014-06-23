@@ -1099,6 +1099,11 @@ And will be encoded as an array:
     }
   ````
 
+> FUTURE [#10](https://github.com/att-cloud/daylight/issues/10):
+> It would be useful to know which associations the client model
+> `accepts_nested_attributes_for` so that we can turn "on/off"
+> the setter for associated objects.
+
 Lastly, `has_one :through` associations also uses the
 `accepts_nested_attributes_for` mechanism to describe the relationship in an
 attributes subhash.  For example
