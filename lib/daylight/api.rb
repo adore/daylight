@@ -101,9 +101,7 @@ class Daylight::API < ActiveResource::Base
       self.version   = config[:version] || config[:versions].last  # specify or use most recent version
       self.timeout   = config[:timeout] if config[:timeout]        # default read_timeout is 60
 
-      # API requires JSON request to emit a root node named after the object’s type
-      # this is different from `include_root_in_json` where every ActiveResource
-      # supplies its root.
+      # Only "parent" elements required to emit a root node
       self.request_root_in_json = config[:request_root_in_json] || true
 
       headers['X-Daylight-Framework'] = Daylight::VERSION
@@ -123,10 +121,20 @@ class Daylight::API < ActiveResource::Base
     end
 
     ##
+    ##
     # Whether to show root for the request
     #
+    # API requires JSON request to emit a root node named after the object’s
+    # type this is different from `include_root_in_json` where _every_
+    # `ActiveResource` supplies its root.
+    #
+    # This causes problems with `accepts_nessted_attributes_for` where the
+    # *_attributes do not need it (and is broken by having a root elmenet)
+    #
     # Turned on by default when transmitting JSON requests.
-
+    #
+    # See:
+    # encode
     def request_root_in_json?
       request_root_in_json && format.extension == 'json'
     end

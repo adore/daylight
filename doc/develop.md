@@ -462,7 +462,8 @@ actions:
 They are also included when specifying `handles :all`.
 
 > INFO: To understand how `root` option is being used in both `assoicated`
-> and `remoted` please refer to the section on [Symantic Data](#symantic-data)
+> and `remoted` please refer to the section on
+[Symantic Data](#associated-and-remoted-responses)
 
 #### Customization
 
@@ -986,4 +987,258 @@ refinements are applied.  For example:
 
 ### Symantic Data
 
+Data transmitted in requests and responses are formatted the same and use
+the same conventions.  Any data recieved can be encoded in a response without
+any issues.
+
+#### Root Element
+
+
+Both requests and responses will have a root element.  For responses, root
+elmeents define which client model(s) will be instanciated.  For requests,
+root elements define the parameter key that object attributes are sent
+under.
+
+For an `Post` object, when encoded to JSON:
+
+  ````json
+    {
+      "post": {
+        "id": 1,
+        "title": "100 Best Albums of 2014",
+        "created_by": 101
+      }
+    }
+  ````
+
+For collection of `Post` objects, when encoded to JSON:
+
+  ````json
+    {
+      "posts": [
+        {
+          "id": 1,
+          "title": "100 Best Albums of 2014",
+          },
+        {
+          "id": 2,
+          "title": "Loving the new Son Lux album",
+        }
+      ]
+    }
+  ````
+
+In both these cases, `post` is identified as the root, it's pluralized for
+to `posts` for a collections.
+
+#### Associated Attributes
+
+Associations for `has_one` are delivered as specified by the
+(serializers)[#serializer] and are embedded as IDs (eg. `blog_id`).
+Foriegn key names (eg. `created_by`) when
+specified are embedded as well:
+
+  ````json
+    {
+      "zone": {
+        "id": 1,
+        "title": "100 Best Albums of 2014",
+        "blog_id": 2
+        "created_by": 101
+      }
+    }
+  ````
+
+When setting a new object:
+
+  ````ruby
+    p.author = API::User.new({username: 'reidmix', fullname: 'Reid MacDonald'})
+  ````
+
+The new object will be updated using the `accepts_nested_attributes_for`
+mechanism on `ActiveRecord`.  These attributes are passed along in its
+own has which `accepts_nested_attributes_for` expects:
+
+  ````json
+    {
+      "zone": {
+        "id": 1,
+        "title": "100 Best Albums of 2014",
+        "author_attributes": {
+          "username": "reidmix",
+          "fullname": "Reid MacDonald"
+        }
+      }
+    }
+  ````
+
+New items in a collections will be added to the existing set:
+
+  ````ruby
+    p.comments << API::Comment.new({created_by: 222, message: "New Comment"})
+  ````
+
+And will be encoded as an array:
+
+  ````json
+    {
+      "zone": {
+        "id": 1,
+        "title": "100 Best Albums of 2014",
+        "comments_attributes": [
+          {
+            "created_by": 101,
+            "message": "Existing Comment"
+          },
+          {
+            "created_by": 222,
+            "fullname": "New Comment"
+          }
+        ]
+      }
+    }
+  ````
+
+Lastly, `has_one :through` associations also uses the
+`accepts_nested_attributes_for` mechanism to describe the relationship in an
+attributes subhash.  For example
+
+  ````json
+    {
+      "post": {
+        "id": 283,
+        "title": "100 Best Albums of 2014",
+        "blog_id": 4,
+        "blog_attributes": {
+          "id": 4,
+          "company_id": 1
+        },
+      }
+    }
+  ````
+
+Our [previous example](#has_one-through) describes when a `Post` has a
+`Company` through a `Blog`.  The `Blog` is referenced directly using the
+`blog_id`.  `Company` is referenced _through_ the `Blog` using both of the
+`blog_attribtues`.
+
+#### Associated and Remoted Responses
+
+The root element for the associated and remoted methods simply use the name of
+the action in the response.
+
+Typically this keeps things simple when retrieving `/v1/blog/1/comments.json`:
+
+  ````json
+    {
+      "comments": [
+        {
+          "id": "2"
+          "post_id": "1"
+          "created_by": 101,
+          "message": "Existing Comment"
+        },
+        {
+          "id": "3"
+          "post_id": "1"
+          "created_by": 222,
+          "fullname": "New Comment"
+        }
+      ]
+    }
+  ````
+
+The associated and remoted methods will often have a configured name (eg.
+`top_comments`).  When building your client models, simply set the `class_name`
+correct to the corresponding client model (ie. `api/v1/comment`)
+
 ### Response Metadata
+
+Metadata about an object is delivered in the `meta` section of the response
+data.  Anything can be stored in this section (in the serializer).
+
+For example:
+
+  ````json
+    {
+      "post": {
+        "id": 1,
+        "title": "100 Best Albums of 2014",
+      },
+      "meta": {
+        "favorited": true
+      }
+    }
+  ````
+
+It is retrieved using the `metadata` hash on the client model.
+
+  ````ruby
+    Post.find(1).metadata[:favorited] #=> true
+  ````
+
+Daylight uses metadata in two standard ways:
+* `read_only` attributes
+* `where_values` clauses.
+
+#### read_only
+
+The way that Daylight know which methods are read only and cannot be written
+is using the list of attributes that are `read_only` for that client model:
+
+  ````json
+    {
+      "post": {
+        "id": 1,
+        "title": "100 Best Albums of 2014",
+      },
+      "meta": {
+        "read_only": {
+          "post": [
+            "slug",
+            "published",
+            "created_at"
+          ]
+        }
+      }
+    }
+  ````
+
+Here, we will not be able to set `slug`, `published?`, and `created_at`
+and Daylight will raise a `NoMethodError`
+
+> NOTE: ActiveResource handles predicate lookups for attributes
+> (eg. `published` vs. `published?`)
+
+#### where_values
+
+How Daylight keeps track of how a model was looked up when using
+`find_or_initialize` and `find_or_create` is by returning the
+`where_values` from ActiveRecord.  These will be merged when the
+`ActiveResource` is saved.
+
+  ````json
+    {
+      "post": {
+        "id": 1,
+        "title": "100 Best Albums of 2014",
+      },
+      "meta": {
+        "where_values": {
+          "blog_id": 1
+        }
+      }
+    }
+  ````
+
+To see this in action, if the `Post` with the queried title was not found:
+
+  ````ruby
+    p = API::Blog.first.find_or_create(title: "100 Best Albums of 2014")
+    p.title   #=> "100 Best Albums of 2014"
+    p.blog_id #=> 1
+  ````
+
+Since, `where_values` clauses can be quite complicated and are resolved by
+`ActiveRecord` we determine them server-side and send them as metadata in
+the response.
