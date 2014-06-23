@@ -105,13 +105,13 @@ there is:
 
 ActiveResource will not be able to resolve these associations correctly without
 using the model-based associations, because it:
-* Cannot determine endpoint or correct class to instanciate
+* Cannot determine endpoint or correct class to instantiate
 * Uses the wrong lookup key (in through associations and foreign key option)
 * Conditions will not be supplied in the request
 
-> NOTE: Daylight includes `Daylight::Refiners` on all models that inheret from
+> NOTE: Daylight includes `Daylight::Refiners` on all models that inherit from
 > `ActiveRecord::Base`.  At this time there is no way to exclude this module
-> from any model.
+> from any model. It does not modify existing ActiveRecord functionality.
 
 
 ### Serializers
