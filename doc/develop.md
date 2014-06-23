@@ -438,7 +438,7 @@ allowed are defined in your [Routes](#routes).
 > called against the collection.
 
 Remoted methods should return a record or collections of records so that they
-may be instanciated correctly by the client and act as a proxy back to the API.
+may be instantiated correctly by the client and act as a proxy back to the API.
 
 On the controller, see it called by the (similarly named) `remoted` action:
 
@@ -995,7 +995,7 @@ any issues.
 
 
 Both requests and responses will have a root element.  For responses, root
-elmeents define which client model(s) will be instanciated.  For requests,
+elmeents define which client model(s) will be instantiated.  For requests,
 root elements define the parameter key that object attributes are sent
 under.
 
