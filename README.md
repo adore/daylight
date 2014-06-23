@@ -102,7 +102,7 @@ Ah, but we have to develop our API and client models:
 
 4. More information can be found on:
     * [Installation Steps](doc/install.md)
-    * [Daylight Users Guide](doc/guide.md)
+    * [Daylight Users Guide](doc/usage.md)
     * [API Developer Guide](doc/develop.md)
     * [Testing Your API](doc/testing.md)
     * [How to Contribute](doc/contribute.md)

@@ -425,7 +425,7 @@ scopes, conditions, order, limit, and offset.  The associated action is
 setup in [Through Associations](#through-associations) on the client model.
 
 > NOTE: You can find more information on how to use these refinements in
-> the [Daylight Users Guide](guide.md)
+> the [Daylight Users Guide](usage.md)
 
 ##### Remoted
 
@@ -745,7 +745,7 @@ You can setup both to use model associations:
     end
   ````
 
-Refer to the [Daylight Users Guide](guide.md) to see how to further work
+Refer to the [Daylight Users Guide](usage.md) to see how to further work
 associations.
 
 #### Scopes and Remoted Methods
