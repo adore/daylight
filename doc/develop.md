@@ -238,7 +238,7 @@ There's duplication in the JSON payload, but `post["blog_id"]` and
 #### Read Only Attributes
 
 There are cases when you want to expose data from the model as read only
-attributes so they cannot be updatedd.  These cases are when the attribute is:
+attributes so they cannot be updated.  These cases are when the attribute is:
 * Evaluated and not stored in the database
 * Stored into the database only when computed
 * Readable but should not be updated
