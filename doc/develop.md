@@ -1043,7 +1043,7 @@ specified are embedded as well:
       "zone": {
         "id": 1,
         "title": "100 Best Albums of 2014",
-        "blog_id": 2
+        "blog_id": 2,
         "created_by": 101
       }
     }
@@ -1239,8 +1239,10 @@ How Daylight keeps track of how a model was looked up when using
 To see this in action, if the `Post` with the queried title was not found:
 
   ````ruby
-    p = API::Blog.first.find_or_create(title: "100 Best Albums of 2014")
+    p = API::Blog.first.posts.find_or_create(title: "100 Best Albums of 2014")
     p.title   #=> "100 Best Albums of 2014"
+
+    # from the `where_values` during the lookup
     p.blog_id #=> 1
   ````
 
