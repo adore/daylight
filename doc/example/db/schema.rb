@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(version: 20140621000208) do
 
   create_table "posts", force: true do |t|
     t.string  "title"
-    t.text    "content"
+    t.text    "body"
     t.integer "blog_id"
   end
 
