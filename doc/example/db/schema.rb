@@ -11,23 +11,39 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140621000208) do
+ActiveRecord::Schema.define(version: 20140623230505) do
 
   create_table "blogs", force: true do |t|
-    t.string "name"
-    t.text   "description"
+    t.string  "name"
+    t.text    "description"
+    t.integer "company_id"
   end
 
   create_table "comments", force: true do |t|
-    t.string  "name"
-    t.text    "content"
-    t.integer "post_id"
+    t.string   "name"
+    t.text     "content"
+    t.boolean  "spam"
+    t.datetime "published_at"
+    t.integer  "like_count"
+    t.integer  "post_id"
+  end
+
+  create_table "companies", force: true do |t|
+    t.string "name"
   end
 
   create_table "posts", force: true do |t|
-    t.string  "title"
-    t.text    "body"
-    t.integer "blog_id"
+    t.string   "title"
+    t.string   "slug"
+    t.text     "body"
+    t.boolean  "published"
+    t.datetime "published_at"
+    t.integer  "blog_id"
+    t.integer  "author_id"
+  end
+
+  create_table "users", force: true do |t|
+    t.string "name"
   end
 
 end
