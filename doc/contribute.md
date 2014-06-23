@@ -21,7 +21,7 @@ mocking framework we built and Documentation Rails engine with hopes
 that they might serve useful to API developers.
 
 Daylight is named as such for our intent the framework would be able to
-"see the light of day".
+"_see the light of day_".
 
 ## Reporting an Issue
 
