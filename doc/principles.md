@@ -1,9 +1,8 @@
 # Guiding Principles
 
 Here are decisions we made when developing Daylight. We often referred back to these
-to help us decide which approach to take.
-
-These are not hard-and-fast rules and can be reviewed and changed as the need arises.
+to help us decide which approach to take. These are not hard-and-fast rules and can
+be reviewed and changed as the need arises.
 
 1. Let Rails do all of the database work
    * The client should require the least amount of data to peform the database task
