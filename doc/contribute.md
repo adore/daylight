@@ -68,7 +68,8 @@ using your branch with your code changes.
 ## Understanding
 
 To better understand how a framework extends or alters the underlying Rails
-technology.  Here are some additional details on how `Daylight` was built.
+technology and help navigate the code for contributing, here are details and
+guidelines on how Daylight was built.
 
 Please rely on the following for reference or feel free to ask or suggest:
 
