@@ -71,7 +71,8 @@ To better understand how a framework extends or alters the underlying Rails
 technology and help navigate the code for contributing, here are details and
 guidelines on how Daylight was built.
 
-Please rely on the following for reference or feel free to ask or suggest:
+Please rely on the following for reference or feel free to ask or suggest
+improvements:
 
 * [Guiding Principles](principles.md)
 * [Build Environment](environment.md)
