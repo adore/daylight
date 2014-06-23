@@ -1,3 +1,5 @@
+/.rbenv-gemsets
+/.ruby-version
+/coverage
 /spec/dummy/db/*.sqlite3
 /spec/dummy/log/*.log
-coverage
