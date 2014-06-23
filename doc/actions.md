@@ -1,5 +1,15 @@
 # Controller Actions
 
+When your `APIController` handles all requests, like so:
+
+````
+class PostController < APIController
+  handles :all
+end
+````
+
+Essentially, these are the actions that are run on its behalf:
+
 ````ruby
 class PostController < APIController
 
