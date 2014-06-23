@@ -1159,8 +1159,9 @@ correct to the corresponding client model (ie. `api/v1/comment`)
 
 ### Response Metadata
 
-Metadata about an object is delivered in the `meta` section of the response
-data.  Anything can be stored in this section (in the serializer).
+Metadata about an object and its usage in the framework is delivered in the
+`meta` section of the response data.  Anything can be stored in this section
+(by the serializer).
 
 For example:
 
@@ -1171,7 +1172,7 @@ For example:
         "title": "100 Best Albums of 2014",
       },
       "meta": {
-        "favorited": true
+        "frozen": true
       }
     }
   ````
@@ -1179,7 +1180,7 @@ For example:
 It is retrieved using the `metadata` hash on the client model.
 
   ````ruby
-    Post.find(1).metadata[:favorited] #=> true
+    Post.find(1).metadata[:frozen] #=> true
   ````
 
 Daylight uses metadata in two standard ways:
