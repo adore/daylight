@@ -53,7 +53,7 @@ class Daylight::API < ActiveResource::Base
     DEFAULT_CONFIG = {
       namespace: 'API',
       endpoint:  'http://localhost',
-      versions:  %w[v1],
+      versions:  %w[v1]
     }.freeze
 
     ##
@@ -106,7 +106,7 @@ class Daylight::API < ActiveResource::Base
 
       headers['X-Daylight-Framework'] = Daylight::VERSION
 
-      # alias_apis if config[:alias_apis]
+      alias_apis unless config[:no_alias_apis]
     end
 
     ##
@@ -158,34 +158,25 @@ class Daylight::API < ActiveResource::Base
       end
 
       ##
-      # Alias the configured Client API constants to be references without a
+      # Alias the configured client API constants to be references without a
       # version number for the active version:
       #
       # For example, if the active version is 'v1':
       #
-      #     ClientAPI::Zone   # => Daylight::V1::Zone
+      #     API::Post   # => API::V1::Post
 
       def alias_apis
-        api_classes.each do |api|
-          Daylight.const_set(api, "#{namespace}::#{version}::#{api}".constantize)
+        api_classes   = "#{namespace}::#{version}".constantize.constants
+        api_namespace = namespace.constantize
+
+        api_classes.each do |api_class|
+          api_namespace.const_set(api_class, "#{namespace}::#{version}::#{api_class}".constantize)
         end
 
         true
-      end
-
-      ##
-      # Load and return the Client APIs for the configured version.
-      #
-      # Searches in the `lib` directory of the Client API under the namespace
-      # and version.  By default, searches Client models in 'lib/api/v1' and
-      # loads them.
-
-      def api_classes
-        api_files = File.join(File.dirname(__FILE__), version.downcase, "**/*.rb")
-
-        Dir[api_files].each { |filename| load filename }
-
-        "#{namespace}::#{version}".constantize.constants
+      rescue => e
+        logger.error("Could not alias_apis #{e.class}:\n\t#{e.message}")
+        false
       end
   end
 
