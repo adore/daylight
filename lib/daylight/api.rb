@@ -175,7 +175,7 @@ class Daylight::API < ActiveResource::Base
 
         true
       rescue => e
-        logger.error("Could not alias_apis #{e.class}:\n\t#{e.message}")
+        logger.error("Could not alias_apis #{e.class}:\n\t#{e.message}") if logger
         false
       end
   end
