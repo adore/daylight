@@ -642,6 +642,17 @@ will not need to update all of the constants in their codebase from
 `API::V1::Post` to `API::V2::Post` after they migrate. Instead they can focus
 on differences provided in the new API version.
 
+When developing your API when you `reload!` within your console, the aliased
+constants will still reference the older class definitions.  To re-alias the
+constants during a `reload!` add the following to an initializer:
+
+  ````ruby
+    require 'daylight/client_reloader'
+  ````
+
+This should not be needed for your end-users but is available for debugging
+purposes if needed.
+
 > FUTURE [#2](https://github.com/att-cloud/daylight/issues/2):
 > It may be possible to have different versions of a client model to run
 > concurrently.  This would aid end users of the API to move/keep some classes
