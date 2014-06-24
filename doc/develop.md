@@ -88,7 +88,7 @@ correctly.  For example:
   ````ruby
     class Post
       has_many :comments
-      has_many :authors, foreign_key: 'created_by', class_name: 'User'
+      has_many :favorites, foreign_key: 'favorite_post_id', class_name: 'User'
       has_many :commenters, -> { uniq }, through: :comments, class_name: 'User'
       has_many :suppressed_comments, -> { where(spam: true) }, class_name: 'Comment'
     end
@@ -97,11 +97,11 @@ correctly.  For example:
 Here we have 4 examples where using the model associations are neccesary.  When
 there is:
 
-1. A configured foreign_key as in `authors`
+1. A configured foreign_key as in `favorites`
 2. A through association as in `commenters`
 3. A condindition block as `commenters` and `suppressed_comments` (eg. `uniq`
    and `where`)
-4. A class_name in all three `author`, `commenters`, and `suppressed_comments`
+4. A class_name in all three `favorites`, `commenters`, and `suppressed_comments`
 
 ActiveResource will not be able to resolve these associations correctly without
 using the model-based associations, because it:
