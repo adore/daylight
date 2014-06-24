@@ -3,7 +3,7 @@
 This is the environment that Daylight was built with that may not be obvious
 simply from the Gemfile.
 
-## Daylight Requirements
+## Requirements
 
 Only items requrired are [ruby](https://www.ruby-lang.org/en/downloads/)
 and [bundler](http://bundler.io/) to contribute to Daylight.
@@ -13,11 +13,11 @@ All other [dependencies](#dependencies) are loaded via `bundler`.
     ruby                      2.0.0-p247
     bundler                   1.3.5
 
-## Developers Preferences
+## Developer Preferences
 
 We use [rbenv](https://github.com/sstephenson/rbenv) to help manage
 our ruby versions and [pow](http://pow.cx/) as our application
-(rack) server.  YMMV, and can use any tool to handle these functions.
+(rack) server.
 
     rbenv                      0.4.0
     pow                        0.4.1
@@ -29,6 +29,8 @@ FWIW, we also use rbenv plugin
 [rbenv-gem-rehash](https://github.com/sstephenson/rbenv-gem-rehash)
 
 We control pow using the [powder](https://github.com/Rodreegez/powder) CLI.
+
+__YMMV, and can use any tool to handle these functions.__
 
 ## Runtime Dependencies
 
