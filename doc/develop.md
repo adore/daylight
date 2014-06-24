@@ -899,8 +899,6 @@ server-side, errors will be raised.
   #   Response message = Bad Request.  Root Cause = unknown association: author
   ````
 
----
-
 ## Underlying Interaction
 
 This section is to help  understanding what the client is doing so you can
