@@ -61,7 +61,7 @@ for rails testing and simplecov-rcov for coverage testing.
 Daylight request and responses occur through webmock.
 `Daylight::Mock` is built on top of it.
 
-    sqlite3-ruby               1.3.9        [Github](https://github.com/sparklemotion/sqlite3-ruby)
+    sqlite3-ruby               1.3.9        https://github.com/sparklemotion/sqlite3-ruby
     factory_girl               2.0          [Github](https://github.com/thoughtbot/factory_girl)
     faker                      1.2.0        [Github](https://github.com/stympy/faker)
 
