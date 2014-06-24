@@ -1144,14 +1144,14 @@ Typically this keeps things simple when retrieving `/v1/blog/1/top_comments.json
     {
       "top_comments": [
         {
-          "id": "2",
-          "post_id": "1",
+          "id": 2,
+          "post_id": 1,
           "created_by": 101,
           "message": "Existing Comment"
         },
         {
-          "id": "3",
-          "post_id": "1",
+          "id": 3,
+          "post_id": 1,
           "created_by": 222,
           "fullname": "New Comment"
         }
