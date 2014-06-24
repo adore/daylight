@@ -624,7 +624,9 @@ Here again, we encourage you to namespace and version your client models.
 You can do this using module names and Daylight will offer several
 conviniences.
 
-First, Daylight will _alias_ to the current version defined in your `setup!`.
+#### Aliased API
+
+Daylight will _alias_ to the current version defined in your `setup!`.
 Assuming you've have two versions of your client models:
 
   ````ruby
@@ -642,6 +644,14 @@ will not need to update all of the constants in their codebase from
 `API::V1::Post` to `API::V2::Post` after they migrate. Instead they can focus
 on differences provided in the new API version.
 
+
+> FUTURE [#2](https://github.com/att-cloud/daylight/issues/2):
+> It may be possible to have different versions of a client model to run
+> concurrently.  This would aid end users of the API to move/keep some classes
+> on a particular version.
+
+#### Client Reloader
+
 When developing your API when you `reload!` within your console, the aliased
 constants will still reference the older class definitions.  To re-alias the
 constants during a `reload!` add the following to an initializer:
@@ -653,13 +663,10 @@ constants during a `reload!` add the following to an initializer:
 This should not be needed for your end-users but is available for debugging
 purposes if needed.
 
-> FUTURE [#2](https://github.com/att-cloud/daylight/issues/2):
-> It may be possible to have different versions of a client model to run
-> concurrently.  This would aid end users of the API to move/keep some classes
-> on a particular version.
+#### Association Lookup
 
-Second, Daylight will lookup association classes using the same module as your
-client model.  This simplifies setting up your relationships becaause you do
+Daylight will lookup association classes using the namespace and version set
+in your client.  This simplifies setting up your relationships becaause you do
 not need to define your `class_name` on each association:
 
   ````ruby
