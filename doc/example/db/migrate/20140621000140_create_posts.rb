@@ -6,6 +6,7 @@ class CreatePosts < ActiveRecord::Migration
       t.text     :body
       t.boolean  :published
       t.datetime :published_at
+      t.integer  :view_count
       t.integer  :blog_id
       t.integer  :author_id
     end
