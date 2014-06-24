@@ -1159,8 +1159,8 @@ Typically this keeps things simple when retrieving `/v1/blog/1/top_comments.json
     }
   ````
 
-The associated and remoted methods will often have a configured name (eg.
-`top_comments`).  When building your client models, simply set the `class_name`
+The associated and remoted methods will use configured name to look up the
+client model.  In the case of `top_comments`, set the `class_name`
 correct to the corresponding client model (ie. `api/v1/comment`)
 
 ### Response Metadata
