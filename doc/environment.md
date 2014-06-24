@@ -3,7 +3,7 @@
 This is the environment that Daylight was built with that may not be obvious
 simply from the Gemfile.
 
-## Requirements
+## Daylight Requirements
 
 Only items requrired are [ruby](https://www.ruby-lang.org/en/downloads/)
 and [bundler](http://bundler.io/) to contribute to Daylight.
