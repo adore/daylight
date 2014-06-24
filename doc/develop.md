@@ -1138,20 +1138,20 @@ Our [previous example](#has_one-through) describes when a `Post` has a
 The root element for the associated and remoted methods simply use the name of
 the action in the response.
 
-Typically this keeps things simple when retrieving `/v1/blog/1/comments.json`:
+Typically this keeps things simple when retrieving `/v1/blog/1/top_comments.json`:
 
   ````json
     {
-      "comments": [
+      "top_comments": [
         {
-          "id": "2"
-          "post_id": "1"
+          "id": "2",
+          "post_id": "1",
           "created_by": 101,
           "message": "Existing Comment"
         },
         {
-          "id": "3"
-          "post_id": "1"
+          "id": "3",
+          "post_id": "1",
           "created_by": 222,
           "fullname": "New Comment"
         }
