@@ -9,6 +9,8 @@ Install the gem or add it to your bundler's Gemfile:
 Set up the gem in a Rails initializer on your application:
 
 ```ruby
+    require 'daylight'
+    
     Daylight::API.setup!({
       namespace: 'API',
       endpoint:  'http://localhost',
