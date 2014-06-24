@@ -30,7 +30,7 @@ FWIW, we also use rbenv plugin
 
 We control pow using the [powder](https://github.com/Rodreegez/powder) CLI.
 
-__YMMV, and can use any tool to handle these functions.__
+_YMMV, and can use any tool to handle these functions._
 
 ## Runtime Dependencies
 
