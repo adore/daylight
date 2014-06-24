@@ -7,6 +7,7 @@ class CreateComments < ActiveRecord::Migration
       t.datetime :published_at
       t.integer  :like_count
       t.integer  :post_id
+      t.integer  :commenter_id
     end
   end
 end

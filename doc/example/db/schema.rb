@@ -26,6 +26,7 @@ ActiveRecord::Schema.define(version: 20140623230505) do
     t.datetime "published_at"
     t.integer  "like_count"
     t.integer  "post_id"
+    t.integer  "commenter_id"
   end
 
   create_table "companies", force: true do |t|
