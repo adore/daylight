@@ -113,6 +113,7 @@ using the model-based associations, because it:
 > `ActiveRecord::Base`.  At this time there is no way to exclude this module
 > from any model. It does not modify existing ActiveRecord functionality.
 
+---
 
 ### Serializers
 
@@ -296,6 +297,7 @@ being sent when the object is saved.
 In this case `published?`, `slug`, `created_at`, and `updated_at` are never
 sent in a PUT update.
 
+---
 
 ### Controllers
 
@@ -521,6 +523,8 @@ In this case use `Daylight::APIController` to subclass from:
     end
   ````
 
+---
+
 ### Routes
 
 Setup your routes as you do in Rails today.  Since Daylight assumes that
@@ -597,6 +601,8 @@ routing options.
 
 As you can see when you develop your API, the routes file becomes a
 specification of what is exposed to the client.
+
+---
 
 ### Client
 
@@ -892,6 +898,8 @@ server-side, errors will be raised.
   #=> ActiveResource::BadRequest: Failed.  Response code = 400.
   #   Response message = Bad Request.  Root Cause = unknown association: author
   ````
+
+---
 
 ## Underlying Interaction
 
