@@ -16,8 +16,9 @@ module Daylight
     autoload :Errors
     autoload :Inflections
     autoload :Refinements
-    autoload :ResourceProxy
     autoload :ReadOnly
+    autoload :ResourceProxy
+    autoload :ReflectionExt
     autoload :API
   end
 end

@@ -30,14 +30,20 @@ describe Daylight::API do
   end
 
   before do
-    @original_password = Daylight::API.password
-    @original_endpoint = Daylight::API.endpoint
-    @original_version  = Daylight::API.version.downcase
+    @original_namespace = Daylight::API.namespace
+    @original_password  = Daylight::API.password
+    @original_endpoint  = Daylight::API.endpoint
+    @original_version   = Daylight::API.version.downcase
   end
 
   after do
     silence_warnings do
-      Daylight::API.setup! endpoint: @original_endpoint, version: @original_version, password: @original_password
+      Daylight::API.setup!({
+        namespace: @original_namespace,
+        endpoint: @original_endpoint,
+        version: @original_version,
+        password: @original_password
+      })
     end
   end
 

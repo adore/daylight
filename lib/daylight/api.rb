@@ -164,6 +164,8 @@ class Daylight::API < ActiveResource::Base
       # For example, if the active version is 'v1':
       #
       #     API::Post   # => API::V1::Post
+      #
+      # Assumes all your model classes are loaded (defined)
 
       def alias_apis
         api_classes   = "#{namespace}::#{version}".constantize.constants
@@ -176,6 +178,7 @@ class Daylight::API < ActiveResource::Base
         true
       rescue => e
         logger.error("Could not alias_apis #{e.class}:\n\t#{e.message}") if logger
+
         false
       end
   end
