@@ -653,8 +653,9 @@ on differences provided in the new API version.
 #### Client Reloader
 
 When developing your API when you `reload!` within your console, the aliased
-constants will still reference the older class definitions.  To re-alias the
-constants during a `reload!` add the following to an initializer:
+constants will still reference the older class definitions.  Currently, this
+only works with IRB.  To re-alias the constants during a `reload!` add the
+following to an initializer:
 
   ````ruby
     require 'daylight/client_reloader'
