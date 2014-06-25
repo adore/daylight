@@ -13,6 +13,7 @@ module Daylight::Refinements
     # Define scopes that the class can be refined by
     def scopes *scope_names
       self.scope_names = scope_names
+      self.scope_names.freeze
 
       scope_names.each do |scope|
         # hand chaining duties off to the ResourceProxy instance
@@ -25,18 +26,18 @@ module Daylight::Refinements
           append_scope(scope)
         end
       end
+    end
 
-      ##
-      # Use limits if no argument are supplied.  Otherwise, continue to use
-      # the ActiveRecord version which retrieves the full result set and calls
-      # first.
-      #
-      # See:
-      # ActiveRecord::Base#first
-      # Daylight::ResourceProxy#first
-      def first *args
-        args.size.zero? ? resource_proxy.first : super
-      end
+    ##
+    # Use limits if no argument are supplied.  Otherwise, continue to use
+    # the ActiveRecord version which retrieves the full result set and calls
+    # first.
+    #
+    # See:
+    # ActiveRecord::Base#first
+    # Daylight::ResourceProxy#first
+    def first *args
+      args.size.zero? ? resource_proxy.first : super
     end
 
     protected
