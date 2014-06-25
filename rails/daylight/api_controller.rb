@@ -73,8 +73,12 @@ class Daylight::APIController < ApplicationController
 
   ##
   # Ensure messaging when there unpermitted attributes on save and update
+  #
+  # This should be an unprocessable_entity when we figure out how to provide which attribute
+  # is causing this error. The ForbiddenAttributesError does not provide context.
+  # See: https://github.com/att-cloud/daylight/issues/8
   rescue_from ActiveModel::ForbiddenAttributesError do |e|
-    render json: { errors: 'unpermitted or missing attribute' }, status: :unprocessable_entity
+    render json: { errors: 'unpermitted or missing attribute' }, status: :bad_request
   end
 
 

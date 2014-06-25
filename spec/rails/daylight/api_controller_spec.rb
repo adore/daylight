@@ -140,16 +140,18 @@ describe Daylight::APIController, type: :controller do
         end
       end
 
+      # TODO: these two should be unprocessable_entity insead
+      # See: https://github.com/att-cloud/daylight/issues/8
       it "has status of unprocessable_entity" do
         post :create, case: {suite_id: 0}
 
-        assert_response :unprocessable_entity
+        assert_response :bad_request
       end
 
       it "returns the record's errors as JSON" do
         post :create, case: {name: 'unpermitted'}
 
-        assert_response :unprocessable_entity
+        assert_response :bad_request
 
         body = JSON.parse(response.body)
         body['errors'].should == 'unpermitted or missing attribute'
