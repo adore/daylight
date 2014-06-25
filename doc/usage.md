@@ -16,9 +16,9 @@ refer to the [installation steps](install.md) for options.
 #### Table of Contents
 * [Client Model Example](#client-model-example)
   * [Namespace and Version](#namespace-and-version)
-* [ActiveResource Overview](#active-resource-overview)
+* [ActiveResource Overview](#activeresource-overview)
 * [Refinements](#refinements)
-  * [Conditions](#conditions)
+  * [Conditions Additions](#condition-additions)
   * [Order](#order)
   * [Limit and Offset](#limit-and-offset)
   * [Scopes](#scopes)
@@ -172,7 +172,7 @@ documenation for more information.
 Daylight offers many ways to refine queries across collections.  These include
 conditions, scopes, order, offset, and limit.
 
-### Conditions
+### Condition Additions
 
 There are several additions to `ActiveResource` conditions.
 
@@ -283,6 +283,7 @@ allows all of the refinements to be chained together for better searches:
 
 Since `offset` and `limit` can be chained together, you can use these with your favorite paginator.
 
+---
 
 ## Remote Methods
 
@@ -369,9 +370,9 @@ save these associated instances directly:
 
 `Bluesky::Zone.nonretired.production.find_by(code: 'sql1').tenants.find_by(name: 'nosql-accenture-dev').vms.running`
 
-Started GET "/v1/zones.json?filters%5Bcode%5D=sql1&limit=1&scopes%5B%5D=nonretired&scopes%5B%5D=production"
-Started GET "/v1/zones/8/tenants.json?filters%5Bname%5D=nosql-accenture-dev&limit=1"
-Started GET "/v1/tenants/1161/vms.json?scopes%5B%5D=running"
+    GET "/v1/zones.json?filters%5Bcode%5D=sql1&limit=1&scopes%5B%5D=nonretired&scopes%5B%5D=production"
+    GET "/v1/zones/8/tenants.json?filters%5Bname%5D=nosql-accenture-dev&limit=1"
+    GET "/v1/tenants/1161/vms.json?scopes%5B%5D=running"
 
 From our example on in the [README](../README.doc) we show creating a `Post`
 and `User` and associating the two:
