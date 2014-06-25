@@ -6,4 +6,9 @@ class API::V1::PostsController < APIController
 
     @post.update_attributes(:view_count, @post.view_count+1)
   end
+
+  private
+    def post_params
+      params.require(:post).permit(:title, :body, :published)
+    end
 end
