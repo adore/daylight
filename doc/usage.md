@@ -370,9 +370,9 @@ save these associated instances directly:
 
 `Bluesky::Zone.nonretired.production.find_by(code: 'sql1').tenants.find_by(name: 'nosql-accenture-dev').vms.running`
 
-    GET "/v1/zones.json?filters%5Bcode%5D=sql1&limit=1&scopes%5B%5D=nonretired&scopes%5B%5D=production"
-    GET "/v1/zones/8/tenants.json?filters%5Bname%5D=nosql-accenture-dev&limit=1"
-    GET "/v1/tenants/1161/vms.json?scopes%5B%5D=running"
+    GET "/v1/zones.json?filters[code]=sql1&limit=1&scopes[]=nonretired&scopes[]=production"
+    GET "/v1/zones/8/tenants.json?filters[name]=nosql-accenture-dev&limit=1"
+    GET "/v1/tenants/1161/vms.json?scopes[]=running"
 
 From our example on in the [README](../README.doc) we show creating a `Post`
 and `User` and associating the two:
