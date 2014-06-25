@@ -44,7 +44,7 @@ refer to these client models in the following `Post` example:
 
   ````ruby
     class API::V1::Post < Daylight::API
-      scope :published
+      scope :published, :updated
 
       belongs_to :blog
       belongs_to :author, class_name: 'api/v1/user'
@@ -174,7 +174,14 @@ conditions, scopes, order, offset, and limit.
 
 ### Condition Additions
 
-There are several additions to `ActiveResource` conditions.
+There are several additions to `ActiveResource` conditions.  Which attributes
+may be refined need to be defined by your API developer but can be inspected
+on a retrieved instance:
+
+  ````ruby
+    post = API::Post.find(1)
+    post.attributes.keys #=> ["id", "blog_id", "title", "body", "slug",  "published", "published_on", "created_by"]
+  ````
 
 If you know there to be one result or only need the first result, use `find_by`:
 
@@ -238,36 +245,78 @@ And you can `offset` which records to be returned:
 
 ### Scopes
 
+Scopes are conditions made available on the client-side model and executed
+server-side.  The function of a scope needs to be defined by your API
+developer but which scopes are available be inspected in client model
+or find in the instance:
+
+  ````ruby
+    API::Post.scope_names #=> [:published, :updated]
+  ````
+
+You can call a scope directly on the model class:
+
+  ````ruby
+    posts = API::Post.published
+
+    # assuming published scope on the server-side is
+    # scope :published, -> {where.not(published_on: nil)}
+
+    posts.first.published_on                  #=> true
+    posts.all? {|p| p.published_on.present? } #=> true
+  ````
+
+You may call multiple scopes on a model:
+
+  ````ruby
+    posts = API::Post.published.edited
+
+    # assuming published scope on the server-side is
+    # scope :edited, -> {where.not(edited_on: nil)}
+
+    posts.first.published_on                  #=> true
+    posts.first.edited_on                     #=> true
+
+    posts.all? {|p| p.published_on.present? } #=> true
+    posts.all? {|p| p.edited_on.present? }    #=> true
+  ````
+
 ### Chaining
 
 All of the above refinements are as limited to the one being used.  Daylight
-allows all of the refinements to be chained together for better searches:
+allows all or any combination of the refinements to be chained together for
+better searches:
 
   ````ruby
-    # get all posts
+    # NONE: get all posts
     posts = API::Post.all
-    posts.map(&:id)  #=> [10, 3, 2, 4, 7, 5, 6, 1, 9, 8]
+    posts.map(&:id)          #=> [10, 3, 2, 4, 7, 5, 6, 1, 9, 8]
 
-    # get posts for blog_id=2
+    # SCOPE: get published posts
+    posts = API::Post.published
+    posts.map(&:id)          #=> [3, 2, 7, 5, 6, 1, 9, 8]
+    posts.first.published_on #=> '2013-09-03'
+
+    # WHERE 1 condition: get posts for blog_id=2
     posts = API::Post.where(blog_id: 2)
-    posts.map(&:id)           #=> [2, 1, 5, 9, 8]
+    posts.map(&:id)           #=> [2, 5, 1, 9, 8]
     posts.map(&:blog_id)      #=> [2, 2, 2, 2, 2]
 
-    # get posts for blog_id=2 AND created_by=2
+    # WHERE 2 conditions: get posts for blog_id=2 AND created_by=2
     posts = API::Post.where(blog_id: 2).where(created_by: 101))
     posts.map(&:id)          #=> [2, 9, 8]
     posts.map(&:created_by)  #=> [101, 101, 101]
 
-    # get posts for blog_id=2 AND created_by=2 order by published_on
+    # ORDER: get posts for blog_id=2 AND created_by=2 order by published_on
     posts = API::Post.where(blog_id: 2).where(created_by: 101)).order(:published_on)
     posts.map(&:id)           #=> [2, 8, 9]
     posts.map(&:published_on) #=> ['2014-01-01', '2014-06-21', '2014-06-26']
 
-    # get posts for blog_id=2 AND created_by=2 order by published_on after the first one
+    # OFFSET: get posts for blog_id=2 AND created_by=2 order by published_on after the first one
     posts = API::Post.where(blog_id: 2).where(created_by: 101)).order(:published_on).offset(1)
     posts.map(&:id)           #=> [8, 9]
 
-    # get posts for blog_id=2 AND created_by=2 order_by published_on
+    # LIMIT: get posts for blog_id=2 AND created_by=2 order_by published_on
     posts = API::Post.where(blog_id: 2).where(created_by: 101)).order(:published_on).offset(1).limit(1)
     posts.map(&:id)           #=> [8]
 
