@@ -13,12 +13,6 @@ client models.  The client models will describe what functionality is available
 to you.  Follow the your API developers instructions on how to setup the API or
 refer to the [installation steps](install.md) for options.
 
-In your application you will have a `setup!` method similar to the following:
-
-  ````ruby
-    Daylight::API.setup!(endpoint: 'http://api.company.com/')
-  ````
-
 #### Table of Contents
 * [Client Model Example](#client-model-example)
   * [Namespace and Version](#namespace-and-version)
@@ -64,9 +58,9 @@ refer to these client models in the following `Post` example:
   ````
 
 All of the client models can be interacted with in the
-[example applicatoin](example.md).
+[example application](example.md).
 
-### Namespace and Versions
+### Namespace and Version
 
 Namespace is the root module for all your client models and can be seen
 in this example as the 'API' in the module.  By default, without a supplied
