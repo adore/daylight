@@ -113,9 +113,9 @@ Get all instances of `Post`, or just the first or last:
     API::Post.last           #=> #<API::V1::Post:0x007ffa8c4763d0 ..>
   ````
 
-> NOTE: Daylight add a [limit](#limit) condition to get the first `Post` as an
-> optimization.  There is no optimization for `last` as it is equivalent to
-> `Post.all.to_a.last`
+> NOTE: Daylight add a [limit](#limit-and-offset) condition to get the first
+> `Post` as an optimization.  There is no optimization for `last` as it is
+> equivalent to `Post.all.to_a.last`
 
 You can `create`, `update`, `delete` a `Post`.  Here's an example of an `update`:
 
@@ -161,6 +161,9 @@ You can use conditions based on results of other searches:
 
 > NOTE: This will issue two requests, the first by `find_by` and the second
 > by `where`.
+
+Please refer to the [ActiveResource](https://github.com/rails/activeresource)
+documenation for more information.
 
 ---
 
