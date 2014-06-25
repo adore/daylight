@@ -21,6 +21,7 @@ In your application you will have a `setup!` method similar to the following:
 
 #### Table of Contents
 * [Client Model Example](#client-model-example)
+** [Namespace and Version](#namespace-and-version)
 * [ActiveResource Overview](#active-resource-overview)
 * [Refinements](#refinements)
 ** [Conditions](#conditions)
@@ -35,7 +36,7 @@ In your application you will have a `setup!` method similar to the following:
 ** [Updating Objects](#updating-objects)
 ** [More Chaining](#more-chaining)
 * [Error Handling](#error-handling)
-* [Optimizations](#optimizations)
+* [Understanding Interaction](#understanding-interaction)
 ** [Request Frequency](#request-frequency)
 ** [Response Size](#response-size)
 
@@ -62,9 +63,8 @@ refer to these client models in the following `Post` example:
     end
   ````
 
-All of the client models can be interacted with in the [example](example)
-application.
-
+All of the client models can be interacted with in the
+[example applicatoin](example.md).
 
 ### Namespace and Versions
 
@@ -95,6 +95,8 @@ for your convinience:
 
 We will use the _aliased_ version of the constant names in the following
 examples unless otherwise noted.
+
+---
 
 ## ActiveResource Overview
 
@@ -166,6 +168,8 @@ You can use conditions based on results of other searches:
 > NOTE: This will issue two requests, the first by `find_by` and the second
 > by `where`.
 
+---
+
 ## Refinements
 
 Daylight offers many ways to refine queries across collections.  These include
@@ -235,6 +239,8 @@ And you can `offset` which records to be returned:
     posts.map(&:id)  #=> [6, 7, 8, 9, 10]
   ````
 
+### Scopes
+
 ### Chaining
 
 All of the above refinements are as limited to the one being used.  Daylight
@@ -280,13 +286,10 @@ allows all of the refinements to be chained together for better searches:
 
 Since `offset` and `limit` can be chained together, you can use these with your favorite paginator.
 
-## New Objects
 
-### `find_or_intialize`
+## Remote Methods
 
-### `find_or_create`
-
-## Scopes and Remotes
+---
 
 ## Associations
 
@@ -344,16 +347,34 @@ save these associated instances directly:
     post.blog.name #=> "Reidmix"
   ````
 
+### Building Objects
+
+#### `find_or_intialize`
+#### `find_or_create`
+
+### Updating Objects
+
+#### Records
+#### Collections
+#### Associations
+
 ### More Chaining
+
+---
 
 ## Error Handling
 
+---
 
-## Optimizations
+## Understanding Interaction
 
-### Understanding Payload Size
+###  Request Frequency
 
-### Understanding Request Frequency
+`Bluesky::Zone.nonretired.production.find_by(code: 'sql1').tenants.find_by(name: 'nosql-accenture-dev').vms.running`
+
+Started GET "/v1/zones.json?filters%5Bcode%5D=sql1&limit=1&scopes%5B%5D=nonretired&scopes%5B%5D=production"
+Started GET "/v1/zones/8/tenants.json?filters%5Bname%5D=nosql-accenture-dev&limit=1"
+Started GET "/v1/tenants/1161/vms.json?scopes%5B%5D=running"
 
 From our example on in the [README](../README.doc) we show creating a `Post`
 and `User` and associating the two:
@@ -367,4 +388,6 @@ There are 3 queries to the server:
 1. To lookup a `User` with the username 'reidmix'
 2. The creation of the `User` with the username 'reidmix'
 3. Save the `Post` and associate the newly created `User`
+
+### Response Size
 
