@@ -12,9 +12,10 @@ end
 class SuitesController < Daylight::APIController
   handles :all
 
-  def suite_params
-    params.require(:suite).permit(:name, :switch)
-  end
+  private
+    def suite_params
+      params.require(:suite).permit(:name, :switch)
+    end
 end
 
 class Case < ActiveRecord::Base

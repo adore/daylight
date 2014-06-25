@@ -190,7 +190,7 @@ class Daylight::APIController < ApplicationController
     # Ex. params[:post]
     def model_params
       model_params_name = "#{model_key}_params"
-      respond_to?(model_params_name) ? send(model_params_name) : params[model_key]
+      respond_to?(model_params_name, true) ? send(model_params_name) : params[model_key]
     end
 
     ##
