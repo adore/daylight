@@ -22,4 +22,10 @@ describe API::V1::Blog do
     blog.posts.count.should == 2
   end
 
+  it 'can be created remotely' do
+    API::V1::Blog.new(name:'Alpaca Fancy').save
+
+    API::V1::Blog.where(name:'Alpaca Fancy').should_not be_empty
+  end
+
 end
