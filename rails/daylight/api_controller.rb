@@ -101,7 +101,7 @@ class Daylight::APIController < ApplicationController
           logger.warn "\tspecified in #{self.name}#handles: #{unhandled.join(',')}"
         end
 
-        public *whitelisted if whitelisted.present?
+        public(*whitelisted) if whitelisted.present?
       end
 
       ##
