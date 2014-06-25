@@ -1,3 +1,3 @@
-class API::V1::PostsController < APIController
+class API::V1::UsersController < APIController
   handles :all
 end

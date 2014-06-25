@@ -1,3 +1,3 @@
-class API::V1::PostsController < APIController
+class API::V1::CompaniesController < APIController
   handles :index, :show, :associated
 end
