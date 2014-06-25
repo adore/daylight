@@ -128,6 +128,14 @@ describe Daylight::ResourceProxy do
     resource.related_proxy_test_classes.should == existing + [related1, related2]
   end
 
+  it 'appends via << to the end of the current set even if the resource is not saved yet' do
+    resource = ProxyTestClass.new
+    related  = RelatedProxyTestClass.new(name: 'this is only a test')
+    resource.related_proxy_test_classes << related
+
+    resource.related_proxy_test_classes.should == [related]
+  end
+
   it "shows custom inspect method" do
     # resource proxy data
     ProxyTestClass.foo.inspect.should match(/#<ProxyTestClass::ResourceProxy \[.*\] @current_params={:scopes=>\[:foo\]}>/)
