@@ -20,8 +20,7 @@ class Daylight::ResourceProxy
 
   def << value
     if association_resource
-      elements = association_resource.new? ? [] : records.elements
-      association_resource.send("#{association_name}=", elements << value)
+      association_resource.send("#{association_name}=", records.elements << value)
     else
       raise NoMethodError, "undefined method `<<' for #{self}"
     end
