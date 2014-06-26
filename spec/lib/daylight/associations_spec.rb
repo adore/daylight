@@ -31,65 +31,95 @@ describe Daylight::Associations do
       end
     end
 
-    it "creates a method that construts an ResourceProxy for the association" do
-      proxy = AssociationsTestClass.new.related_test_classes
-
-      proxy.should be_is_a Daylight::ResourceProxy
-      proxy.resource_class.should == RelatedTestClass
-    end
-
-    it "creates a method that construts an ResourceProxy with context about the association" do
-      resource = AssociationsTestClass.new
-      proxy    = resource.related_test_classes
-
-      proxy.association_name.should == :related_test_classes
-      proxy.association_resource.should == resource
-    end
-
-    it "hits the association api endpoint" do
-      AssociationsTestClass.new.related_test_classes.load
-
-      a_request(:get, "http://daylight.test/v1/associations_test_classes/123/related_test_classes.json").should have_been_made
-    end
-
-    it "caches the results of the association" do
-      instance = AssociationsTestClass.new
-      proxy = instance.related_test_classes
-      instance.related_test_classes.should == proxy
-    end
 
     it "fetches the results out of the attributes if they exist" do
-      object = AssociationsTestClass.new
+      object = AssociationsTestClass.first
       object.attributes['related_test_classes_attributes'] = ['yay']
-      assocation = object.related_test_classes
-      assocation.should be_instance_of(Array)
-      assocation.first.should == 'yay'
+      collection = object.related_test_classes
+      collection.should be_instance_of(Array)
+      collection.first.should == 'yay'
     end
 
-    it "supports the :class_name option" do
-      proxy = AssociationsTestClass.new.things
-      proxy.resource_class.should == RelatedTestClass
+    describe "with new resource" do
+      let(:new_resource) { AssociationsTestClass.new }
+
+
+      it "caches the results of the association" do
+        collection = new_resource.related_test_classes
+        new_resource.related_test_classes.should == collection
+      end
+
+      it "creates a method that construts an Array for the collection" do
+        collection = new_resource.related_test_classes
+
+        collection.should be_a Array
+      end
+
+      it "sets the associations directly the attributes hash" do
+        new_resource.related_test_classes = ["associated instances"]
+
+        new_resource.attributes['related_test_classes_attributes'].should == ["associated instances"]
+      end
+
+      it "fetches the stored associations out of the attributes when they are set" do
+        new_resource.related_test_classes = ["associated instances"]
+
+        new_resource.related_test_classes.should == ["associated instances"]
+      end
     end
 
-    it "chains using the proxy class for the associated model" do
-      proxy = AssociationsTestClass.new.related_test_classes.where(wibble: 'wobble')
 
-      proxy.resource_class.should == RelatedTestClass
-      proxy.to_params[:filters].should == {wibble: 'wobble'}
-    end
+    describe "with existing resource" do
+      let(:existing_resource) { AssociationsTestClass.first }
 
-    it "sets the associations directly the attributes hash" do
-      resource = AssociationsTestClass.new
-      resource.related_test_classes = ["associated instances"]
+      it "creates a method that construts an ResourceProxy for the association" do
+        proxy = existing_resource.related_test_classes
 
-      resource.attributes['related_test_classes_attributes'].should == ["associated instances"]
-    end
+        proxy.should be_a Daylight::ResourceProxy
+        proxy.resource_class.should == RelatedTestClass
+      end
 
-    it "fetches the stored associations out of the attributes when they exist" do
-      resource = AssociationsTestClass.new
-      resource.related_test_classes = ["associated instances"]
+      it "creates a method that construts an ResourceProxy with context about the association" do
+        proxy = existing_resource.related_test_classes
 
-      resource.related_test_classes.should == ["associated instances"]
+        proxy.association_name.should == :related_test_classes
+        proxy.association_resource.should == existing_resource
+      end
+
+      it "hits the association api endpoint" do
+        existing_resource.related_test_classes.load
+
+        a_request(:get, "http://daylight.test/v1/associations_test_classes/123/related_test_classes.json").should have_been_made
+      end
+
+      it "caches the results of the association" do
+        proxy = existing_resource.related_test_classes
+        existing_resource.related_test_classes.should == proxy
+      end
+
+      it "supports the :class_name option" do ## THIS ONE
+        proxy = existing_resource.things
+        proxy.resource_class.should == RelatedTestClass
+      end
+
+      it "chains using the proxy class for the associated model" do
+        proxy = existing_resource.related_test_classes.where(wibble: 'wobble')
+
+        proxy.resource_class.should == RelatedTestClass
+        proxy.to_params[:filters].should == {wibble: 'wobble'}
+      end
+
+      it "sets the associations directly the attributes hash" do
+        existing_resource.related_test_classes = ["associated instances"]
+
+        existing_resource.attributes['related_test_classes_attributes'].should == ["associated instances"]
+      end
+
+      it "fetches the stored associations out of the attributes when they exist" do
+        existing_resource.related_test_classes = ["associated instances"]
+
+        existing_resource.related_test_classes.should == ["associated instances"]
+      end
     end
   end
 
