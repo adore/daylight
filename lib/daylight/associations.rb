@@ -63,6 +63,9 @@ module Daylight::Associations
 
         # setup the resource_proxy to fetch the results
         define_cached_method reflection.name, cache_key: nested_attribute_key do
+          # return a empty collection if this is a new record
+          return self.send("#{reflection.name}=", []) if new?
+
           resource_proxy = resource_proxy_for(reflection, self)
           resource_proxy.from(association_path(reflection))
         end
