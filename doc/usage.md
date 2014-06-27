@@ -533,7 +533,7 @@ This also will work to add to a collection on a new or existing resource:
   ````
 
 > FUTURE [#15](https://github.com/att-cloud/daylight/issues/15):
-> There is no way to modify (ie. delete) an item nor empty the collection.
+> There is no way to remove an nested resource from a collection nor empty the collection.
 
 ### More Chaining
 
