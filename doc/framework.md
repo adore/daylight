@@ -55,6 +55,29 @@ The examples are mostly canned, taken from the first reflection name, attribute 
 
 We use [actionpack-page_caching](https://github.com/rails/actionpack-page_caching) to cache the documentation after the first request.
 
+#### Rake Tasks
+
+Add this to your `Rakefile`:
+  ```ruby
+    require 'daylight/tasks'
+  ```
+
+This provides two rake tasks:
+  ```
+    rake doc:api:generate # Pre-generate the API documentation
+    rake doc:api:clean    # Clear the API documentation
+  ```
+
+* `doc:api:generate` runs through every page in the documentation so it can be pre-cached. Make sure to run it in an environment where caching is turned on:
+  ```ruby
+    config.action_controller.perform_caching = true
+  ```
+  ```
+    RAILS_ENV=production rake doc:api:generate
+  ```
+
+* `doc:api:clean` clears out the documentation cache directory.
+
 ## Testing
 
   ```ruby
