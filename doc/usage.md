@@ -25,13 +25,12 @@ refer to the [installation steps](install.md) for options.
   * [Chaining](#chaining)
 * [Remote Methods](#remote-methods)
 * [Associations](#associations)
-  * [Nested Objects](#nested-objects)
-  * [Updating Objects](#updating-objects)
+  * [Nested Resources](#nested-resources)
   * [More Chaining](#more-chaining)
 * [Building Objects](#building-objects)
   * [`find_or_create`](#find_or_create)
   * [`find_or_initialize`](#find_or_initialize)
-  * [Building on Associations](#building-on-associations)
+  * [Building using an Association](#building-using-an-associations)
 * [Error Handling](#error-handling)
 * [Understanding Interaction](#understanding-interaction)
   * [Request Frequency](#request-frequency)
@@ -129,7 +128,7 @@ You can `create`, `update`, `delete` a `Post`.  Here's an example of an `update`
     post.save                 #=> true
   ````
 
-Get associated records:
+Get associated resources:
 
   ````ruby
     post = API::Post.find(1)  #=> #<API::V1::Post:0x007ffa8c44fde8 ..>
@@ -137,7 +136,7 @@ Get associated records:
                               #    #<API::V1::Comment:0x007ffa8c48e728 ..>, ...]
   ````
 
-Search across the collection of records:
+Search across the collection of resources:
 
   ````ruby
     posts = API::Post.where(created_by: 101)
@@ -237,7 +236,7 @@ You can `limit` the results that are returned by the API:
     posts.size #=> 10
   ````
 
-And you can `offset` which records to be returned:
+And you can `offset` which resources to be returned:
 
   ````ruby
     posts = API::Post.all
@@ -342,7 +341,7 @@ See [Request Parameters](develop.md#request-parameters) for further reading.
 ## Associations
 
 Associations work as they do today in `ActiveResource` One one notable
-excpetion.  Client models that have the `has_many through: :associated` will
+exception.  Client models that have the `has_many through: :associated` will
 perform the lookup for associated objects server-side.
 
 > NOTE: This is useful if conditions or configuration is defined on the
@@ -350,56 +349,119 @@ perform the lookup for associated objects server-side.
 > [developing models](develop.md#models) for more information.
 
 Daylight adds additional functionality directly on the association:
-* add new records
-* update existing records
-* associate an existing record
-* add a record to a collection
+* add new resources
+* update existing resources
+* add a new resource to a collection
+* associate two existing resources
 
-Currently, `ActiveResource` will let you associate a associated record by
-setting the `foreign_key` directly on a model.
+Currently, `ActiveResource` will only let you associate a resource by setting
+the `foreign_key` directly on a model.
 
-### Nested Objects
+###  Nested Resources
 
-When manipulating objects on an association, we call these _Nested Objects_.
+When manipulating resources on an association, we call these _Nested Resources_.
 
-> INFO: Nested Objects are named as such because they use they send their
-> data as a nested hash on the parent object and server-side employ the
-> `accepts_nessted_attributes_for` mechanism.
+> INFO: We call it "Nested Resource" because data for them are sent
+> as a nested hash on the parent resource and server-side employ the
+> `accepts_nested_attributes_for` mechanism.
 
-Not all nested objects can be manipulated on the model, you can see which
+Not all nested resources can be manipulated on the model, you can see which
 objects are accepted by inspecting the instance:
 
   ````
     post = API::Post.find(1)
-    post.nested_objects #=> [:author, :comments]
+    post.nested_resources #=> [:author, :comments]
   ````
 
 In this example, posts will reject updates to `blog`, `company`, and
 `commenters` nested objects.
 
-To create a new author for the `post` you can:
+To create a new nested object is simple, create the object and set it on the
+`has_one` or `has_many` association:
+
+#### Creating a Nested Resource
+
+You can create a new nested resource for a new or existing resources.  For
+example a new `post`:
+
+  ````ruby
+    post = API::Post.new
+    post.title  = "100 Best Albums of 2014"
+    post.author = API::User.new(username: 'reidmix')
+    post.save       #=> true
+    post.id         #=> 43
+
+    # reload the original object to see the new nested objects
+    post = API::Post.find(43)
+    post.author.id  #=> 101
+    post.created_by #=> 101 (foreign_key on post)
+
+    # you can look up the new user directly
+    user = API::User.find(101)
+    user.username #=> "reidmix"
+  ````
+
+This will work on an existing post:
 
   ````ruby
     post = API::Post.first
-    post.author = API::User.new(username: 'reidmix')
+    post.author = API::User.new(username: 'dmcinnes')
     post.save       #=> true
 
-    # reload the original object to see the new user
-    post.reload
-    post.author.id  #=> 101
-    post.created_by #=> 101 (foreign_key)
+    # reload the original object to see the new nested objects
+    post = API::Post.first
+    post.author.id  #=> 102
+    post.created_by #=> 102 (foreign_key on post)
 
-    # you can look up the new user
-    user = API::User.find_by(username: 'reidmix)
-    user.id #=> 101
+    # you can look up the new user directly
+    user = API::User.find(102)
+    user.username #=> "dmcinness"
   ````
 
-### Updating Nested Objects
+#### Creating a Nested Resource in a Collection
 
-#### Records
+You can also create a nested object via a collection on a new or existing
+resource.  For example, on our new `post`:
 
-Currently, saving the parent class doesn't save updates to the nested record.
-As a work around, you can save these associated instances directly:
+  ````ruby
+    post = API::Post.new
+    post.comments #=> []
+    post.comments << API::Comment.new(message: 'First!')
+    post.save #=> true
+
+    # reload the original object to see the new user
+    post = API::Post.first
+    post.comments.first.id      #=> 321
+    post.comments.first.message #=> "First!"
+
+    # you can look up the new comment
+    comment = API::Comment.find(321)
+    comment.post_id #=> 1
+  ````
+
+You can also add a nested object to an existing collection:
+
+  ````ruby
+    post = API::Post.first
+    post.comments #=> []
+    post.comments << API::Comment.new(message: 'Last!')
+    post.save #=> true
+
+    # reload the original object to see the new user
+    post = API::Post.first
+    post.comments.last.id      #=> 322
+    post.comments.last.message #=> "Last!"
+
+    # you can look up the new comment
+    comment = API::Comment.find(322)
+    comment.post_id #=> 1
+  ````
+
+
+#### Updating a Nested Resource
+
+Updates to nested resources are not saved by saving the parent resource.
+You must save the nested resources directly:
 
   ````ruby
     post = API::Post.first
@@ -410,50 +472,68 @@ As a work around, you can save these associated instances directly:
     post.author.full_name #=> "Reid MacDonald"
   ````
 
-#### Collections
-#### Associations
-
-
-If your model `accepts_nested_attributes_for` on the `blog` association, you
-may re-associate it:
+This is the same as saying:
 
   ````ruby
-    post = Daylight::Post.first
+    post = API::Post.first
 
-    post.blog.id #=> 1
-    post.blog = API::Blog.find(2)
-    post.save    #=> true
+    author = post.author
+    auhor.full_name = "Reid MacDonald"
+    auhor.save #=> true
 
-    post = Daylight::Post.first
-    post.blog.id #=> 2
+    post = API::Post.first
+    post.author.full_name #=> "Reid MacDonald"
   ````
 
-
-> NOTE: There is alignment with `has_one :through` built in Daylight to match
-> Rails way of doing things.
-
-You can chain `accepts_nested_attributes_for` to update these
-`has_one :through` associations.  For example, if both:
-* `Post` `accepts_nested_attributes_for :blog`
-* `Blog` `accepts_nested_attributes_for :company`
-Then you can re-associate the  `Company` on the `Post` itself:
+The same is true of nested objects in collections:
 
   ````ruby
-    post = Daylight::Post.first
+    post = API::Post.first
 
-    post.blog.id #=> 1
-    post.company = API::Company.find(3)
-    post.save    #=> true
+    first_comment = post.comments.first
+    first_comment.message = "First!"
+    first_comment.save #=> true
 
-    post = Daylight::Post.first
-    post.company.id #=> 2
+    post = API::Post.first
+    post.comments.first.message #=> "First!"
   ````
 
 > FUTURE [#5](https://github.com/att-cloud/daylight/issues/5):
-> Updates on the `has_one` and `belongs_to` association do not get propagated
-> and should be.  Currently, only re-associations are propagated.
+> Updates to the associated nested resource do not get saved when the parent
+> resources are saved and they should be.
 
+#### Associating an Existing Nested Resources
 
+Associating using an existing nested records is possible with Daylight.  The
+nested record does not need to be new as they do in `ActiveRecord`.
+
+Setting an existing nested resource on a new or existing parent resource will
+associate them:
+
+  ````ruby
+    post = API::Post.first
+
+    post.author = API::User.find_by(username: 'reidmix')
+    post.save #=> true
+
+    post.created_by #=> 101
+    post.author.id  #=> 101
+  ````
+
+This also will work to add to a collection on a new or existing resource:
+
+  ````ruby
+    post = API::Post.first
+
+    post.commenters << API::User.find_by(username: 'reidmix')
+    post.save #=> true
+
+    post = API::Post.first
+    post.commenters.find {|c| c.username == 'reidmix'} # #<API::V1::User:0x007fe2cfc45ce8 ..>
+  ````
+
+> FUTURE [#15](https://github.com/att-cloud/daylight/issues/15):
+> There is no way to modify (ie. delete) an item nor empty the collection.
 
 ### More Chaining
 
@@ -519,8 +599,7 @@ automatically.
 
 Again, all of the Daylight's refinement chaining can be used.
 
-### Building on Associations
-
+### Building using an Associations
 
 
 ---
