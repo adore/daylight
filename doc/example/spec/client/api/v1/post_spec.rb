@@ -41,7 +41,7 @@ describe API::V1::Post do
     limited.last.title.should include('Porcelain Dreams')
   end
 
-  it 'chained query with ordering' do
+  it 'does a chained query with ordering' do
     results = API::V1::Post.where(author_id: author.id).order(:published_at)
     results.map(&:title).should ==
       ['Yellow River', 'Porcelain Dreams', 'Joys of Drinking Water']
@@ -49,5 +49,41 @@ describe API::V1::Post do
 
   it 'does a find_by lookup by first match' do
     API::V1::Post.find_by(slug: 'yellow-river').title.should == 'Yellow River'
+  end
+
+  describe 'associations' do
+    let(:post) { Post.first }
+    let(:commenter1) { User.new(name: 'Justin Tyme') }
+    let(:commenter2) { User.new(name: 'Amanda Huggenkiss') }
+
+    before do
+      post.comments << Comment.new(content: 'first!',  commenter: commenter1, spam: false)
+      post.comments << Comment.new(content: 'second!', commenter: commenter2, spam: true)
+      post.comments << Comment.new(content: 'third!',  commenter: commenter2, spam: false)
+      post.save
+    end
+
+    it 'performs lookup and association' do
+      comments = API::V1::Post.first.comments
+      comments.count.should == 3
+    end
+
+    it 'performs a query on the lookup\'s association' do
+      comments = API::V1::Post.first.comments.where(commenter_id: commenter2.id)
+      comments.count.should == 2
+      comments.first.content.should == 'second!'
+      comments.last.content.should  == 'third!'
+    end
+
+    it 'performs a chained query on the lookup\'s association' do
+      comment = API::V1::Post.first.comments.where(commenter_id: commenter2.id).first
+      comment.content.should == 'second!'
+    end
+
+    it 'performs a chained query on the lookup\'s association with scope' do
+      comments = API::V1::Post.first.comments.where(commenter_id: commenter2.id).legit
+      comments.count.should == 1
+      comments.first.content.should == 'third!'
+    end
   end
 end

@@ -5,7 +5,7 @@ class API::V1::Post < Daylight::API
   belongs_to :author, class_name: 'api/v1/user'
 
   has_many :comments, through: :associated
-  has_many :commenters, through: :associated, class_name: 'api/v1/comment'
+  has_many :commenters, through: :associated, class_name: 'api/v1/user'
   has_many :suppressed_comments, through: :associated, class_name: 'api/v1/comment'
 
   has_one :company, through: :blog
