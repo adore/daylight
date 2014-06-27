@@ -391,7 +391,7 @@ example a new `post`:
     post.save       #=> true
     post.id         #=> 43
 
-    # reload the original object to see the new nested objects
+    # reload the original object to see the new user
     post = API::Post.find(43)
     post.author.id  #=> 101
     post.created_by #=> 101 (foreign_key on post)
@@ -408,7 +408,7 @@ This will work on an existing post:
     post.author = API::User.new(username: 'dmcinnes')
     post.save       #=> true
 
-    # reload the original object to see the new nested objects
+    # reload the original object to see the new user
     post = API::Post.first
     post.author.id  #=> 102
     post.created_by #=> 102 (foreign_key on post)
@@ -429,7 +429,7 @@ resource.  For example, on our new `post`:
     post.comments << API::Comment.new(message: 'First!')
     post.save #=> true
 
-    # reload the original object to see the new user
+    # reload the original object to see the new comment
     post = API::Post.first
     post.comments.first.id      #=> 321
     post.comments.first.message #=> "First!"
@@ -447,7 +447,7 @@ You can also add a nested object to an existing collection:
     post.comments << API::Comment.new(message: 'Last!')
     post.save #=> true
 
-    # reload the original object to see the new user
+    # reload the original object to see the new comment
     post = API::Post.first
     post.comments.last.id      #=> 322
     post.comments.last.message #=> "Last!"
