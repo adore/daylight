@@ -1,5 +1,5 @@
 class API::V1::Post < Daylight::API
-  scopes :published
+  scopes :published, :recent
 
   belongs_to :blog
   belongs_to :author, class_name: 'api/v1/user'

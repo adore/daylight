@@ -1,5 +1,6 @@
 class Post < ActiveRecord::Base
   scope :published, -> { where(published: true) }
+  scope :recent,    -> { where('published_at > ?', 1.day.ago) }
 
   belongs_to :blog
   belongs_to :author, class_name: 'User'
