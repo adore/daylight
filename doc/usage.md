@@ -305,21 +305,21 @@ better searches:
     posts.map(&:id)           #=> [2, 5, 1, 9, 8]
     posts.map(&:blog_id)      #=> [2, 2, 2, 2, 2]
 
-    # WHERE 2 conditions: get posts for blog_id=2 AND created_by=2
+    # WHERE 2 conditions: get posts for blog_id=101 AND created_by=2
     posts = API::Post.where(blog_id: 2).where(created_by: 101))
     posts.map(&:id)          #=> [2, 9, 8]
     posts.map(&:created_by)  #=> [101, 101, 101]
 
-    # ORDER: get posts for blog_id=2 AND created_by=2 order by published_on
+    # ORDER: get posts for blog_id=2 AND created_by=101 order by published_on
     posts = API::Post.where(blog_id: 2).where(created_by: 101)).order(:published_on)
     posts.map(&:id)           #=> [2, 8, 9]
     posts.map(&:published_on) #=> ['2014-01-01', '2014-06-21', '2014-06-26']
 
-    # OFFSET: get posts for blog_id=2 AND created_by=2 order by published_on after the first one
+    # OFFSET: get posts for blog_id=2 AND created_by=101 order by published_on after the first one
     posts = API::Post.where(blog_id: 2).where(created_by: 101)).order(:published_on).offset(1)
     posts.map(&:id)           #=> [8, 9]
 
-    # LIMIT: get posts for blog_id=2 AND created_by=2 order_by published_on
+    # LIMIT: get posts for blog_id=2 AND created_by=2 order_by published_on and just the second one
     posts = API::Post.where(blog_id: 2).where(created_by: 101)).order(:published_on).offset(1).limit(1)
     posts.map(&:id)           #=> [8]
 
@@ -457,7 +457,6 @@ You can also add a nested object to an existing collection:
     comment.post_id #=> 1
   ````
 
-
 #### Updating a Nested Resource
 
 Updates to nested resources are not saved by saving the parent resource.
@@ -537,6 +536,58 @@ This also will work to add to a collection on a new or existing resource:
 
 ### More Chaining
 
+Along with the collection returned by queries across collections, you may
+continue to apply refinements to associations.
+
+Similar to [chaining](#chainging), refinements on assoications.:
+
+  ````ruby
+    # NONE: get all comments for a post
+    comments = API::Post.find(1).comments
+    comments.map(&:id)          #=> [11, 33, 32, 54, 17, 15, 16, 1, 90, 81]
+
+    # SCOPE: get a post's edited comments
+    comments = API::Post.find(1).comments.edited
+    comments.map(&:id)          #=> [33, 32, 17, 15, 16, 1, 90, 81]
+    comments.first.edited_on    #=> '2013-09-03'
+
+    # WHERE 1 condition: get a post's comments for blog_id=2
+    comments = API::Post.find(1).comments.where(has_images: true)
+    comments.map(&:id)           #=> [32, 15, 1, 90, 81]
+    comments.map(&:has_images)   #=> [true, true, true, true, true]
+
+    # WHERE 2 conditions: get a post's comments that has_images AND created_by=101
+    comments = API::Post.find(1).comments.where(has_images: true).where(created_by: 101))
+    comments.map(&:id)          #=> [32, 90, 81]
+    comments.map(&:created_by)  #=> [101, 101, 101]
+
+    # ORDER: get a post's comments that has_images AND created_by=101 order by edited_on
+    comments = API::Post.find(1).where(has_images: true).where(created_by: 101)).order(:edited_on)
+    comments.map(&:id)           #=> [32, 81, 90]
+    comments.map(&:published_on) #=> ['2014-01-01', '2014-06-21', '2014-06-26']
+
+    # OFFSET: get post's comments that has_images AND created_by=101 order by edited_on after the first one
+    comments = API::Post.find(1),where(has_images: true).where(created_by: 101)).order(:edited_on).offset(1)
+    comments.map(&:id)           #=> [80, 91]
+
+    # LIMIT: get post's comments that has_images AND created_by=101 order by edited_on and just the second one
+    comments = API::Post.find(1).where(has_images: true).where(created_by: 101)).order(:edited_on).offset(1).limit(1)
+    comments.map(&:id)           #=> [80]
+
+    comments = API::Post.find(1).where(has_images: true).where(created_by: 101)).order(:edited_on).offset(1).limit(1).first
+    comments.id                   #=> 80
+    comments.has_images           #=> true
+    comments.created_by           #=> 101
+    comments.published_on         # '2014-06-21'
+  ````
+
+As you could guess, you could end up with very sophisticated queries traversing
+multiple associations.  For example:
+
+`API::Post.published.updated.find_by(slug: '100-best-albums-of-2014').comments.edited.where(has_images: true).first.images.approved`
+
+Please review [Request Frequency](#request-frequency) to better understand how
+the requests are composed.
 
 ---
 
@@ -645,11 +696,13 @@ As you can see, remote methods cannot be chained:
 
 ###  Request Frequency
 
+`API::Post.published.updated.find_by(slug: '100-best-albums-of-2014').comments.edited.where(has_images: true).first.images.approved`
+
 `Bluesky::Zone.nonretired.production.find_by(code: 'sql1').tenants.find_by(name: 'nosql-accenture-dev').vms.running`
 
-    GET "/v1/zones.json?filters[code]=sql1&limit=1&scopes[]=nonretired&scopes[]=production"
-    GET "/v1/zones/8/tenants.json?filters[name]=nosql-accenture-dev&limit=1"
-    GET "/v1/tenants/1161/vms.json?scopes[]=running"
+    GET "/v1/posts.json?filters[slug]=100-best-albums-of-2014&limit=1&scopes[]=published&scopes[]=updated"
+    GET "/v1/posts/8/comments.json?filters[has_images]=true&scopes[]=comments"
+    GET "/v1/comments/1161/images.json?scopes[]=approved"
 
 From our example on in the [README](../README.doc) we show creating a `Post`
 and `User` and associating the two:
