@@ -539,7 +539,7 @@ This also will work to add to a collection on a new or existing resource:
 Along with the collection returned by queries across collections, you may
 continue to apply refinements to associations.
 
-Similar to [chaining](#chainging), refinements on assoications.:
+Similar to [chaining](#chainging), refinements on assoications:
 
 ````ruby
   # NONE: get all comments for a post
