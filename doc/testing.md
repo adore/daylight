@@ -6,7 +6,7 @@ Daylight offers a simple mocking framework that simplifies the process of writin
 
 Works with both Rspec and TestUnit/Minitest.
 
-To start add this to your +test_helper.rb+ or +spec_helper.rb+:
+To start add this to your `test_helper.rb` or `spec_helper.rb`:
 
   ```ruby
     Daylight::Mock.setup
