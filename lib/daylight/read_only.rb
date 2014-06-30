@@ -19,11 +19,7 @@ module Daylight::ReadOnly
   # metadata
 
   def read_only
-    @read_only ||= begin
-      metadata[:read_only][self.class.element_name] || []
-    rescue
-      []
-    end
+    @read_only ||= metadata[:read_only] || []
   end
 
   ##

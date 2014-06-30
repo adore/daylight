@@ -196,10 +196,22 @@ class Daylight::API < ActiveResource::Base
     if Hash === attributes && attributes.has_key?('meta')
       # save and strip any metadata supplied in the response
       metadata = (attributes.delete('meta')||{}).with_indifferent_access
+      metadata.merge!(metadata.delete(self.class.element_name) || {})
     end
     @metadata = metadata || {}
 
     super
+  end
+
+  ##
+  # Get the list of nested_resources from the metadata attribute.
+  # If there are none then an empty array is supplied.
+  #
+  # See:
+  # metadata
+
+  def nested_resources
+    @nested_resources ||= metadata[:nested_resources] || []
   end
 
   ##

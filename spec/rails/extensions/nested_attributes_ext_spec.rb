@@ -1,5 +1,7 @@
 require 'spec_helper'
 
+class NoNestedAttributesTest < ActiveRecord::Base; end
+
 # `inverse_of` and `accepts_nested_attributes_for` both need to be defined to
 # test cyclic autosave problem that AutosaveAssociataionFix resolves
 class NestedAttributeTest < ActiveRecord::Base
@@ -11,7 +13,7 @@ end
 class SingleNestedAttributeTest < ActiveRecord::Base
   has_one :single, class_name: 'AssocNestedAttributeTest', inverse_of: :single_nested_attribute_test
 
-  accepts_nested_attributes_for :single
+  accepts_nested_attributes_for :single, allow_destroy: true # with options
 end
 
 class AssocNestedAttributeTest < ActiveRecord::Base
@@ -54,6 +56,26 @@ describe NestedAttributesExt, type: [:model] do
       end
     end
   end
+
+  describe 'nested_resource_names' do
+    it 'has empty array of no nested resources are configured' do
+      NoNestedAttributesTest.nested_resource_names.should == []
+      NoNestedAttributesTest.nested_resource_names.should be_frozen
+    end
+
+    it 'stores only nested resource names' do
+      SingleNestedAttributeTest.nested_resource_names.should == [:single]
+      SingleNestedAttributeTest.nested_resource_names.should be_frozen
+
+      AssocNestedAttributeTest.nested_resource_names.should == [:nested_attribute_test, :single_nested_attribute_test]
+      AssocNestedAttributeTest.nested_resource_names.should be_frozen
+    end
+
+    it 'propogates and updates nested attribute options' do
+      SingleNestedAttributeTest.nested_attributes_options.should == {single: {allow_destroy: true, update_only: false}}
+    end
+  end
+
 
   describe 'has_many' do
     let(:record) { create(:nested_attribute_test) }

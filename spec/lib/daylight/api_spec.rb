@@ -126,88 +126,20 @@ describe Daylight::API do
     end
   end
 
-  describe "read only attriubtes" do
+  describe "nested_resources" do
     before do
       data = {
         test_descendant: { name: "foo", immutable: "readme"},
-        meta: { read_only: { test_descendant: ["immutable"] } }
+        meta: { test_descendant: { read_only: ["immutable"], nested_resources: ["test_resource"] } }
       }
 
       stub_request(:get, %r{#{TestDescendant.site}}).to_return(body: data.to_json)
     end
 
-    it "is accessible" do
+    it "is defined" do
       test = TestDescendant.find(1)
 
-      test.immutable.should == 'readme'
-    end
-
-    it "cannot be set" do
-      test = TestDescendant.find(1)
-
-      lambda { test.immutable = 'foo' }.should raise_error(NoMethodError)
-    end
-
-    it "does not respond to setter" do
-      test = TestDescendant.find(1)
-
-      test.should_not respond_to(:immutable=)
-    end
-
-    it "is excluded when generating json" do
-      json = TestDescendant.find(1).to_json
-
-      JSON.parse(json).keys.should_not include('immutable')
-    end
-
-    it "is excluded when generating json with child resource" do
-      test1 = TestDescendant.find(1)
-      test2 = TestDescendant.find(1)
-      test1.attributes['child'] = test2
-
-      json = JSON.parse(test1.to_json)
-      json.keys.should_not include('immutable')
-
-      json['child'].keys.should_not include('immutable')
-    end
-
-    it "is excluded when generating json with children collection" do
-      test1 = TestDescendant.find(1)
-      test2 = TestDescendant.find(1)
-      test1.attributes['children'] = [test2]
-
-      json = JSON.parse(test1.to_json)
-      json.keys.should_not include('immutable')
-
-      json['children'].map(&:keys).flatten.should_not include('immutable')
-    end
-
-    it "is excluded xml" do
-      xml = TestDescendant.find(1).to_xml
-
-      parse_xml(xml).keys.should_not include('immutable')
-    end
-
-    it "is excluded when generating json with child resource" do
-      test1 = TestDescendant.find(1)
-      test2 = TestDescendant.find(1)
-      test1.attributes['child'] = test2
-
-      xml = parse_xml(test1.to_xml)
-      xml.keys.should_not include('immutable')
-
-      xml['child'].keys.should_not include('immutable')
-    end
-
-    it "is excluded when generating json with children collection" do
-      test1 = TestDescendant.find(1)
-      test2 = TestDescendant.find(1)
-      test1.attributes['children'] = [test2]
-
-      xml = parse_xml(test1.to_xml)
-      xml.keys.should_not include('immutable')
-
-      xml['children'].map(&:keys).flatten.should_not include('immutable')
+      test.nested_resources.should == ["test_resource"]
     end
   end
 end

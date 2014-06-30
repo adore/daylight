@@ -1225,8 +1225,8 @@ is using the list of attributes that are `read_only` for that client model:
         "title": "100 Best Albums of 2014",
       },
       "meta": {
-        "read_only": {
-          "post": [
+        "post": {
+          "read_only": [
             "slug",
             "published",
             "created_at"
@@ -1241,6 +1241,36 @@ and Daylight will raise a `NoMethodError`
 
 > NOTE: ActiveResource handles predicate lookups for attributes
 > (eg. `published` vs. `published?`)
+
+
+#### nested_resources
+
+The way that Daylight know what Nested Resources are available to be set is
+is using a list of classes that are `nested_resources` for that client model:
+
+  ````json
+    {
+      "post": {
+        "id": 1,
+        "title": "100 Best Albums of 2014",
+      },
+      "meta": {
+        "post": {
+          "nested_resources": [
+            "author",
+            "comments"
+          ]
+        }
+      }
+    }
+  ````
+
+Here, we will be able to create or associate the `author` resource when creating
+or updating a `post`.  We can also create a new `comment` and add it to the
+collection in the same way.
+
+> INFO: You can read up more in the User's Guide on how to use
+> [Nested Resources](usage.md#nested-resources).
 
 #### where_values
 

@@ -8,6 +8,8 @@ module NestedAttributesExt
   extend ActiveSupport::Concern
 
   included do
+    class_attribute :nested_resource_names
+    self.nested_resource_names = [].freeze
 
     ##
     # Associate any existing records that may be missing before running any updates on them.
@@ -33,6 +35,23 @@ module NestedAttributesExt
       super
     end
   end
+
+  module ClassMethods
+    ##
+    # Saves off the reflection names that the nested attributes are accepted for.
+    # Does not alter original behavoir or arguments.
+    #
+    # See:
+    # ActiveRecord::NestedAttributes#accepts_nested_attributes_for
+    def accepts_nested_attributes_for *attr_names
+      nested_resources = attr_names.dup
+      nested_resources.extract_options!
+      self.nested_resource_names = nested_resources.map(&:to_sym).freeze
+
+      super
+    end
+  end
+
 
   private
     ##
