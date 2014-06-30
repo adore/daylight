@@ -6,7 +6,7 @@ Install the gem or add it to your bundler's Gemfile:
 
     gem install daylight
 
-Set up the gem in a Rails initializer on your application:
+Require and run setup:
 
 ```ruby
     require 'daylight'
