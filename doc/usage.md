@@ -291,43 +291,43 @@ allows all or any combination of the refinements to be chained together for
 better searches:
 
   ````ruby
-  # NONE: get all posts
-  posts = API::Post.all
-  posts.map(&:id)          #=> [10, 3, 2, 4, 7, 5, 6, 1, 9, 8]
+    # NONE: get all posts
+    posts = API::Post.all
+    posts.map(&:id)          #=> [10, 3, 2, 4, 7, 5, 6, 1, 9, 8]
 
-  # SCOPE: get published posts
-  posts = API::Post.published
-  posts.map(&:id)          #=> [3, 2, 7, 5, 6, 1, 9, 8]
-  posts.first.published_on #=> '2013-09-03'
+    # SCOPE: get published posts
+    posts = API::Post.published
+    posts.map(&:id)          #=> [3, 2, 7, 5, 6, 1, 9, 8]
+    posts.first.published_on #=> '2013-09-03'
 
-  # WHERE 1 condition: get posts for blog_id=2
-  posts = API::Post.where(blog_id: 2)
-  posts.map(&:id)           #=> [2, 5, 1, 9, 8]
-  posts.map(&:blog_id)      #=> [2, 2, 2, 2, 2]
+    # WHERE 1 condition: get posts for blog_id=2
+    posts = API::Post.where(blog_id: 2)
+    posts.map(&:id)           #=> [2, 5, 1, 9, 8]
+    posts.map(&:blog_id)      #=> [2, 2, 2, 2, 2]
 
-  # WHERE 2 conditions: get posts for blog_id=101 AND created_by=2
-  posts = API::Post.where(blog_id: 2).where(created_by: 101))
-  posts.map(&:id)          #=> [2, 9, 8]
-  posts.map(&:created_by)  #=> [101, 101, 101]
+    # WHERE 2 conditions: get posts for blog_id=101 AND created_by=2
+    posts = API::Post.where(blog_id: 2).where(created_by: 101))
+    posts.map(&:id)          #=> [2, 9, 8]
+    posts.map(&:created_by)  #=> [101, 101, 101]
 
-  # ORDER: get posts for blog_id=2 AND created_by=101 order by published_on
-  posts = API::Post.where(blog_id: 2).where(created_by: 101)).order(:published_on)
-  posts.map(&:id)           #=> [2, 8, 9]
-  posts.map(&:published_on) #=> ['2014-01-01', '2014-06-21', '2014-06-26']
+    # ORDER: get posts for blog_id=2 AND created_by=101 order by published_on
+    posts = API::Post.where(blog_id: 2).where(created_by: 101)).order(:published_on)
+    posts.map(&:id)           #=> [2, 8, 9]
+    posts.map(&:published_on) #=> ['2014-01-01', '2014-06-21', '2014-06-26']
 
-  # OFFSET: get posts for blog_id=2 AND created_by=101 order by published_on after the first one
-  posts = API::Post.where(blog_id: 2).where(created_by: 101)).order(:published_on).offset(1)
-  posts.map(&:id)           #=> [8, 9]
+    # OFFSET: get posts for blog_id=2 AND created_by=101 order by published_on after the first one
+    posts = API::Post.where(blog_id: 2).where(created_by: 101)).order(:published_on).offset(1)
+    posts.map(&:id)           #=> [8, 9]
 
-  # LIMIT: get posts for blog_id=2 AND created_by=2 order_by published_on and just the second one
-  posts = API::Post.where(blog_id: 2).where(created_by: 101)).order(:published_on).offset(1).limit(1)
-  posts.map(&:id)           #=> [8]
+    # LIMIT: get posts for blog_id=2 AND created_by=2 order_by published_on and just the second one
+    posts = API::Post.where(blog_id: 2).where(created_by: 101)).order(:published_on).offset(1).limit(1)
+    posts.map(&:id)           #=> [8]
 
-  post = API::Post.where(blog_id: 2).where(created_by: 101)).order(:published_on).offset(1).limit(1).first
-  post.id                   #=> 8
-  post.blog_id              #=> 2
-  post.created_by           #=> 101
-  post.published_on         # '2014-06-21'
+    post = API::Post.where(blog_id: 2).where(created_by: 101)).order(:published_on).offset(1).limit(1).first
+    post.id                   #=> 8
+    post.blog_id              #=> 2
+    post.created_by           #=> 101
+    post.published_on         # '2014-06-21'
   ````
 
 > NOTE: Since `offset` and `limit` can be chained together, you can use these
@@ -542,43 +542,43 @@ continue to apply refinements to associations.
 Similar to [chaining](#chainging), refinements on assoications.:
 
   ````ruby
-  # NONE: get all comments for a post
-  comments = API::Post.find(1).comments
-  comments.map(&:id)          #=> [11, 33, 32, 54, 17, 15, 16, 1, 90, 81]
+    # NONE: get all comments for a post
+    comments = API::Post.find(1).comments
+    comments.map(&:id)          #=> [11, 33, 32, 54, 17, 15, 16, 1, 90, 81]
 
-  # SCOPE: get a post's edited comments
-  comments = API::Post.find(1).comments.edited
-  comments.map(&:id)          #=> [33, 32, 17, 15, 16, 1, 90, 81]
-  comments.first.edited_on    #=> '2013-09-03'
+    # SCOPE: get a post's edited comments
+    comments = API::Post.find(1).comments.edited
+    comments.map(&:id)          #=> [33, 32, 17, 15, 16, 1, 90, 81]
+    comments.first.edited_on    #=> '2013-09-03'
 
-  # WHERE 1 condition: get a post's comments for blog_id=2
-  comments = API::Post.find(1).comments.where(has_images: true)
-  comments.map(&:id)           #=> [32, 15, 1, 90, 81]
-  comments.map(&:has_images)   #=> [true, true, true, true, true]
+    # WHERE 1 condition: get a post's comments for blog_id=2
+    comments = API::Post.find(1).comments.where(has_images: true)
+    comments.map(&:id)           #=> [32, 15, 1, 90, 81]
+    comments.map(&:has_images)   #=> [true, true, true, true, true]
 
-  # WHERE 2 conditions: get a post's comments that has_images AND created_by=101
-  comments = API::Post.find(1).comments.where(has_images: true).where(created_by: 101))
-  comments.map(&:id)          #=> [32, 90, 81]
-  comments.map(&:created_by)  #=> [101, 101, 101]
+    # WHERE 2 conditions: get a post's comments that has_images AND created_by=101
+    comments = API::Post.find(1).comments.where(has_images: true).where(created_by: 101))
+    comments.map(&:id)          #=> [32, 90, 81]
+    comments.map(&:created_by)  #=> [101, 101, 101]
 
-  # ORDER: get a post's comments that has_images AND created_by=101 order by edited_on
-  comments = API::Post.find(1).where(has_images: true).where(created_by: 101)).order(:edited_on)
-  comments.map(&:id)           #=> [32, 81, 90]
-  comments.map(&:published_on) #=> ['2014-01-01', '2014-06-21', '2014-06-26']
+    # ORDER: get a post's comments that has_images AND created_by=101 order by edited_on
+    comments = API::Post.find(1).where(has_images: true).where(created_by: 101)).order(:edited_on)
+    comments.map(&:id)           #=> [32, 81, 90]
+    comments.map(&:published_on) #=> ['2014-01-01', '2014-06-21', '2014-06-26']
 
-  # OFFSET: get post's comments that has_images AND created_by=101 order by edited_on after the first one
-  comments = API::Post.find(1),where(has_images: true).where(created_by: 101)).order(:edited_on).offset(1)
-  comments.map(&:id)           #=> [80, 91]
+    # OFFSET: get post's comments that has_images AND created_by=101 order by edited_on after the first one
+    comments = API::Post.find(1),where(has_images: true).where(created_by: 101)).order(:edited_on).offset(1)
+    comments.map(&:id)           #=> [80, 91]
 
-  # LIMIT: get post's comments that has_images AND created_by=101 order by edited_on and just the second one
-  comments = API::Post.find(1).where(has_images: true).where(created_by: 101)).order(:edited_on).offset(1).limit(1)
-  comments.map(&:id)           #=> [80]
+    # LIMIT: get post's comments that has_images AND created_by=101 order by edited_on and just the second one
+    comments = API::Post.find(1).where(has_images: true).where(created_by: 101)).order(:edited_on).offset(1).limit(1)
+    comments.map(&:id)           #=> [80]
 
-  comments = API::Post.find(1).where(has_images: true).where(created_by: 101)).order(:edited_on).offset(1).limit(1).first
-  comments.id                   #=> 80
-  comments.has_images           #=> true
-  comments.created_by           #=> 101
-  comments.published_on         # '2014-06-21'
+    comments = API::Post.find(1).where(has_images: true).where(created_by: 101)).order(:edited_on).offset(1).limit(1).first
+    comments.id                   #=> 80
+    comments.has_images           #=> true
+    comments.created_by           #=> 101
+    comments.published_on         # '2014-06-21'
   ````
 
 As you could guess, you could end up with very sophisticated queries traversing
