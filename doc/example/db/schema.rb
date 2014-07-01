@@ -39,7 +39,7 @@ ActiveRecord::Schema.define(version: 20140623230505) do
     t.text     "body"
     t.boolean  "published"
     t.datetime "published_at"
-    t.integer  "view_count"
+    t.integer  "view_count",   default: 0
     t.integer  "blog_id"
     t.integer  "author_id"
   end
