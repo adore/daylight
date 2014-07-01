@@ -825,15 +825,33 @@ server-side, errors will be raised.
 
 ## Understanding Interaction
 
+To help understand how requests from the client will produce load on the server
+API, will aid in understanding what load is produced on the API server(s).
+
+Daylight does its best to collect information about a query before issuing the
+request, but can only do so much.  Daylight will still suffer from putting a
+request in a tight loop as any other web application will.
+
 ###  Request Frequency
 
-`API::Post.published.updated.find_by(slug: '100-best-albums-of-2014').comments.edited.where(has_images: true).first.images.approved`
+A request is issued for any query for a resource or collection of resources.
+Everytime an association is traversed, a new request sent.   All the refinements
+on a collection is sent along with the request.
 
-`Bluesky::Zone.nonretired.production.find_by(code: 'sql1').tenants.find_by(name: 'nosql-accenture-dev').vms.running`
+Given a large request like:
+
+  ````ruby
+    API::Post.published.updated.find_by(slug: '100-best-albums-of-2014').comments.edited.where(has_images: true).first.images.liked.limit(1).first
+                                                                        ^                                             ^                     ^
+                                                                        |                                             |                     |
+                                                       [Post request]---+                         [Comment request]---+   [Image request]---+
+  ````
+
+There are three resources/collections that are retrieved from the server, for `post`, `comment`, and `image`:
 
     GET "/v1/posts.json?filters[slug]=100-best-albums-of-2014&limit=1&scopes[]=published&scopes[]=updated"
     GET "/v1/posts/8/comments.json?filters[has_images]=true&scopes[]=comments"
-    GET "/v1/comments/1161/images.json?scopes[]=approved"
+    GET "/v1/comments/1161/images.json?scopes[]=liked&limit=1"
 
 From our example on in the [README](../README.doc) we show creating a `Post`
 and `User` and associating the two:
