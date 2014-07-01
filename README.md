@@ -110,4 +110,4 @@ Ah, but we have to develop our API and client models:
 ## License
 
 Daylight is released under the [Apache License](http://www.apache.org/licenses/LICENSE-2.0)
-<span style="color:#CCC">on June 30th, 2014<span>
+<p style="color:#CCC">on June 30th, 2014<p>
