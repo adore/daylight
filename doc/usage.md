@@ -656,9 +656,9 @@ Again, all of the Daylight's refinement chaining can be used.
 
 You can create an object based on a collection for an association.
 
-> NOTE: Specifically, only a `has_many` association as `belongs_to` or
-> `has_one` asscoiation will have a `nil` object if they are not set
-> (ie. there's no foriegn_key).
+> NOTE: Specifically, only a `has_many` association. The `belongs_to` or
+> `has_one` asscoiations will have a `nil` object if they are not set
+> (ie. there's no foriegn_key) and will not work.
 
 For example  if there is no `comment` for the the `post`:
 
@@ -712,7 +712,7 @@ As you can see, remote methods cannot be chained:
     API::Post.find(1).top_comments.find_by(user_id: 1)
 
     #=> NoMethodError: undefined method `find_by' for #<ActiveResource::Collection:0x007f83208937a8>
-   ````
+  ````
 
 ---
 
