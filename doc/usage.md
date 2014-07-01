@@ -840,12 +840,12 @@ on a collection is sent along with the request.
 
 Given a large request like:
 
-  ````ruby
-    API::Post.published.updated.find_by(slug: '100-best-albums-of-2014').comments.edited.where(has_images: true).first.images.liked.limit(1).first
-                                                                        ^                                             ^                     ^
-                                                                        |                                             |                     |
-                                                       [Post request]---+                         [Comment request]---+   [Image request]---+
-  ````
+````ruby
+API::Post.published.updated.find_by(slug: '100-best-albums-of-2014').comments.edited.where(has_images: true).first.images.liked.limit(1).first
+                                                                    ^                                             ^                     ^
+                                                                    |                                             |                     |
+                                                   [Post request]---+                         [Comment request]---+   [Image request]---+
+````
 
 There are three resources/collections that are retrieved from the server, for `post`, `comment`, and `image`:
 
