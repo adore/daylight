@@ -539,7 +539,7 @@ This also will work to add to a collection on a new or existing resource:
 Along with the collection returned by queries across collections, you may
 continue to apply refinements to associations.
 
-Similar to [chaining](#chainging), refinements on assoications:
+Similar to [chaining](#chainging), refinements on assoications.:
 
 ````ruby
   # NONE: get all comments for a post
@@ -611,6 +611,8 @@ The `first_or_create` method will save the object if it does not already exist.
   ````ruby
     post = API::Post.where(slug: '100-best-albums-of-2014').first_or_create
     post.new?   #=> false
+
+    # set an attribute directly
     post.exerpt = "Ranked list of the 100 best albums so far in 2014"
     post.save   #=> true
   ````
@@ -652,6 +654,34 @@ Again, all of the Daylight's refinement chaining can be used.
 
 ### Building using an Associations
 
+You can create an object based on a collection for an association.
+
+> NOTE: Specifically, only a `has_many` association as `belongs_to` or
+> `has_one` asscoiation will have a `nil` object if they are not set
+> (ie. there's no foriegn_key).
+
+For example  if there is no `comment` for the the `post`:
+
+  ````ruby
+    comment = API::Post.find(1).comments.first_or_initialize({
+        message: "Am I the first comment?"
+      })
+    comment.new?    #=> true
+    comment.post_id #=> 1
+    comment.save    #=> true
+  ````
+
+You may apply any refinement to the association:
+
+  ````ruby
+    comment = API::Post.find(1).comments.where(is_liked: true).first_or_create
+    comment.new?    #=> false
+    comment.post_id #=> 1
+
+    # Update the message
+    comment.message = "You really like me when I said: '#{comment.message}'"
+    comment.save    #=> true
+  ````
 
 ---
 
