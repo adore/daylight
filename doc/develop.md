@@ -22,7 +22,6 @@ To better undertand Daylight's interactions, we define the following components:
   * [Controllers](#controllers)
   * [Routes](#routes)
   * [Client](#client)
-* [Error Handling](#error-handling)
 * [Underlying Interaction](#underlying-interaction)
   * [Symantic URLs](#symantic-urls)
   * [Request Params](#request-params)
@@ -815,108 +814,6 @@ And used like so:
 
 > FUTURE [#9](https://github.com/att-cloud/daylight/issues/9):
 > Remote methods cannot be further refined like associations
-
-## Error Handling
-
-A goal of Daylight is to offer better handling and messaging to the client when
-expected errors occur.  This will aid in development of both the API and when
-users of that API are having issues.
-
-### Validation Errors
-
-Daylight exposes validation errors on creates and updates.  Given a validation
-on a model:
-
-  ````ruby
-  class Post < ActiveRecord::Base
-    validates :title, presence: true
-  end
-  ````
-
-When saving this model from the client errors will be exposed similar to
-`ActiveRecord`:
-
-  ````ruby
-  post = API::Post.new
-  post.save             # => false
-  post.errors.messages  # => {:base=>["Title can't be blank"]}
-  ````
-
-With the introduction of and use of
-[Strong Parameters](http://guides.rubyonrails.org/action_controller_overview.html#strong-parameters)
-unpermitted or missing attributes will be detected.
-
-> FUTURE [#8](https://github.com/att-cloud/daylight/issues/8):
-> Would be nice to know which parameter is raising the error and if it was a
-> _required_ parameter or an _unpermitted_ one.
-
-Lets say `created_at` is not permitted on the `PostController`:
-  ````ruby
-  post = API::Post.new(created_at: Time.now)
-  post.save             # => false
-  post.errors.messages  # => {:base=>["Unpermitted or missing attribute"]}
-  ````
-
-### Bad Requests
-
-Daylight will raise an error on unknown attributes.  This differes from
-`ActiveRecord` where it will be raised immediately because the error is
-detected by `APIController` during a `save` action.
-
-For example, given the same `Post` model above:
-  ````ruby
-  post = API::Post.new(foo: 'bar')
-  post.save
-  #=> ActiveResource::BadRequest: Failed.  Response code = 400.
-  #   Response message = Bad Request.  Root Cause = unknown attribute: foo
-  ````
-
-Similarly, Daylight raises errors on unknown keys, associations, scopes,
-or remoted methods.  The error will be raise as soon as the request is
-issued, not just on `save` actions.
-
-For example, when providing an incorrect condition:
-  ````ruby
-  API::Post.find_by(foo: 'bar')
-  #=> ActiveResource::BadRequest: Failed.  Response code = 400.
-  #   Response message = Bad Request.  Root Cause = unknown key: foo
-  ````
-If invalid statements are issued server-side they will be raised:
-
-  ````ruby
-  API::Post.find(1).limit(:foo)
-  #=> ActiveResource::BadRequest: Failed.  Response code = 400.
-  #   Response message = Bad Request.  Root Cause = invalid value for Integer(): "foo"
-  ````
-
-This is also useful developing and detecting errors in your client models
-Given the client model:
-
-  ````ruby
-  class API::V1::Post < Daylight::API
-    scopes :published
-    remote :top_comments
-
-    has_many :author, through: :associated
-  end
-  ````
-
-If neither `published`, `top_comments`, nor `author` are not setup on the
-server-side, errors will be raised.
-
-  ````ruby
-  API::Post.published
-  #=> ActiveResource::BadRequest: Failed.  Response code = 400.
-  #   Response message = Bad Request.  Root Cause = unknown scope: published
-
-  API::Post.by_popularirty
-  #=> ActiveResource::BadRequest: Failed.  Response code = 400.
-  #   Response message = Bad Request.  Root Cause = unknown remote: top_comments
-
-  API::Post.find(1).author
-  #=> ActiveResource::BadRequest: Failed.  Response code = 400.
-  #   Response message = Bad Request.  Root Cause = unknown association: author
-  ````
 
 ## Underlying Interaction
 
