@@ -871,3 +871,71 @@ There are 3 queries to the server:
 
 ### Response Size
 
+Responses are in JSON, but XML can be supported.  Response size depends
+several factors:
+1. The length of each attribute
+1. The number of attributes per resource
+2. The number of resources
+3. The metadata
+
+For example, for a collection of `posts`:
+
+  ````json
+    {
+      "posts": [
+        {
+          "id": 1,
+          "blog_id": "1",
+          "title": "100 Best Albums of 2014",
+          "created_by": "101",
+          "slug": "100-best-albums-of-2014"
+          "exerpt":"Ranked list of the 100 best albums so far in 2014",
+          "body": "2014 is a year of many albums, here is a...",
+          "published": true,
+          "updated": false
+        },
+        {
+          "id": 2,
+          "blog_id": "1",
+          "title": "100 Best Albums of All Time",
+          "created_by": "101",
+          "slug": "100-best-albums-of-all-time"
+          "exerpt":"Ranked list of the 100 best albums evar.",
+          "body": "Here is my favorite albums of all time...",
+          "published": true,
+          "updated": true
+        }
+      ],
+      "meta": {
+        "where_values": {
+          "blog_id": 1
+          },
+        "post": {
+          "read_only": [
+            "slug",
+            "published",
+            "updated"
+          ],
+          "nested_resources": [
+            "author",
+            "comments"
+          ]
+        }
+      }
+    }
+  ````
+
+Here we show 2 posts, but imagine showing every `post` in each request.
+Each time a request can be made that will reduce the size of the collection
+will speed up response times from the server.
+
+Metadata about the response and elements in the collection are also returned
+per request.  Find out more about this in the
+[API Developers Guide](develop.md#response-metadata)
+
+For expensive requests, your API developers may automatically limit the
+"page size" returned by the server and you will need to paginate through
+the results.
+
+Please refer to [Benchmarks](benchmarks.md#) for further reading
+about response times between the client and the server.
