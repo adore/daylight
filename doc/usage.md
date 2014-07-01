@@ -841,30 +841,33 @@ on a collection is sent along with the request.
 Given a large request like:
 
 ````ruby
-API::Post.published.updated.find_by(slug: '100-best-albums-of-2014').comments.edited.where(has_images: true).first.images.liked.limit(1).first
-                                                                    ^                                             ^                     ^
-                                                                    |                                             |                     |
-                                                   [Post request]---+                         [Comment request]---+   [Image request]---+
+  API::Post.published.updated.find_by(slug: '100-best-albums-of-2014'). # Post request (with refinements)
+    comments.edited.where(has_images: true).first.                      # Comment request (with refinements)
+    images.liked.limit(1).                                              # Image request (with refinements)
+    map(&:caption).first                                                # No request: iterating over data structure
 ````
 
-There are three resources/collections that are retrieved from the server, for `post`, `comment`, and `image`:
+There are 3 resources/collections retrieved from the server.  One each for
+`post`, `comment`, and `image`.  You can see this in the API server logs:
 
     GET "/v1/posts.json?filters[slug]=100-best-albums-of-2014&limit=1&scopes[]=published&scopes[]=updated"
     GET "/v1/posts/8/comments.json?filters[has_images]=true&scopes[]=comments"
     GET "/v1/comments/1161/images.json?scopes[]=liked&limit=1"
 
-From our example on in the [README](../README.doc) we show creating a `Post`
-and `User` and associating the two:
 
-    post = API::Post.new(slug: '100-best-albums-2014')
+Multi-step requests pretty much match up to the action being performed.
+From our example on in the [README](../README.doc) we show creating a `post`
+and `user` and associating the two:
+
+    post = API::Post.find_by(slug: '100-best-albums-2014')
     post.author = API::User.find_or_create(username: 'reidmix')
     post.save
 
 There are 3 queries to the server:
 
-1. To lookup a `User` with the username 'reidmix'
-2. The creation of the `User` with the username 'reidmix'
-3. Save the `Post` and associate the newly created `User`
+1. Initial lookup for the `post`
+2. The creation of the `user`
+3. Save the `post` to associate the newly created `user`
 
 ### Response Size
 
