@@ -336,6 +336,20 @@ better searches:
 In all of these cases, Daylight issues only one request per search.
 See [Request Parameters](develop.md#request-parameters) for further reading.
 
+Just like `ActiveRecord`, each part of the chain has its own context and can be
+inspected individually.
+
+  ````ruby
+    published_posts = API::Post.published
+    first_published = published_posts.order(:published_on).first
+
+    first_published.id         #=> 2
+    published_posts.map(&:id)  #=> [3, 2, 7, 5, 6, 1, 9, 8]
+  ````
+
+Here you can see a result set can be further refined while not affecting the
+original result set.
+
 ---
 
 ## Associations
@@ -588,6 +602,21 @@ multiple associations.  For example:
 
 Please review [Request Frequency](#request-frequency) to better understand how
 the requests are composed.
+
+As before with [chaining](#chaining) each part of the chain has its own context
+and can be inspected individually.
+
+  ````ruby
+    first_published_post    = API::Post.published.first
+    comments_with_images    = first_published_post.comments.where(has_images: true)
+    my_last_edited_comment  = comments_with_images.where(created_by: 101)).order(:edited_on).last
+
+    my_last_edited_comment.id       #=> 90
+    comments_with_images.map(&:id)  #=> [32, 15, 1, 90, 81]
+  ````
+
+Here you can see a result set can be further refined while not affecting the
+original result set fetched for the association.
 
 ---
 

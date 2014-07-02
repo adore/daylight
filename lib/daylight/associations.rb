@@ -222,7 +222,7 @@ module Daylight::Associations
     end
 
     private
-      def define_cached_method method_name, options={},  &block
+      def define_cached_method method_name, options={}, &block
         # define an uncached method to call
         uncached_method_name = :"#{method_name}_without_cache"
         define_method(uncached_method_name, block)
