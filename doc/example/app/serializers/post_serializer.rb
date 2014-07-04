@@ -5,5 +5,6 @@ class PostSerializer < ActiveModel::Serializer
   read_only :published_at, :slug, :published?
 
   has_one :author
+  has_one :blog
   has_one :company, through: :blog
 end

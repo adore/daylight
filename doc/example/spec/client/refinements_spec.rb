@@ -25,12 +25,13 @@ describe 'refinements' do
       post.slug.should == "5-amazing-things-you-probably-didnt-know-about-apis"
     end
 
-    xit 'can chain where clauses' do
-      posts = API::Post.where(author_id: server_author.id).where(blog_id: server_blog.id).where(published: true)
+    # Not using the published: true clause here because of an active record bug with type casting boolean values for sqlite3
+    # More details here: https://github.com/att-cloud/daylight/issues/16
+    it 'can chain where clauses' do
+      posts = API::Post.where(author_id: server_author.id).where(blog_id: server_blog.id)
       posts.size.should == 1
       posts.first.author_id.should == server_author.id
       posts.first.blog_id.should == server_blog.id
-      posts.first.published.should be_true
     end
 
   end

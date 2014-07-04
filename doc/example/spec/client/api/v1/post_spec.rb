@@ -21,15 +21,15 @@ describe API::V1::Post do
   end
 
   it 'performs chained queries with a scope' do
-    published = API::V1::Post.where(author_id: author.id).published
-    published.count.should == 2
-    titles = published.map(&:title)
+    available = API::V1::Post.where(author_id: author.id).available
+    available.count.should == 2
+    titles = available.map(&:title)
     titles.should include('Yellow River')
     titles.should include('Joys of Drinking Water')
   end
 
   it 'performs chained queries with multiple scopes' do
-    recently_published = API::V1::Post.where(author_id: author.id).published.recent
+    recently_published = API::V1::Post.where(author_id: author.id).available.recent
     recently_published.count.should == 1
     recently_published.first.title.should == 'Joys of Drinking Water'
   end
