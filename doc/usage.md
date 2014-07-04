@@ -210,17 +210,17 @@ In fact there's more to [chaining](#chaining) than just `where` clauses.
 As in `ActiveRecord` you can also refine by `limit`, `offset`, and `order`
 
   ````ruby
-    posts = API::Post.order_by(:published_on)
+    posts = API::Post.order(:published_on)
     posts.map(&:published_on) #=> ['2014-01-01', '2014-06-21', '2014-06-26']
   ````
 
 You can also specify the direction or reverse the direction:
 
   ````ruby
-    posts = API::Post.order_by('published_on ASC')
+    posts = API::Post.order('published_on ASC')
     posts.map(&:published_on) #=> ['2014-01-01', '2014-06-21', '2014-06-26']
 
-    posts = API::Post.order_by('published_on DESC')
+    posts = API::Post.order('published_on DESC')
     posts.map(&:published_on) #=> ['2014-06-26', '2014-06-21', '2014-01-01']
   ````
 

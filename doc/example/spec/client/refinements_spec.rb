@@ -2,9 +2,10 @@ require 'spec_helper'
 
 describe 'refinements' do
 
+  let(:server_blog)   { Blog.create(name: "Freely's Feels") }
+  let(:server_author) { User.create(name: "I.P. Freely") }
+
   describe 'conditions additions' do
-    let(:server_blog)   { Blog.create(name: "Freely's Feels") }
-    let(:server_author) { User.create(name: "I.P. Freely") }
     let!(:server_post) do
       Post.create(
         title:        "5 amazing things you probably didn't know about APIs",
@@ -33,7 +34,24 @@ describe 'refinements' do
       posts.first.author_id.should == server_author.id
       posts.first.blog_id.should == server_blog.id
     end
+  end
 
+  describe 'order' do
+    before do
+      Post.create(title: "one",   published_at: 1.day.ago)
+      Post.create(title: "two",   published_at: 2.days.ago)
+      Post.create(title: "three", published_at: 3.days.ago)
+    end
+
+    it 'can refine by order' do
+      posts = API::Post.order(:published_at)
+      posts.map(&:title).should == %w[three two one]
+    end
+
+    it 'can reverse the order' do
+      posts = API::Post.order('published_at DESC')
+      posts.map(&:title).should == %w[one two three]
+    end
   end
 
 end
