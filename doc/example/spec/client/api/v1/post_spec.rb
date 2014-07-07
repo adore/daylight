@@ -5,9 +5,9 @@ describe API::V1::Post do
   let!(:author) { User.create(name: 'I.P. Freely') }
 
   before do
-    Post.create(title: 'Yellow River',           author: author, published: true,  published_at: 1.week.ago)
-    Post.create(title: 'Joys of Drinking Water', author: author, published: true,  published_at: Time.now)
-    Post.create(title: 'Porcelain Dreams',       author: author, published: false, published_at: 1.hour.ago)
+    Post.create(title: 'Yellow River',           author: author, published_at: 1.week.ago)
+    Post.create(title: 'Joys of Drinking Water', author: author, published_at: Time.now)
+    Post.create(title: 'Porcelain Dreams',       author: author, published_at: 1.hour.ago)
   end
 
   it 'performs simple queries' do
@@ -21,16 +21,13 @@ describe API::V1::Post do
   end
 
   it 'performs chained queries with a scope' do
-    available = API::V1::Post.where(author_id: author.id).available
-    available.count.should == 2
-    titles = available.map(&:title)
-    titles.should include('Yellow River')
-    titles.should include('Joys of Drinking Water')
+    published = API::V1::Post.where(author_id: author.id).published
+    published.count.should == 3
   end
 
   it 'performs chained queries with multiple scopes' do
-    recently_published = API::V1::Post.where(author_id: author.id).available.recent
-    recently_published.count.should == 1
+    recently_published = API::V1::Post.where(author_id: author.id).published.recent
+    recently_published.count.should == 2
     recently_published.first.title.should == 'Joys of Drinking Water'
   end
 

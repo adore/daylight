@@ -11,7 +11,6 @@ describe 'refinements' do
         title:        "5 amazing things you probably didn't know about APIs",
         author:       server_author,
         blog:         server_blog,
-        published:    true,
         published_at: 1.week.ago
       )
     end
@@ -75,6 +74,34 @@ describe 'refinements' do
 
       posts = API::Post.offset(5)
       posts.map(&:title).should == %w[6 7 8 9 10]
+    end
+  end
+
+  describe 'scopes' do
+    before do
+      Post.create(title: 'Yellow River',           published_at: 1.week.ago, edited_at: nil)
+      Post.create(title: 'Joys of Drinking Water', published_at: Time.now,   edited_at: 1.week.ago)
+      Post.create(title: 'Porcelain Dreams',       published_at: nil,        edited_at: 1.day.ago)
+    end
+
+    it 'reports which scopes are available' do
+      API::Post.scope_names.should == [:published, :recent, :edited]
+    end
+
+    it 'can be called directly on the client model class' do
+      posts = API::Post.published
+
+      posts.count.should == 2
+      posts.first.should be_published
+      posts.all? {|p| p.published_at.present? }.should be_true
+    end
+
+    it 'can be called multiple times on a model' do
+      posts = API::Post.published.edited
+
+      posts.count.should == 1
+      posts.first.published_at.should be_present
+      posts.first.edited_at.should be_present
     end
   end
 

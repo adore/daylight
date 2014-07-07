@@ -1,5 +1,6 @@
 class Post < ActiveRecord::Base
-  scope :available, -> { where(published: true) }
+  scope :published, -> { where.not(published_at: nil) }
+  scope :edited,    -> { where.not(edited_at: nil) }
   scope :recent,    -> { where('published_at > ?', 1.day.ago) }
 
   belongs_to :blog
