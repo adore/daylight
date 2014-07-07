@@ -54,4 +54,28 @@ describe 'refinements' do
     end
   end
 
+  describe 'limit and offset' do
+    before do
+      (1..10).each do |count|
+        Post.create(title: count.to_s)
+      end
+    end
+
+    it 'can limit the results' do
+      posts = API::Post.limit(1)
+      posts.size.should == 1
+
+      posts = API::Post.limit(8)
+      posts.size.should == 8
+    end
+
+    it 'can offset which resources are returned' do
+      posts = API::Post.all
+      posts.map(&:title).should == %w[1 2 3 4 5 6 7 8 9 10]
+
+      posts = API::Post.offset(5)
+      posts.map(&:title).should == %w[6 7 8 9 10]
+    end
+  end
+
 end
