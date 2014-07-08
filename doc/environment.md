@@ -56,6 +56,22 @@ will cache the generated documenation so there is no penalty to the server.
 [hanna-bootstrap](https://github.com/ngs/hanna-bootstrap) to generate
 rdoc using the twitter bootstrap theme.
 
+
+## API Development Dependencies
+
+We have used the following for API Development.  Without any motification we
+expect you to develop your API using:
+
+    rails                      4.0
+    activeresource             4.0
+    active_model_serializers   0.8
+
+In our own API, we use the following to assist us to build our API, these
+libraries are in no way required to use Daylight:
+
+    rails-api                  0.1.0
+    versionist                 1.2.1
+
 ## Development & Test Dependencies
 
     rspec                      2.14.1
@@ -88,3 +104,5 @@ the binaries or use your favorite package manager.
 We use [factory_girl](https://github.com/thoughtbot/factory_girl)
 to build our fixtures and [faker](https://github.com/stympy/faker)
 to populate its data.
+
+
