@@ -67,7 +67,8 @@ expect you to develop your API using:
     active_model_serializers   0.8
 
 In our own API, we use the following to assist us to build our API, these
-libraries are in no way required to use Daylight:
+libraries are in no way required to use Daylight.  These are only offered
+as suggestions:
 
     rails-api                  0.1.0
     versionist                 1.2.1
