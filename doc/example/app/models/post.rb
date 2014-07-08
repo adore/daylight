@@ -12,7 +12,7 @@ class Post < ActiveRecord::Base
 
   has_one :company, through: :blog
 
-  accepts_nested_attributes_for :comments
+  accepts_nested_attributes_for :comments, :author
 
   before_create do
     self.slug = title.downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '')

@@ -9,6 +9,6 @@ class API::V1::PostsController < APIController
 
   private
     def post_params
-      params.require(:post).permit(:title, :body, :published)
+      params.require(:post).permit(:title, :body, :published, :author_id, author_attributes: [:name])
     end
 end
