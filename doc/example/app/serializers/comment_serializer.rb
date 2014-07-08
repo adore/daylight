@@ -4,5 +4,5 @@ class CommentSerializer < ActiveModel::Serializer
   attributes :id, :name, :content, :like_count
   read_only :spam, :published_at
 
-  has_one :post
+  has_one :post, :commenter
 end
