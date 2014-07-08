@@ -306,24 +306,24 @@ better searches:
   posts.map(&:blog_id)      #=> [2, 2, 2, 2, 2]
 
   # WHERE 2 conditions: get posts for blog_id=101 AND created_by=2
-  posts = API::Post.where(blog_id: 2).where(created_by: 101))
+  posts = API::Post.where(blog_id: 2).where(created_by: 101)
   posts.map(&:id)          #=> [2, 9, 8]
   posts.map(&:created_by)  #=> [101, 101, 101]
 
   # ORDER: get posts for blog_id=2 AND created_by=101 order by published_on
-  posts = API::Post.where(blog_id: 2).where(created_by: 101)).order(:published_on)
+  posts = API::Post.where(blog_id: 2).where(created_by: 101).order(:published_on)
   posts.map(&:id)           #=> [2, 8, 9]
   posts.map(&:published_on) #=> ['2014-01-01', '2014-06-21', '2014-06-26']
 
   # OFFSET: get posts for blog_id=2 AND created_by=101 order by published_on after the first one
-  posts = API::Post.where(blog_id: 2).where(created_by: 101)).order(:published_on).offset(1)
+  posts = API::Post.where(blog_id: 2).where(created_by: 101).order(:published_on).offset(1)
   posts.map(&:id)           #=> [8, 9]
 
   # LIMIT: get posts for blog_id=2 AND created_by=2 order_by published_on and just the second one
-  posts = API::Post.where(blog_id: 2).where(created_by: 101)).order(:published_on).offset(1).limit(1)
+  posts = API::Post.where(blog_id: 2).where(created_by: 101).order(:published_on).offset(1).limit(1)
   posts.map(&:id)           #=> [8]
 
-  post = API::Post.where(blog_id: 2).where(created_by: 101)).order(:published_on).offset(1).limit(1).first
+  post = API::Post.where(blog_id: 2).where(created_by: 101).order(:published_on).offset(1).limit(1).first
   post.id                   #=> 8
   post.blog_id              #=> 2
   post.created_by           #=> 101
