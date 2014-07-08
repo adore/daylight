@@ -105,4 +105,55 @@ describe 'refinements' do
     end
   end
 
+  describe 'chaining' do
+
+    let(:blog) { Blog.new(name: "Freely's Feels") }
+    let(:author) { User.create(name: 'I.P. Freely') }
+
+    before do
+      Post.create(title: 'Yellow River',           author: author, blog: blog, published_at: 1.week.ago)
+      Post.create(title: 'Joys of Drinking Water', author: author, blog: blog, published_at: Time.now)
+      Post.create(title: 'Porcelain Dreams',       author: author, blog: blog, published_at: 1.hour.ago)
+      Post.create(title: 'Something Else',         author: nil,    blog: blog, published_at: 1.hour.ago)
+      Post.create(title: 'Some Other Thing',       author: author, blog: nil,  published_at: 1.hour.ago)
+    end
+
+    it 'works with two conditions' do
+      posts = API::Post.where(blog_id: blog.id).where(author_id: author.id)
+      titles = posts.map(&:title)
+      titles.count.should == 3
+      titles.should include('Yellow River')
+      titles.should include('Joys of Drinking Water')
+      titles.should include('Porcelain Dreams')
+    end
+
+    it 'allows ordering' do
+      posts = API::Post.where(blog_id: blog.id).where(author_id: author.id).order(:published_at)
+      posts.map(&:title).should == ['Yellow River', 'Porcelain Dreams', 'Joys of Drinking Water']
+    end
+
+    it 'allows offset' do
+      posts = API::Post.where(blog_id: blog.id).where(author_id: author.id).order(:published_at).offset(1)
+      posts.map(&:title).should == ['Porcelain Dreams', 'Joys of Drinking Water']
+    end
+
+    it 'allows limit' do
+      posts = API::Post.where(blog_id: blog.id).where(author_id: author.id).order(:published_at).offset(1).limit(1)
+      posts.map(&:title).should == ['Porcelain Dreams']
+    end
+
+    it 'allows first' do
+      post = API::Post.where(blog_id: blog.id).where(author_id: author.id).order(:published_at).offset(1).limit(1).first
+      post.title.should == 'Porcelain Dreams'
+    end
+
+    it 'saves context for each part of the chain' do
+      published_posts = API::Post.published
+      first_published = published_posts.order(:published_at).first
+
+      first_published.title.should == 'Yellow River'
+      published_posts.count.should == 5
+    end
+  end
+
 end
