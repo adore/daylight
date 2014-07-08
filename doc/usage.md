@@ -478,8 +478,8 @@ You must save the nested resources directly:
 
   ````ruby
     post = API::Post.first
-    post.auhor.full_name = "Reid MacDonald"
-    post.auhor.save #=> true
+    post.author.full_name = "Reid MacDonald"
+    post.author.save #=> true
 
     post = API::Post.first
     post.author.full_name #=> "Reid MacDonald"
@@ -491,8 +491,8 @@ This is the same as saying:
     post = API::Post.first
 
     author = post.author
-    auhor.full_name = "Reid MacDonald"
-    auhor.save #=> true
+    author.full_name = "Reid MacDonald"
+    author.save #=> true
 
     post = API::Post.first
     post.author.full_name #=> "Reid MacDonald"
