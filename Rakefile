@@ -5,4 +5,4 @@ desc "Default task is to run rspec tests"
 task default: :spec
 
 desc "Remove all generated files"
-task clean: %w[clobber_rcov clobber_rdoc]
+task clean: %w[clobber_rcov clobber_rdoc clobber_gem]

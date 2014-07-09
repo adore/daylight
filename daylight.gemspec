@@ -5,11 +5,15 @@ Gem::Specification.new do |s|
   s.name        = 'daylight'
   s.version     = Daylight::VERSION
   s.platform    = Gem::Platform::RUBY
+  s.license     = 'Apache-2.0'
   s.authors     = ['Reid MacDonald', 'Doug McInnes']
   s.email       = ['reidmix@gmail.com', 'doug@dougmcinnes.com']
-  s.homepage    = ''
-  s.summary     = %q{}
-  s.description = %q{}
+  s.homepage    = 'https://github.com/att-cloud/daylight'
+  s.summary     = "Allow ActiveResource to function more like ActiveRecord"
+  s.description = <<-DESC
+    Daylight extends Rails on the server and ActiveResource in the client to
+    allow your ActiveResource client API to perform more like to ActiveRecord
+  DESC
 
   s.add_runtime_dependency 'rails',                    '~> 4.0.1'
   s.add_runtime_dependency 'activeresource',           '~> 4.0.0'
@@ -26,8 +30,9 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'factory_girl'
   s.add_development_dependency 'faker'
 
-  s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
-  s.require_paths = ['lib']
+  s.files            = `git ls-files -- {app,config,lib,rails}/*`.split("\n")
+  s.test_files       = `git ls-files -- spec/*`.split("\n")
+  s.executables      = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  s.extra_rdoc_files = `git ls-files -- **/*.md`.split("\n") + %w[README.md]
+  s.require_paths    = ['lib']
 end

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    daylight (0.0.0.1)
+    daylight (0.9.0.rc1)
       actionpack-page_caching (~> 1.0.2)
       active_model_serializers (~> 0.8.1)
       activeresource (~> 4.0.0)
