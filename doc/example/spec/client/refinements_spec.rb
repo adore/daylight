@@ -105,7 +105,7 @@ describe 'refinements' do
     end
   end
 
-  describe 'chaining' do
+  describe 'chaining from resource classes' do
 
     let(:blog) { Blog.new(name: "Freely's Feels") }
     let(:author) { User.create(name: 'I.P. Freely') }
@@ -116,6 +116,16 @@ describe 'refinements' do
       Post.create(title: 'Porcelain Dreams',       author: author, blog: blog, published_at: 1.hour.ago)
       Post.create(title: 'Something Else',         author: nil,    blog: blog, published_at: 1.hour.ago)
       Post.create(title: 'Some Other Thing',       author: author, blog: nil,  published_at: 1.hour.ago)
+    end
+
+    it 'works in the simple case' do
+      posts = API::Post.where(blog_id: blog.id)
+      titles = posts.map(&:title)
+      titles.count.should == 4
+      titles.should include('Yellow River')
+      titles.should include('Joys of Drinking Water')
+      titles.should include('Porcelain Dreams')
+      titles.should include('Something Else')
     end
 
     it 'works with two conditions' do
@@ -153,6 +163,68 @@ describe 'refinements' do
 
       first_published.title.should == 'Yellow River'
       published_posts.count.should == 5
+    end
+  end
+
+  describe 'chaining from resource instances' do
+
+    let(:post)    { API::Post.first }
+    let(:reidmix) { API::User.find_by(name: 'reidmix') }
+
+    before do
+      post = Post.create(title: 'Yellow River')
+
+      dmcinnes = User.create(name: 'dmcinnes')
+      reidmix  = User.create(name: 'reidmix')
+
+      Comment.create(content: 'First!',  post: post, edited_at: 1.day.ago,  like_count: 1, commenter: dmcinnes)
+      Comment.create(content: 'Second!', post: post, edited_at: 2.days.ago, like_count: 2, commenter: dmcinnes)
+      Comment.create(content: 'Third!',  post: post, edited_at: 3.days.ago, like_count: 2, commenter: reidmix)
+      Comment.create(content: 'Fourth!', post: post, edited_at: nil,        like_count: 0, commenter: reidmix)
+      Comment.create(content: 'Fifth!',  post: post, edited_at: 5.days.ago, like_count: 2, commenter: reidmix)
+      Comment.create(content: 'Sixth!',  post: post, edited_at: 6.days.ago, like_count: 2, commenter: reidmix)
+    end
+
+    it 'works in the simple case' do
+      comments = post.comments
+      comments.count.should == 6
+    end
+
+    it 'isolates with scope' do
+      comments = post.comments.edited
+      comments.map(&:content).should == %w[First! Second! Third! Fifth! Sixth!]
+    end
+
+    # TODO should be able to use the user client object as a filter value
+    # instead of using the ids
+    it 'isolates with scope and filter' do
+      comments = post.comments.where(commenter_id: reidmix.id)
+      comments.map(&:content).should == %w[Third! Fourth! Fifth! Sixth!]
+    end
+
+    it 'isolates with scope and multiple filters' do
+      comments = post.comments.where(commenter_id: reidmix.id).where(like_count: 2)
+      comments.map(&:content).should == %w[Third! Fifth! Sixth!]
+    end
+
+    it 'isolates and orders with scope and multiple filters' do
+      comments = post.comments.where(commenter_id: reidmix.id).where(like_count: 2).order(:edited_at)
+      comments.map(&:content).should == %w[Sixth! Fifth! Third!]
+    end
+
+    it 'isolates and orders with scope and multiple filters and an offset' do
+      comments = post.comments.where(commenter_id: reidmix.id).where(like_count: 2).order(:edited_at).offset(1)
+      comments.map(&:content).should == %w[Fifth! Third!]
+    end
+
+    it 'isolates and orders with scope and multiple filters and an offset and limit' do
+      comments = post.comments.where(commenter_id: reidmix.id).where(like_count: 2).order(:edited_at).offset(1).limit(1)
+      comments.map(&:content).should == %w[Fifth!]
+    end
+
+    it 'returns the first isolated, ordered, scoped, filtered, offsetted and limited result' do
+      comment = post.comments.where(commenter_id: reidmix.id).where(like_count: 2).order(:edited_at).offset(1).limit(1).first
+      comment.content.should == 'Fifth!'
     end
   end
 

@@ -24,6 +24,7 @@ ActiveRecord::Schema.define(version: 20140623230505) do
     t.text     "content"
     t.boolean  "spam"
     t.datetime "published_at"
+    t.datetime "edited_at"
     t.integer  "like_count"
     t.integer  "post_id"
     t.integer  "commenter_id"

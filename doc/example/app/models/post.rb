@@ -22,6 +22,10 @@ class Post < ActiveRecord::Base
     published_at.present?
   end
 
+  def edited?
+    edited_at.present?
+  end
+
   def top_comments
     comments.order_by(:like_count)
   end
