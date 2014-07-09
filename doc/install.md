@@ -82,22 +82,22 @@ Add this to your `Rakefile`:
 
 This provides two rake tasks:
 
-  ```
+  ````
     rake doc:api:generate # Pre-generate the API documentation
     rake doc:api:clean    # Clear the API documentation
-  ```
+  ````
 
 The `doc:api:generate` tasks requests every page in the documentation so it can
 be pre-cached.  Make sure to run it in an environment where caching is turned
 on:
 
-  ```ruby
+  ````ruby
     config.action_controller.perform_caching = true
-  ```
+  ````
 
-  ```
+  ````
     RAILS_ENV=production rake doc:api:generate
-  ```
+  ````
 
 The `doc:api:clean` tasks clears out the documentation cache directory.
 
@@ -109,11 +109,11 @@ API.
 
 Add the following to your `test_helper.rb` or `spec_helper.rb`:
 
-  ```ruby
+  ````ruby
     require 'daylight/mock'
 
     Daylight::Mock.setup
-  ```
+  ````
 
 ## Console
 
