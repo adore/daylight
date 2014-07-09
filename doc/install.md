@@ -8,26 +8,26 @@ Install the gem or add it to your bundler's Gemfile:
 
 Require and run setup, no options are needed:
 
-    ````
-        require 'daylight'
+  ````ruby
+    require 'daylight'
 
-        Daylight::API.setup!
-    ````
+    Daylight::API.setup!
+  ````
 
 This is the same as specifying `setup!` with the following defaults:
 
-    ````ruby
-        require 'daylight'
+  ````ruby
+    require 'daylight'
 
-        Daylight::API.setup!({
-          namespace: 'API',
-          password:  nil,
-          endpoint:  'http://localhost',
-          version:   'v1',
-          versions:  ['v1'],
-          timeout:   60
-        })
-    ````
+    Daylight::API.setup!({
+      namespace: 'API',
+      password:  nil,
+      endpoint:  'http://localhost',
+      version:   'v1',
+      versions:  ['v1'],
+      timeout:   60
+    })
+  ````
 
 You can customize each of these options:
 * `namespace` is the module to which you wish ActiveResource client models to belong
