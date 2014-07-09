@@ -93,8 +93,9 @@ class Daylight::APIController < ApplicationController
       #--
       # `public` is called in context of the subclass
       def handles *actions
+        actions = API_ACTIONS.dup if actions.any? {|a| a == :all }
+
         whitelisted = actions.map(&:to_sym) & API_ACTIONS
-        whitelisted = API_ACTIONS.dup if actions.any? {|a| a == :all }
 
         if (unhandled = actions - whitelisted).present?
           logger.warn "Daylight::APIController isn't handling unwhitelisted actions"
