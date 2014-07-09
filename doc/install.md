@@ -124,5 +124,5 @@ when you `reload!` Add the following to an initializer on your server:
     require 'daylight/client_reloader'
   ````
 
-More information about the [client reloader][develop.md#client-reloader] is
+More information about the [client reloader](develop.md#client-reloader) is
 available in the development guide.
