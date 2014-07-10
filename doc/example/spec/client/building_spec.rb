@@ -28,4 +28,14 @@ describe 'building' do
     end
   end
 
+  describe :first_or_initialize do
+    it 'instatiates the object but not save it automatically' do
+      post = API::Post.where(slug: '100-best-albums-of-2014').first_or_initialize({
+        title: "Ranked list of the 100 best albums so far in 2014"
+      })
+      post.should be_new
+      post.save.should be_true
+    end
+  end
+
 end
