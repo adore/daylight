@@ -14,6 +14,8 @@ class Post < ActiveRecord::Base
 
   accepts_nested_attributes_for :comments, :author
 
+  validates :title, presence: true
+
   before_create do
     self.slug = title.downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '')
   end
