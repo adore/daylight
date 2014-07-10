@@ -38,4 +38,32 @@ describe 'building' do
     end
   end
 
+  describe 'through associations' do
+
+    let(:post) { API::Post.first }
+
+    before do
+      Post.create(title: 'Advance Stirings in Relation to the Foraging Abilities of Avian Species')
+    end
+
+    it 'can create an object based on a collection for an association' do
+      comment = post.comments.first_or_initialize(content: "Am I the first comment?")
+      comment.should be_new
+      comment.post_id.should == post.id
+      comment.save.should be_true
+    end
+
+    it 'also works with refinements' do
+      Comment.create(content: 'First!', post: Post.first, like_count: 1)
+
+      comment = post.comments.where(like_count: 1).first_or_create
+      comment.should_not be_new
+      comment.post_id.should == post.id
+
+      # Update the message
+      comment.content = "You really like me when I said: '#{comment.content}'"
+      comment.save.should be_true
+    end
+  end
+
 end
