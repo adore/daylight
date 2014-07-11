@@ -29,6 +29,6 @@ class Post < ActiveRecord::Base
   end
 
   def top_comments
-    comments.order_by(:like_count)
+    comments.order_by('like_count DESC').limit(3)
   end
 end
