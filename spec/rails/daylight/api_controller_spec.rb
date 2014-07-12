@@ -130,9 +130,34 @@ describe Daylight::APIController, type: :controller do
       end
     end
 
+    describe "rescue from UnpermittedParameters error" do
+      def self.controller_class
+        SuitesController
+      end
+
+      before do
+        @routes.draw do
+          resources :suites
+        end
+      end
+
+      it "has status of unprocessable_entity" do
+        post :create, suite: {unpermitted: 'attr'}
+
+        assert_response :unprocessable_entity
+      end
+
+      it "reports errors for unpermitted attributes" do
+        post :create, suite: {unpermitted: 'attr'}
+
+        body = JSON.parse(response.body)
+        body['errors']['unpermitted'].should == ['unpermitted parameter']
+      end
+    end
+
     describe "rescue from ForbiddenAttributesError" do
       def self.controller_class
-       TestCasesController
+        TestCasesController
       end
 
       before do
@@ -141,8 +166,6 @@ describe Daylight::APIController, type: :controller do
         end
       end
 
-      # TODO: these two should be unprocessable_entity insead
-      # See: https://github.com/att-cloud/daylight/issues/8
       it "has status of unprocessable_entity" do
         post :create, case: {suite_id: 0}
 
@@ -155,7 +178,7 @@ describe Daylight::APIController, type: :controller do
         assert_response :bad_request
 
         body = JSON.parse(response.body)
-        body['errors'].should == 'unpermitted or missing attribute'
+        body['errors'].should == 'parameters have not been permitted on this action'
       end
     end
   end
@@ -282,7 +305,7 @@ describe Daylight::APIController, type: :controller do
   describe "common actions" do
     # rspec-rails does not honor the tests(controller) function
     def self.controller_class
-     SuitesController
+      SuitesController
     end
 
     before do

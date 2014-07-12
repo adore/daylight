@@ -20,6 +20,10 @@ Dir.glob(File.expand_path('../config/**/*.rb', __FILE__)).each { |f| require f }
 # in spec/support/ and its subdirectories.
 Dir.glob(File.expand_path('../support/**/*.rb', __FILE__)).each { |f| require f }
 
+# make unpermitted parameters raise exceptions so we can test them!
+# See https://github.com/att-cloud/daylight/issues/8
+ActionController::Parameters.action_on_unpermitted_parameters = :raise
+
 RSpec.configure do |config|
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
