@@ -24,7 +24,7 @@ describe Daylight::ReadOnly do
         meta: { test_read_only: { read_only: ["immutable"], nested_resources: ["test_resource"] } }
       }
 
-      stub_request(:get, %r{#{TestReadOnly.site}}).to_return(body: data.to_json)
+      stub_request(:any, %r{#{TestReadOnly.site}}).to_return(body: data.to_json)
     end
 
     it "is defined" do
@@ -105,6 +105,14 @@ describe Daylight::ReadOnly do
       xml.keys.should_not include('immutable')
 
       xml['children'].map(&:keys).flatten.should_not include('immutable')
+    end
+
+    it "always loads read_only attributes from the server" do
+      test = TestReadOnly.new
+      test.read_only.should == []
+
+      test.save
+      test.read_only.should == ['immutable']
     end
   end
 end
