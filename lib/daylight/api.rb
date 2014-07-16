@@ -193,12 +193,7 @@ class Daylight::API < ActiveResource::Base
   # Concern cannot call `super` from module to base class (we think)
 
   def initialize(attributes={}, persisted = false)
-    if Hash === attributes && attributes.has_key?('meta')
-      # save and strip any metadata supplied in the response
-      metadata = (attributes.delete('meta')||{}).with_indifferent_access
-      metadata.merge!(metadata.delete(self.class.element_name) || {})
-    end
-    @metadata = metadata || {}
+    extract_metadata!(attributes)
 
     super
   end
@@ -251,5 +246,48 @@ class Daylight::API < ActiveResource::Base
   def encode(options={})
     super(self.class.request_root_in_json? ? { :root => self.class.element_name }.merge(options) : options)
   end
+
+  protected
+    ##
+    # Override `ActiveResource` method so it strips the meta attributes for create and update actions.
+    #
+    # Solves problem where `remove_root` was not performing because meta was still in the response.
+    # For GET objects, this is handled by `initialize` but that's too late in this case.
+    #
+    # See:
+    # ActiveResource::Base#load_attributes_from_response
+
+    def load_attributes_from_response(response)
+      if response_loadable?(response)
+        decoded_body = self.class.format.decode(response.body)
+        extract_metadata!(decoded_body)
+        load(decoded_body, true, true)
+        @persisted = true
+      end
+    end
+
+  private
+
+    ##
+    # Does this response actaully have a body?
+
+    def response_loadable?(response)
+      response_code_allows_body?(response.code) &&
+      (response['Content-Length'].nil? || response['Content-Length'] != "0") &&
+      !response.body.nil? &&
+      response.body.strip.size > 0
+    end
+
+    ##
+    # Extract meta attribute from attributes and save it
+
+    def extract_metadata!(attributes)
+      if Hash === attributes && attributes.has_key?('meta')
+        # save and strip any metadata supplied in the response
+        metadata = (attributes.delete('meta')||{}).with_indifferent_access
+        metadata.merge!(metadata.delete(self.class.element_name) || {})
+      end
+      @metadata = metadata || {}
+    end
 end
 
