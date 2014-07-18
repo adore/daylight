@@ -85,7 +85,7 @@ describe 'refinements' do
     end
 
     it 'reports which scopes are available' do
-      API::Post.scope_names.should == [:published, :recent, :edited]
+      API::Post.scope_names.should == [:published, :recent, :edited, :liked]
     end
 
     it 'can be called directly on the client model class' do
