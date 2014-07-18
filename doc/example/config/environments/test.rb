@@ -35,4 +35,6 @@ DaylightExample::Application.configure do
   config.active_support.deprecation = :stderr
 
   I18n.enforce_available_locales = false
+
+  config.action_controller.action_on_unpermitted_parameters = :raise
 end

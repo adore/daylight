@@ -1,6 +1,7 @@
 class API::V1::PostsController < APIController
   handles :all
 
+  # override the default show action defined by `handles`
   def show
     super
 
@@ -9,8 +10,6 @@ class API::V1::PostsController < APIController
 
   private
     def post_params
-      params.require(:post).permit(:title, :body, :published, :author_id,
-                                   author_attributes: [:name],
-                                   comments_attributes: [:id, :content])
+      params.require(:post).permit!
     end
 end

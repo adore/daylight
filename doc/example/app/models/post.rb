@@ -12,7 +12,7 @@ class Post < ActiveRecord::Base
 
   has_one :company, through: :blog
 
-  accepts_nested_attributes_for :comments, :author
+  accepts_nested_attributes_for :comments, :author, :blog
 
   validates :title, presence: true
 

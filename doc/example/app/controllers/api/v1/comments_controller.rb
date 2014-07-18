@@ -3,6 +3,6 @@ class API::V1::CommentsController < APIController
 
   private
     def comment_params
-      params.require(:comment).permit(:name, :content)
+      params.require(:comment).permit!
     end
 end

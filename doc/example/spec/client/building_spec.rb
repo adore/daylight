@@ -7,7 +7,7 @@ describe 'building' do
       post = API::Post.where(title: '100 Best Albums of 2014').first_or_create
       post.should_not be_new
 
-      post.content = "Ranked list of the 100 best albums so far in 2014"
+      post.body = "Ranked list of the 100 best albums so far in 2014"
       post.save.should be_true
     end
 

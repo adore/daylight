@@ -3,6 +3,6 @@ class API::V1::UsersController < APIController
 
   private
     def user_params
-      params.require(:user).permit(:name)
+      params.require(:user).permit!
     end
 end

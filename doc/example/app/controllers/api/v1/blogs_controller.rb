@@ -3,6 +3,6 @@ class API::V1::BlogsController < APIController
 
   # private
     def blog_params
-      params.require(:blog).permit(:name, :description)
+      params.require(:blog).permit(:name)
     end
 end
