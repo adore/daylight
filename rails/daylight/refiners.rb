@@ -158,6 +158,7 @@ module Daylight::Refiners
     end
 
     def add_remoted(method)
+      raise ArgumentError, "Configured remote method '#{method}' in routes does not exist" unless method_defined?(method)
       remoted_methods.push(method.to_sym).uniq!
     end
 
@@ -175,7 +176,7 @@ module Daylight::Refiners
     end
 
     def remoted method
-      raise ArgumentError, "Unknown remote: #{method}" unless self.class.remoted? method
+      raise ArgumentError, "Unknown remote: #{method}" unless self.class.remoted?(method)
       public_send(method)
     end
   end
