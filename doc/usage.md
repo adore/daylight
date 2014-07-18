@@ -816,7 +816,7 @@ For example, when providing an incorrect condition:
 If invalid statements are issued server-side they will be raised:
 
   ````ruby
-  API::Post.find(1).limit(:foo)
+  API::Post.published.limit(:foo)
   #=> ActiveResource::BadRequest: Failed.  Response code = 400.
   #   Response message = Bad Request.  Root Cause = invalid value for Integer(): "foo"
   ````
