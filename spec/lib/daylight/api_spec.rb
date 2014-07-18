@@ -142,4 +142,37 @@ describe Daylight::API do
       test.nested_resources.should == ["test_resource"]
     end
   end
+
+  describe 'metadata' do
+    before do
+      data = {
+        test_descendant: { name: "foo", immutable: "readme"},
+        meta: { test_descendant: { read_only: ["immutable"], nested_resources: ["test_resource"] } }
+      }
+
+      stub_request(:any, %r{#{TestDescendant.site}}).to_return(body: data.to_json)
+    end
+
+    it "is extracted from the response" do
+      test = TestDescendant.find(1)
+
+      test.metadata.should be_present
+      test.metadata['read_only'].should == ['immutable']
+    end
+
+    it "is extracted from the response on an update" do
+      test = TestDescendant.find(1)
+      test.metadata.should be_present
+      test.metadata.clear
+      test.metadata.should_not be_present
+
+      test.save
+      test.metadata.should be_present
+    end
+
+    it "is extracted from the response on a create" do
+      test = TestDescendant.create(name: 'foo')
+      test.metadata.should be_present
+    end
+  end
 end
