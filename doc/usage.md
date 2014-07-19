@@ -827,23 +827,17 @@ Given the client model:
   ````ruby
   class API::V1::Post < Daylight::API
     scopes :published
-    remote :top_comments
-
+    
     has_many :author, through: :associated
   end
   ````
 
-If neither `published`, `top_comments`, nor `author` are not setup on the
-server-side, errors will be raised.
+If neither `published` nor `author` are not setup on the server-side, errors will be raised.
 
   ````ruby
   API::Post.published
   #=> ActiveResource::BadRequest: Failed.  Response code = 400.
   #   Response message = Bad Request.  Root Cause = unknown scope: published
-
-  API::Post.by_popularirty
-  #=> ActiveResource::BadRequest: Failed.  Response code = 400.
-  #   Response message = Bad Request.  Root Cause = unknown remote: top_comments
 
   API::Post.find(1).author
   #=> ActiveResource::BadRequest: Failed.  Response code = 400.
