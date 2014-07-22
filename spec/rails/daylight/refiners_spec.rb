@@ -169,8 +169,9 @@ describe Daylight::Refiners do
       expect { RefinersTestClass.remoted(id:1, remoted:'not_a_remoted_method') }.to raise_error(ArgumentError)
     end
 
-    it "raises an error when trying to configure an non-existing method as a remote" do
-      expect { RefinersTestClass.add_remoted(:unknown) }.to raise_error(ArgumentError)
+    it "does not set up non-existent methods as remotes" do
+      RefinersTestClass.add_remoted(:unknown)
+      RefinersTestClass.remoted_methods.should_not include(:unknown)
     end
 
     it "returns the remoted call data" do

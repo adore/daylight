@@ -158,8 +158,11 @@ module Daylight::Refiners
     end
 
     def add_remoted(method)
-      raise ArgumentError, "Configured remote method '#{method}' in routes does not exist" unless method_defined?(method)
-      remoted_methods.push(method.to_sym).uniq!
+      if method_defined?(method)
+        remoted_methods.push(method.to_sym).uniq!
+      else
+        Rails.logger.warn "Configured remote method '#{method}' in #{self.name} routes does not exist!"
+      end
     end
 
     def remoted?(method)
