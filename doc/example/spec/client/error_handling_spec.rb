@@ -32,6 +32,11 @@ describe 'error handling' do
     expect{ API::Post.liked.to_a }.to raise_error(ActiveResource::BadRequest, /unknown scope: liked/i)
   end
 
+  it 'raises an error on unknown remotes' do
+    Post.create(title: 'unknown remote test')
+    expect{ API::Post.first.top_spammers }.to raise_error(ActiveResource::BadRequest, /unknown remote: top_spammers/i)
+  end
+
   it 'raises an error on unknown associations' do
     Post.create(title: 'unknown association test')
     expect{ API::Post.first.spammers.to_a }.to raise_error(ActiveResource::BadRequest, /unknown association: spammers/i)

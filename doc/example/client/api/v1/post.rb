@@ -13,6 +13,7 @@ class API::V1::Post < Daylight::API
 
   remote :top_comments,  class_name: 'api/v1/comment'
 
-  # this doesn't exist server-side, they are here for error_handling tests
+  # these don't exist server-side, they are here for error_handling tests
   has_many :spammers, through: :associated, class_name: 'api/v1/user'
+  remote :top_spammers, class_name: 'api/v1/user'
 end
