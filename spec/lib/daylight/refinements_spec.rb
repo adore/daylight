@@ -24,6 +24,24 @@ describe Daylight do
       RefinementTestClass.should respond_to(:baz)
     end
 
+    it 'keeps track of scopes' do
+      RefinementTestClass.scope_names.should include(:foo)
+      RefinementTestClass.scope_names.should include(:bar)
+    end
+
+    it 'allows addition of scopes' do
+      names = RefinementTestClass.scope_names
+      names.should include(:foo)
+      names.should include(:bar)
+
+      RefinementTestClass.scopes :baz
+
+      names = RefinementTestClass.scope_names
+      names.should include(:foo)
+      names.should include(:bar)
+      names.should include(:baz)
+    end
+
     it 'supports first' do
       resource = RefinementTestClass.first
 

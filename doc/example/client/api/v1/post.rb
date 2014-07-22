@@ -1,6 +1,5 @@
 class API::V1::Post < Daylight::API
-  scopes :published, :recent, :edited,
-         :liked # doesn't exist server-side for error handling tests
+  scopes :published, :recent, :edited
 
   belongs_to :blog
   belongs_to :author, class_name: 'api/v1/user'
@@ -14,6 +13,7 @@ class API::V1::Post < Daylight::API
   remote :top_comments,  class_name: 'api/v1/comment'
 
   # these don't exist server-side, they are here for error_handling tests
+  scopes :liked
   has_many :spammers, through: :associated, class_name: 'api/v1/user'
   remote :top_spammers, class_name: 'api/v1/user'
 end

@@ -11,11 +11,12 @@ module Daylight::Refinements
     attr_accessor :scope_names
 
     # Define scopes that the class can be refined by
-    def scopes *scope_names
-      self.scope_names = scope_names
-      self.scope_names.freeze
+    def scopes *names
+      self.scope_names ||= []
 
-      scope_names.each do |scope|
+      names.each do |scope|
+        self.scope_names << scope
+
         # hand chaining duties off to the ResourceProxy instance
         define_singleton_method scope do
           resource_proxy.append_scope(scope)
@@ -26,6 +27,8 @@ module Daylight::Refinements
           append_scope(scope)
         end
       end
+
+      # self.scope_names.freeze
     end
 
     ##
