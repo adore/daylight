@@ -150,28 +150,24 @@ describe Daylight::Refiners do
   end
 
   describe :remoted_methods do
-    it "keeps track of remoted methods" do
+    before do
       RefinersTestClass.add_remoted(:foo)
+    end
 
+    it "keeps track of remoted methods" do
       RefinersTestClass.remoted?(:foo).should be_true
       RefinersTestClass.remoted?(:not_a_remoted_method).should be_false
 
       RefinersTestClass.remoted_methods.should == [:foo]
     end
-  end
-
-  describe :remoted do
-    before do
-      RefinersTestClass.add_remoted(:foo)
-    end
-
-    it "raises an error if an unknown remoted is supplied" do
-      expect { RefinersTestClass.remoted(id:1, remoted:'not_a_remoted_method') }.to raise_error(ArgumentError)
-    end
 
     it "does not set up non-existent methods as remotes" do
       RefinersTestClass.add_remoted(:unknown)
       RefinersTestClass.remoted_methods.should_not include(:unknown)
+    end
+
+    it "raises an error if an unknown remoted is supplied" do
+      expect { RefinersTestClass.remoted(id:1, remoted:'not_a_remoted_method') }.to raise_error(ArgumentError)
     end
 
     it "returns the remoted call data" do
