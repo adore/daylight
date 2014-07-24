@@ -22,7 +22,7 @@ require 'active_resource/reflection'
 # The `:class_name` option still can be specified for alternate behavior
 #
 #    class API::V1::Post < Daylight::API
-#       belongs_to author, :class_name: 'api/v1/user', foreign_key: 'created_by'
+#       belongs_to :author, class_name: 'api/v1/user', foreign_key: 'created_by'
 #    end
 
 module Daylight::ReflectionExt
