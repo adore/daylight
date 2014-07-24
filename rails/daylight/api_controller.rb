@@ -1,6 +1,6 @@
 ##
 # Common conntroller built on top of `ApplicationController` that assists with
-# setting up standard, convential REST and Daylight supported actions.
+# setting up standard, conventional REST and Daylight supported actions.
 #
 # Have your API Controllers subclass from APIController:
 #
