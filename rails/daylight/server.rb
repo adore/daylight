@@ -25,5 +25,7 @@ end
 # A convinience alias that will avoids any name collisions
 APIController = Daylight::APIController unless defined?(APIController)
 
-# Hook into ActiveRecord::Base `inherited` chain to extend subclasses
-ActiveRecord::Base.send(:include, Daylight::Refiners::Extension)
+# Mix into ActiveRecord::Base
+ActiveSupport.on_load :active_record do
+  prepend Daylight::Refiners
+end

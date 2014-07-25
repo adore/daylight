@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 class RefinerMockActiveRecordBase
-  include Daylight::Refiners::Extension
+  prepend Daylight::Refiners
 
   def self.scope(name, body, &block); end
   def self.where(*args); end
