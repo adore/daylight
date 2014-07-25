@@ -557,7 +557,7 @@ To expose model assoications, you can do that with Daylight additions to
 routing options.
 
 > FUTURE [#7](https://github.com/att-cloud/daylight/issues/7):
-> The cliento only supports model associations on `has_many` relationships.  We
+> The client only supports model associations on `has_many` relationships.  We
 > will need to evaluate the need to support model associations on `has_one` and
 > `has_many` (as we never had a case for it)
 
