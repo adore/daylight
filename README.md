@@ -1,3 +1,5 @@
+[![Gem Version](https://badge.fury.io/rb/daylight.svg)](http://badge.fury.io/rb/daylight)
+
 # Daylight
 
 Daylight extends Rails and ActiveResource to allow your client API to perform
