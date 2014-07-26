@@ -681,7 +681,7 @@ Once all client models are setup, associationed models will be fetched and
 initialized:
 
   ````ruby
-    post = Daylight::Post.first
+    post = API::V1::Post.first
 
     post.blog       #=> #<API::V1::Blog:0x007fd8ca4717d8 ...>
     post.comments   #=> [#<API::V1::Comment:0x007fd8ca538ce8...>, ...]
@@ -705,7 +705,7 @@ in `ActiveRecord`:
 The `User` will be correctly retrieved for the `author` association:
 
   ````ruby
-    Daylight::Post.first.author   #=> #<API::V1::User:0x007fd8ca543e90 ...>
+    API::V1::Post.first.author   #=> #<API::V1::User:0x007fd8ca543e90 ...>
   ````
 
 #### Through Associations
