@@ -774,7 +774,7 @@ associations.
 
 #### Scopes and Remoted Methods
 
-Adding adding scopes and remoted methods are very simple.
+Adding scopes and remoted methods is very simple.
 
 
 Given the `ActiveRecord` model setup:
