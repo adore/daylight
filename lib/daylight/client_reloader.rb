@@ -1,5 +1,5 @@
 ##
-# Runs `alias_api` in the console during API development to re-alias the to the
+# Runs `alias_api` in the console during API development to re-alias the
 # reloaded constants.  Otherwise, they will hold onto the old un-reloaded
 # constants in memory.
 #
