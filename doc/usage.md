@@ -354,8 +354,8 @@ original result set.
 
 ## Associations
 
-Associations work as they do today in `ActiveResource` One one notable
-exception.  Client models that have the `has_many through: :associated` will
+Associations work as they do today in `ActiveResource` with one notable
+exception: client models that have the `has_many through: :associated` will
 perform the lookup for associated objects server-side.
 
 > NOTE: This is useful if conditions or configuration is defined on the
