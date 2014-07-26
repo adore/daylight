@@ -2,8 +2,8 @@ require 'spec_helper'
 require 'daylight/mock'
 
 describe Daylight::Mock do
-  class MiniTest::Spec ; end
-  class MiniTest::Test ; end
+  class Minitest::Spec ; end
+  class Minitest::Test ; end
 
   class TestClient < Daylight::API
     has_many :test_client_children, through: :associated, class_name: 'TestClientChild'
@@ -125,7 +125,6 @@ describe Daylight::Mock do
         daylight_mock.last_created(:test_clients).target_object.code.should == 'foo'
       end
     end
-
   end
 
   describe 'minitest setup' do
@@ -140,5 +139,4 @@ describe Daylight::Mock do
       minitest.before_setup
     end
   end
-
 end
