@@ -1,5 +1,5 @@
 ##
-# Support for handling ActiveRecord-like refinementmes and chaining them together
+# Support for handling ActiveRecord-like refinements and chaining them together
 # These refinements include: +where+, +find_by+, +order+, +limit+, and +offset+
 # Named +scopes+ are also supported.
 module Daylight::Refinements
