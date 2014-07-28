@@ -128,7 +128,7 @@ describe Daylight::Mock do
   end
 
   describe 'minitest setup' do
-    let(:minitest) { Minitest::Test.new(:setup) }
+    let(:minitest) { Minitest::Test.new(:foo) rescue MiniTest::Test.new }
 
     it "adds our mock methods to Minitest::Test" do
       minitest.should respond_to(:daylight_mock)

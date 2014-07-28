@@ -243,7 +243,7 @@ module Daylight
         def setup_minitest
           require 'webmock/minitest'
 
-          clazz = MiniTest::Test rescue MiniTest::Unit::TestCase
+          clazz = MiniTest::Test rescue Minitest::Test
 
           clazz.class_eval do
             include Daylight::Mock
