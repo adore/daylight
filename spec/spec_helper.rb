@@ -11,6 +11,9 @@ require 'rspec/autorun'
 
 require 'webmock/rspec'
 
+require 'factory_girl'
+require 'faker'
+
 WebMock.disable_net_connect!
 
 # Load additional rspec configuration files first
