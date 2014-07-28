@@ -1,20 +1,25 @@
 ##
 # Methods in which to refine a query by a model's scopes or attributes
 module Daylight::Refiners
-  extend ActiveSupport::Concern
 
-  module Extension
-    extend ActiveSupport::Concern
-
-    module ClassMethods
-      ##
-      # Extends subclasses of ActiveRecord::Base with the Daylight::Refiners features
-      # This hooks into the `inherited` method chain to perform this extension.
-      def inherited active_record
-        active_record.send(:include, Daylight::Refiners)
-        super
-      end
+  ##
+  # Prepend class methods onto ActiveResource
+  def self.prepended(base)
+    class << base
+      prepend ClassMethods
     end
+  end
+
+  ##
+  # Helper to follow a named association if it exists
+  def associated name
+    raise ArgumentError, "Unknown association: #{name}" unless self.class.reflection_names.include? name.to_s
+    public_send(name)
+  end
+
+  def remoted method
+    raise ArgumentError, "Unknown remote: #{method}" unless self.class.remoted?(method)
+    public_send(method)
   end
 
   ##
@@ -170,17 +175,9 @@ module Daylight::Refiners
     end
   end
 
-  included do
-    ##
-    # Helper to follow a named association if it exists
-    def associated name
-      raise ArgumentError, "Unknown association: #{name}" unless self.class.reflection_names.include? name.to_s
-      public_send(name)
-    end
+end
 
-    def remoted method
-      raise ArgumentError, "Unknown remote: #{method}" unless self.class.remoted?(method)
-      public_send(method)
-    end
-  end
+# Mix into ActiveRecord::Base
+ActiveSupport.on_load :active_record do
+  prepend Daylight::Refiners
 end
