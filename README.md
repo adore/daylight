@@ -1,6 +1,7 @@
 # Daylight
 
 [![Gem Version](https://badge.fury.io/rb/daylight.svg)](http://badge.fury.io/rb/daylight)
+[![Build Status](https://travis-ci.org/att-cloud/daylight.svg?branch=master)](https://travis-ci.org/att-cloud/daylight)
 
 Daylight extends Rails and ActiveResource to allow your client API to perform
 akin to ActiveRecord
