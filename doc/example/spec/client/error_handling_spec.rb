@@ -19,7 +19,7 @@ describe 'error handling' do
   end
 
   it 'reports on bad query parameters' do
-    expect{ API::Post.find_by(foo: 'bar') }.to raise_error(ActiveResource::BadRequest, /unknown key: foo/i)
+    expect{ API::Post.find_by(foo: 'bar') }.to raise_error(ActiveResource::BadRequest, /unknown key: "?foo"?/i)
   end
 
   it 'reports on invalid server-side statements' do
