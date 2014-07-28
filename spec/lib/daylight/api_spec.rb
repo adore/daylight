@@ -146,7 +146,7 @@ describe Daylight::API do
   describe 'metadata' do
     before do
       data = {
-        test_descendant: { name: "foo", immutable: "readme"},
+        test_descendant: { id: 1, name: "foo", immutable: "readme"},
         meta: { test_descendant: { read_only: ["immutable"], nested_resources: ["test_resource"] } }
       }
 

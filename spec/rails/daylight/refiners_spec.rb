@@ -111,7 +111,7 @@ describe Daylight::Refiners do
     end
 
     it 'raises an error if an unknown attribute is supplied' do
-      expect { RefinersTestClass.filter_by(baz: 'wibble') }.to raise_error(ArgumentError, 'Unknown key: baz')
+      expect { RefinersTestClass.filter_by(baz: 'wibble') }.to raise_error(ArgumentError, /Unknown key: "?baz"?/)
     end
 
     it 'applies where clause for all supplied attributes' do
