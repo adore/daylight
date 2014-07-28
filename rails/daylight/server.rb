@@ -18,12 +18,14 @@ module Daylight
 
   autoload :Helpers
   autoload :Params
-  autoload :Refiners
   autoload :APIController
+
+  eager_autoload do
+    autoload :Refiners
+  end
 end
 
 # A convinience alias that will avoids any name collisions
 APIController = Daylight::APIController unless defined?(APIController)
 
-# Hook into ActiveRecord::Base `inherited` chain to extend subclasses
-ActiveRecord::Base.send(:include, Daylight::Refiners::Extension)
+Daylight.eager_load!

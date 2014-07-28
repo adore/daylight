@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 class RefinerMockActiveRecordBase
-  include Daylight::Refiners::Extension
+  prepend Daylight::Refiners
 
   def self.scope(name, body, &block); end
   def self.where(*args); end
@@ -56,8 +56,19 @@ describe Daylight::Refiners::AttributeSeive do
 end
 
 describe Daylight::Refiners do
+  class AnotherRefinersTestClass < RefinerMockActiveRecordBase
+    scope :scope_c, -> { 'c' }
+  end
+
   it 'tracks registered scopes' do
     RefinersTestClass.registered_scopes.should == %w[scope_a scope_b]
+  end
+
+  it 'keeps track of different scopes on different classes' do
+    RefinersTestClass.registered_scopes.should == %w[scope_a scope_b]
+    AnotherRefinersTestClass.registered_scopes.should == %w[scope_c]
+
+    RefinerMockActiveRecordBase.scope :scope_x, -> { 'x' }
   end
 
   it 'returns true if scoped? finds a match' do
