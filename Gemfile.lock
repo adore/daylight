@@ -159,6 +159,7 @@ DEPENDENCIES
   daylight!
   factory_girl
   faker
+  rake
   rspec
   rspec-rails (~> 2.14.0)
   simplecov-rcov (~> 0.2.3)
