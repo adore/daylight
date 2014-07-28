@@ -18,14 +18,14 @@ module Daylight
 
   autoload :Helpers
   autoload :Params
-  autoload :Refiners
   autoload :APIController
+
+  eager_autoload do
+    autoload :Refiners
+  end
 end
 
 # A convinience alias that will avoids any name collisions
 APIController = Daylight::APIController unless defined?(APIController)
 
-# Mix into ActiveRecord::Base
-ActiveSupport.on_load :active_record do
-  prepend Daylight::Refiners
-end
+Daylight.eager_load!

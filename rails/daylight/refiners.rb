@@ -1,6 +1,27 @@
 ##
 # Methods in which to refine a query by a model's scopes or attributes
 module Daylight::Refiners
+
+  ##
+  # Prepend class methods onto ActiveResource
+  def self.prepended(base)
+    class << base
+      prepend ClassMethods
+    end
+  end
+
+  ##
+  # Helper to follow a named association if it exists
+  def associated name
+    raise ArgumentError, "Unknown association: #{name}" unless self.class.reflection_names.include? name.to_s
+    public_send(name)
+  end
+
+  def remoted method
+    raise ArgumentError, "Unknown remote: #{method}" unless self.class.remoted?(method)
+    public_send(method)
+  end
+
   ##
   # Helper to determine whether a request to use an attribute is valid or invalid
   # Keeps track of which attributes are part of the request.
@@ -154,24 +175,9 @@ module Daylight::Refiners
     end
   end
 
+end
 
-  def self.prepended(base)
-    class << base
-      prepend ClassMethods
-    end
-
-    base.class_eval do
-      ##
-      # Helper to follow a named association if it exists
-      def associated name
-        raise ArgumentError, "Unknown association: #{name}" unless self.class.reflection_names.include? name.to_s
-        public_send(name)
-      end
-
-      def remoted method
-        raise ArgumentError, "Unknown remote: #{method}" unless self.class.remoted?(method)
-        public_send(method)
-      end
-    end
-  end
+# Mix into ActiveRecord::Base
+ActiveSupport.on_load :active_record do
+  prepend Daylight::Refiners
 end
