@@ -1,4 +1,5 @@
 source "http://rubygems.org"
 
-# Specify your gem's dependencies in vault.gemspec
+gem 'rails', '>= 4.0.1', '~> 4.1.0'
+
 gemspec
