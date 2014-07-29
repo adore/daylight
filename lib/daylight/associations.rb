@@ -55,8 +55,8 @@ module Daylight::Associations
     # ActiveResource::Associations#has_many
 
     def has_many name, options={}
-      through = options.delete(:through).to_s
-      return super unless through == 'associated'
+      through = options.delete(:use).to_s
+      return super if through == 'resource'
 
       create_reflection(:has_many, name, options).tap do |reflection|
         nested_attribute_key = "#{reflection.name}_attributes"

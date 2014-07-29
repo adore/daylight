@@ -11,8 +11,8 @@ describe Daylight::ReflectionExt do
   class TestAPI::V1::Comment < Daylight::API; end
 
   class TestAPI::V1::Post < Daylight::API
-    has_many :comments
-    has_many :top_comments, class_name: 'test_api/v1/comment'
+    has_many :comments,     use: 'resource'
+    has_many :top_comments, use: 'resource', class_name: 'test_api/v1/comment'
 
     belongs_to :test_fallback
   end

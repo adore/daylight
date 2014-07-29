@@ -6,7 +6,7 @@ describe Daylight::Mock do
   class Minitest::Test ; end
 
   class TestClient < Daylight::API
-    has_many :test_client_children, through: :associated, class_name: 'TestClientChild'
+    has_many :test_client_children, class_name: 'TestClientChild'
   end
 
   class TestClientChild < Daylight::API ; end

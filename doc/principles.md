@@ -25,9 +25,9 @@ be reviewed and changed as the need arises.
 
 4. Expected behavior of dependent software _should_ not change when extended
    * Developers should not be surprised by unexpected results from software they know and love
-   * Exception is to fix exposed problems in the underlying software or if the benefits are highly valueble
-   * Changes to the underlying software can be triggered through configuration
-   * **Examples**:`AutosaveAssociationFix`, `ActiveResource::Base#has_one`, `ReflectionExt`
+   * Exception is to fix exposed problems in the underlying software or if the benefits are highly valueble, consistant
+   * Changes to the underlying software (or default behavior) can be triggered through configuration
+   * **Examples**:`AutosaveAssociationFix`, `ActiveResource::Base#has_one`, `ReflectionExt`, `Daylight::Association::ClassMethods#has_many`
 
 5. Extend dependent software (gems) by including changes using `ActiveSupport::Concerns`
    * Concerns show in ancestor lists and can chain to original methods via `super`

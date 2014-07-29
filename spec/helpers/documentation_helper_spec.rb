@@ -5,7 +5,7 @@ describe DaylightDocumentation::DocumentationHelper do
   class TestModel < ActiveRecord::Base
     include Daylight::Associations
 
-    has_many :users
+    has_many :users, use: 'resource'
 
     # override attribute names so we don't have to mock
     # out the database table
