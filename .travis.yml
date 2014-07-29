@@ -5,7 +5,6 @@ env:
   - TEST_SUITE=units       TEST_DIR=.
   - TEST_SUITE=integration TEST_DIR=doc/example
 rvm:
-  - 2.0.0-p247
   - 2.1.1
   - 2.0.0
 gemfile:
