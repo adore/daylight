@@ -1,4 +1,7 @@
 language: ruby
+script:
+  - bundle exec rake
+  - cd doc/example && bundle exec rake
 rvm:
   - 2.0.0-p247
   - 2.1.1
