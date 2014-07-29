@@ -23,3 +23,5 @@ RSpec.configure do |config|
 
   config.order = "random"
 end
+
+load "#{Rails.root.to_s}/db/schema.rb"
