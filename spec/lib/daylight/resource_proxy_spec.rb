@@ -6,7 +6,7 @@ describe Daylight::ResourceProxy do
     self.password = nil
 
     scopes :foo, :bar
-    has_many :related_proxy_test_classes, through: :associated
+    has_many :related_proxy_test_classes
 
     def self.wibble
       'wibble'

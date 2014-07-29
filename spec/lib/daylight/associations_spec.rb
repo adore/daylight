@@ -11,8 +11,8 @@ describe Daylight::Associations do
     self.password = nil
     self.include_format_in_path = false
 
-    has_many   :related_test_classes, through: :associated
-    has_many   :things,        class_name: 'RelatedTestClass', through: :associated
+    has_many   :related_test_classes
+    has_many   :things,        class_name: 'RelatedTestClass'
     belongs_to :parent,        class_name: 'RelatedTestClass'
     has_one    :grandparent,   class_name: 'RelatedTestClass', through: :parent
     has_one    :associate,     class_name: 'RelatedTestClass'

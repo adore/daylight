@@ -53,8 +53,8 @@ refer to these client models in the following `Post` example:
 
       has_one :company, through: :blog
 
-      has_many :comments
-      has_many :commenters, through: :associated, class_name: 'api/v1/user'
+      has_many :comments,   use: 'resource'
+      has_many :commenters, class_name: 'api/v1/user'
 
       remote :top_comments, class_name: 'api/v1/comment'
     end
@@ -355,8 +355,8 @@ original result set.
 ## Associations
 
 Associations work as they do today in `ActiveResource` with one notable
-exception: client models that have the `has_many through: :associated` will
-perform the lookup for associated objects server-side.
+exception: client models will perform the lookup for associated objects
+server-side.
 
 > NOTE: This is useful if conditions or configuration is defined on the
 > server-side model to perform correctly.  Refer to
@@ -370,6 +370,18 @@ Daylight adds additional functionality directly on the association:
 
 Currently, `ActiveResource` will only let you associate a resource by setting
 the `foreign_key` directly on a model.
+
+If you want to use the original behavior where the `foreign_key` is used to
+lookup up associated objects, you can pass the `use: 'resource'` to the
+`has_many` association.
+
+  ````ruby
+    has_many :comments, use: 'resource'
+  ````
+
+Like the default `ActiveResource` behavior, this will return a
+`ActiveResource::Collection` that cannot be [chained](#chaining), nor can
+[nested resources](#nested-resources) be set in the collection.
 
 ###  Nested Resources
 
@@ -829,7 +841,7 @@ Given the client model:
     scopes :published
     remote :top_comments
 
-    has_many :author, through: :associated
+    has_many :author
   end
   ````
 
