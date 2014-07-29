@@ -5,7 +5,7 @@ namespace :ci do
   desc "Runs continuous integration integration tests"
   task :integration do
     Bundler.with_clean_env do
-      system("cd doc/example && bundle exec rspec")
+      system("cd doc/example && bundle install && bundle exec rspec")
     end
   end
 end
