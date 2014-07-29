@@ -18,7 +18,7 @@ namespace :ci do
     update_gemfile!
 
     Bundler.with_clean_env do
-      unless system("bundle exec rspec ENV['TEST_DIR']")
+      unless system("cd #{ENV['TEST_DIR']} && bundle install && bundle exec rspec")
         abort('Integration tests failed')
       end
     end
