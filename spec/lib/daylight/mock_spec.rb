@@ -64,6 +64,15 @@ describe Daylight::Mock do
       end
     end
 
+    describe 'patch' do
+      let(:data) { {test_client: {name: 'wibble'}}.to_json }
+
+      it "updates the attributes" do
+        object = TestClient.find(1)
+        object.patch(:test, {}, data).should be_true
+      end
+    end
+
     describe 'create' do
       it "returns the created object" do
         object = TestClient.new(name: 'foo')

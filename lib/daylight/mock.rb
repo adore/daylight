@@ -90,6 +90,8 @@ module Daylight
             :created
           when :put
             :updated
+          when :patch
+            :patched
           when :delete
             :deleted
           end
@@ -141,6 +143,14 @@ module Daylight
           respond_with(status: 201)
         end
 
+        def process_patched
+          clazz = model_class(path_parts.resource)
+          data = post_data[path_parts.resource.singularize]
+          @target_object = new_record(clazz, data.merge(id: path_parts.id.to_i))
+
+          respond_with(status: 204)
+        end
+
         def process_deleted
           clazz = model_class(path_parts.resource)
           @target_object = new_record(clazz, id: path_parts.id.to_i)
@@ -190,7 +200,7 @@ module Daylight
         end
       end
 
-      %w[created updated associated indexed shown deleted].each do |action|
+      %w[created updated patched associated indexed shown deleted].each do |action|
         define_method action do |resource|
           @storage[action.to_s][resource.to_s.pluralize]
         end
