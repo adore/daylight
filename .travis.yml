@@ -1,12 +1,13 @@
 language: ruby
 cache: bundler
-script: "bundle exec rake ci:$TEST_SUITE"
+install: "cd $TEST_DIR && bundle install --jobs=3 --retry=3 --deployment"
+script:  "cd $TEST_DIR && bundle exec rake"
 env:
-  - TEST_SUITE=units       TEST_DIR=.
-  - TEST_SUITE=integration TEST_DIR=doc/example
+  - TEST_DIR=.
+  - TEST_DIR=doc/example
 rvm:
   - 2.1.1
   - 2.0.0
 gemfile:
-  - gemfiles/rails-4.0.gemfile
-  - gemfiles/rails-4.1.gemfile
+  - $TEST_DIR/gemfiles/rails-4.0.gemfile
+  - $TEST_DIR/gemfiles/rails-4.1.gemfile
