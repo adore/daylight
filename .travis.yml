@@ -3,8 +3,8 @@ cache: bundler
 install: "cd $TEST_DIR && bundle install --jobs=3 --retry=3 --deployment"
 script:  "cd $TEST_DIR && bundle exec rake"
 env:
-  - TEST_DIR=.
-  - TEST_DIR=doc/example
+  - TEST_DIR=$PWD
+  - TEST_DIR=$PWD/doc/example
 rvm:
   - 2.1.1
   - 2.0.0
