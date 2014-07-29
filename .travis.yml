@@ -1,5 +1,9 @@
 language: ruby
 cache: bundler
+script: "bundle exec rake ci:$TEST_SUITE"
+env:
+  - TEST_SUITE=units
+  - TEST_SUITE=integration
 rvm:
   - 2.0.0-p247
   - 2.1.1
