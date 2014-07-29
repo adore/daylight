@@ -7,7 +7,6 @@ PATH
       activeresource (~> 4.0.0)
       haml (~> 4.0.5)
       hanna-bootstrap (~> 0.0.5)
-      rails (~> 4.1.0, >= 4.0.1)
 
 GEM
   remote: http://rubygems.org/
@@ -159,6 +158,7 @@ DEPENDENCIES
   daylight!
   factory_girl
   faker
+  rails (~> 4.1.0, >= 4.0.1)
   rake
   rspec
   rspec-rails (~> 2.14.0)
