@@ -1,7 +1,5 @@
 language: ruby
-script:
-  - bundle exec rake
-  - cd doc/example && bundle install --jobs=3 --retry=3 --deployment && bundle exec rspec
+cache: bundler
 rvm:
   - 2.0.0-p247
   - 2.1.1
