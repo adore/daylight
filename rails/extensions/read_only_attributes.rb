@@ -3,10 +3,8 @@ module ReadOnlyAttributes
 
   included do
     # place the read_only attributes along side the other class_attributes for a Serializer
-    class << self
-      class_attribute :_read_only
-      self._read_only = []
-    end
+    class_attribute :_read_only
+    self._read_only = []
   end
 
   module ClassMethods
