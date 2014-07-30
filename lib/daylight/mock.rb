@@ -99,6 +99,9 @@ module Daylight
 
       private
         def model_class(model_name)
+          candidate_name = [Daylight::API.namespace, Daylight::API.version, model_name.classify].join("::")
+          candidate_name.constantize
+        rescue
           model_name.classify.constantize
         end
 
