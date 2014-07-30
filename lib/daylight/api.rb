@@ -151,10 +151,13 @@ class Daylight::API < ActiveResource::Base
           raise "Unsupported version #{v} is not one of #{versions.join(', ')}"
         end
 
-        @version     = v.upcase
-        version_path = "/#{v.downcase}/".gsub(/\/+/, '/')
+        # Set the version string as the path prefix.
+        #
+        # Explicitly adding the endpoint.path here because ActiveResource ignores it
+        # when a prefix path has been set.
+        set_prefix "/#{endpoint.path}/#{v.downcase}/".gsub(/\/+/, '/')
 
-        set_prefix version_path
+        @version = v.upcase
       end
 
       ##

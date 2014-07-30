@@ -3,8 +3,6 @@ require 'spec_helper'
 describe Daylight do
 
   class RefinementTestClass < Daylight::API
-    self.password = nil
-
     scopes :foo, :bar
   end
 

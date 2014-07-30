@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 class TestReadOnly < Daylight::API
-  self.password = nil
-
   has_one :child, class_name: 'TestReadOnly'
 end
 

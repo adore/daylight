@@ -3,8 +3,6 @@ require 'spec_helper'
 describe Daylight::Collection do
 
   class CollectionTestClass < Daylight::API
-    self.password = nil
-
     scopes :foo, :bar
   end
 

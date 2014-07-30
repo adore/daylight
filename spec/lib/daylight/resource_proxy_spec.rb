@@ -3,8 +3,6 @@ require 'spec_helper'
 describe Daylight::ResourceProxy do
 
   class ProxyTestClass < Daylight::API
-    self.password = nil
-
     scopes :foo, :bar
     has_many :related_proxy_test_classes
 
@@ -15,17 +13,11 @@ describe Daylight::ResourceProxy do
 
   class RelatedProxyTestClass < Daylight::API
     scopes :baz
-
-    self.password = nil
   end
 
-  class ProxyTestClass1 < Daylight::API
-    self.password = nil
-  end
+  class ProxyTestClass1 < Daylight::API ; end
 
-  class ProxyTestClass2 < Daylight::API
-    self.password = nil
-  end
+  class ProxyTestClass2 < Daylight::API ; end
 
   before do
     data = [{name: 'one'}, {name: 'two'}]

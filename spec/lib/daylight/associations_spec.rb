@@ -3,12 +3,10 @@ require 'spec_helper'
 describe Daylight::Associations do
 
   class RelatedTestClass < Daylight::API
-    self.password = nil
     self.include_format_in_path = false
   end
 
   class AssociationsTestClass < Daylight::API
-    self.password = nil
     self.include_format_in_path = false
 
     has_many   :related_test_classes

@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 class TestDescendant < Daylight::API
-  self.password = nil
-
   has_one :child, class_name: 'TestDescendant'
 end
 
@@ -53,11 +51,26 @@ describe Daylight::API do
 
   it 'sets up site and prefix' do
     silence_warnings do
-      Daylight::API.setup! endpoint: 'http://api.Daylight.test/', version: 'v1'
+      Daylight::API.setup! endpoint: 'http://api.daylight.test/', version: 'v1'
     end
 
-    Daylight::API.site.to_s.should == 'http://api.Daylight.test/'
+    Daylight::API.site.to_s.should == 'http://api.daylight.test/'
     Daylight::API.prefix.should == '/v1/'
+  end
+
+  it 'handles sites with paths' do
+    silence_warnings do
+      Daylight::API.setup! endpoint: 'http://api.daylight.test/myapi', version: 'v1'
+    end
+
+    Daylight::API.site.to_s.should == 'http://api.daylight.test/myapi'
+    Daylight::API.prefix.should == '/myapi/v1/'
+
+    stub_request(:get, %r{#{TestDescendant.site}}).to_return(body: {}.to_json)
+
+    TestDescendant.find(1)
+
+    assert_requested :get, 'http://api.daylight.test/myapi/v1/test_descendants/1.json'
   end
 
   it 'sets request_root_in_json to true by default' do

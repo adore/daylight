@@ -287,7 +287,7 @@ module Daylight
       # it does matching.
       def site_with_credentials
         @site_with_credentials ||= Daylight::API.site.dup.tap do |site|
-          site.userinfo = "#{Daylight::API.user}:#{Daylight::API.password}"
+          site.userinfo = [Daylight::API.user, Daylight::API.password].compact.join(':')
           site.to_s
         end
       end
