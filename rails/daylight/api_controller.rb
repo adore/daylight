@@ -34,8 +34,8 @@
 # controller name.  If you need to customize these, you can change them:
 #
 #   class ExampleController < APIController
-#     self.model_name  = :news
-#     self.record_name = :post
+#     set_model_name  :news
+#     set_record_name :post
 #
 #     handles :index
 #   end
@@ -50,11 +50,7 @@ class Daylight::APIController < ApplicationController
   include VersionedUrlFor
 
   API_ACTIONS = [:index, :create, :show, :update, :destroy, :associated, :remoted].freeze
-  class_attribute :record_name, :collection_name, :model_name
-
-  alias_method :set_record_name,     :record_name=      #:nodoc:
-  alias_method :set_collection_name, :collection_name=  #:nodoc:
-  alias_method :set_model_name,      :model_name=       #:nodoc:
+  class_attribute :record_name, :collection_name, :model_name, instance_predicate: false
 
   ##
   # Ensure messaging when sending unknown attributes or improper SQL
@@ -87,6 +83,11 @@ class Daylight::APIController < ApplicationController
 
 
   class << self
+
+    alias_method :set_record_name,     :record_name=      #:nodoc:
+    alias_method :set_collection_name, :collection_name=  #:nodoc:
+    alias_method :set_model_name,      :model_name=       #:nodoc:
+
     protected
       ##
       # Turns on common actions based on subclass needs (sets them as public methods).

@@ -27,16 +27,16 @@ end
 class TestCasesController < Daylight::APIController
   handles :create, :update, :destroy
 
-  self.model_name      = :case
-  self.record_name     = :result
-  self.collection_name = :results
+  set_model_name      :case
+  set_record_name     :result
+  set_collection_name :results
 end
 
 class TestAppRecord < ActiveResource::Base
 end
 
 class TestErrorsController < Daylight::APIController
-  self.model_name  = :test_app_record
+  set_model_name :test_app_record
 
   def raise_argument_error
     raise ArgumentError.new('this is my message')
