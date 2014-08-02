@@ -20,6 +20,7 @@ module NestedAttributesExt
       return if attributes_collection.nil?
 
       associate_existing_records(association_name, attributes_collection)
+      unassociate_missing_records(association_name, attributes_collection)
 
       super
     end
@@ -86,6 +87,29 @@ module NestedAttributesExt
 
       # concat the unassociated records to the association
       association.concat(association.klass.find(unassociated_record_ids))
+    end
+
+    ##
+    # Determines removed records from existing records on the association and sets their
+    # foreign keys to NULL
+    def unassociate_missing_records(association_name, attributes_collection)
+      # determine existing records, bail if there are none specified by 'id'
+      attribute_ids = attributes_collection.map {|a| (a['id'] || a[:id]) }.compact
+      return if attribute_ids.empty?
+
+      association = association(association_name)
+      primary_key = association.klass.primary_key.to_sym
+
+      existing_record_ids = association.scope.pluck(primary_key)
+
+      # removed records are those that are not part of existing in the association
+      removed_record_ids = existing_record_ids.map(&:to_s) - attribute_ids.map(&:to_s)
+
+      # set the foreign keys on the removed records to nil
+      if removed_record_ids.present?
+        foreign_key = association.reflection.foreign_key
+        association.reflection.klass.where(primary_key => removed_record_ids).update_all(foreign_key => nil)
+      end
     end
 end
 
