@@ -64,24 +64,16 @@ module NestedAttributesExt
       return if attribute_ids.empty?
 
       association = association(association_name)
-      primary_key = association.klass.primary_key.to_sym
+      foreign_key = association.reflection.foreign_key
 
-      # get known existing ids on the association
-      existing_record_ids = if association.loaded?
-          association.target.map(&primary_key)
-        else
-          association.scope.where(primary_key => attribute_ids).pluck(primary_key)
-        end
-
-      # unassociated records are those that are not part of existing in the association
-      unassociated_record_ids = attribute_ids.map(&:to_s) - existing_record_ids.map(&:to_s)
+      # unassociated records ids are those not existing in the association ids
+      unassociated_record_ids = attribute_ids.map(&:to_s) - association.ids_reader.map(&:to_s)
 
       # we are about to set all foreign_keys, remove any foreign_key references in
       # unassigned records attributes so they don't get clobbered
       attributes_collection.map do |a|
         if unassociated_record_ids.include?((a['id'] || a[:id]).to_s)
-          key = association.reflection.foreign_key
-          a.delete(key) || a.delete(key.to_sym)
+          a.delete(foreign_key) || a.delete(foreign_key.to_sym)
         end
       end
 
