@@ -105,11 +105,8 @@ module NestedAttributesExt
       # removed records are those that are not part of existing in the association
       removed_record_ids = existing_record_ids.map(&:to_s) - attribute_ids.map(&:to_s)
 
-      # set the foreign keys on the removed records to nil
-      if removed_record_ids.present?
-        foreign_key = association.reflection.foreign_key
-        association.reflection.klass.where(primary_key => removed_record_ids).update_all(foreign_key => nil)
-      end
+      # remove the records from the association
+      association.scope.delete(removed_record_ids) if removed_record_ids.present?
     end
 end
 
