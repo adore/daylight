@@ -90,12 +90,9 @@ module NestedAttributesExt
       return if attribute_ids.empty?
 
       association = association(association_name)
-      primary_key = association.klass.primary_key.to_sym
-
-      existing_record_ids = association.scope.pluck(primary_key)
 
       # removed records are those that are not part of existing in the association
-      removed_record_ids = existing_record_ids.map(&:to_s) - attribute_ids.map(&:to_s)
+      removed_record_ids = association.ids_reader.map(&:to_s) - attribute_ids.map(&:to_s)
 
       # remove the records from the association
       association.scope.delete(removed_record_ids) if removed_record_ids.present?
