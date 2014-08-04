@@ -28,9 +28,7 @@ class Daylight::ResourceProxy
   ##
   # Loads records from server based on current paremeters and from URL
   def load
-    resource_class.find(:all, params: to_params, from: @from).tap do |results|
-      @original_result_ids = results.map(&:id)
-    end
+    resource_class.find(:all, params: to_params, from: @from)
   end
 
   ##
