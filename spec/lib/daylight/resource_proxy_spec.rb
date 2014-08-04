@@ -50,24 +50,15 @@ describe Daylight::ResourceProxy do
     it "still thrown when chaining" do
       expect { ProxyTestClass.foo.not_a_method }.to raise_error(NoMethodError)
     end
-
-    it "still thrown when appending to scopes" do
-      ProxyTestClass.foo.association_resource.should be_nil
-
-      expect { ProxyTestClass.foo << ['foo class'] }.to raise_error(NoMethodError)
-    end
   end
 
   describe "Array methods" do
-    it "supported as a generated method" do
+    it "supports through method_missing" do
       mock    = ProxyTestClass.new(name: 'three')
       results = ProxyTestClass.foo
 
       results.should_not respond_to(:push)
       results.push(mock).last.name.should == 'three'
-
-      # now has the delegate
-      results.should respond_to(:push)
     end
 
     it "supported as delegates" do
