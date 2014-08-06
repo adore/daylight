@@ -19,6 +19,8 @@ module NestedAttributesExt
     def assign_nested_attributes_for_collection_association association_name, attributes_collection
       return if attributes_collection.nil?
 
+      return if is_collection_multilevel?(association_name)
+
       associate_existing_records(association_name, attributes_collection)
       unassociate_missing_records(association_name, attributes_collection)
 
@@ -95,7 +97,19 @@ module NestedAttributesExt
       removed_record_ids = association.ids_reader.map(&:to_s) - attribute_ids.map(&:to_s)
 
       # remove the records from the association
-      association.scope.delete(removed_record_ids) if removed_record_ids.present?
+      association.delete(*removed_record_ids) unless removed_record_ids.empty?
+    end
+
+    def is_collection_multilevel?(association_name)
+      association = association(association_name)
+
+      return false unless association.reflection.options.has_key? :through
+
+      logger.error <<-ERROR
+Attempt to modify "#{association_name}" collection on #{self.class.name}.
+  Ignoring modification for has-many-through/has-and-belongs-to-many used with
+  accepts_nested_attributes_for because it causes unexpected results.
+ERROR
     end
 end
 
