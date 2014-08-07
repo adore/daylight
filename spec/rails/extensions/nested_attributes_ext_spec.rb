@@ -24,6 +24,16 @@ class AssocNestedAttributeTest < ActiveRecord::Base
   accepts_nested_attributes_for :nested_attribute_test, :single_nested_attribute_test
 end
 
+class HabtmParentNestedAttributeTest < ActiveRecord::Base
+  has_and_belongs_to_many :foo, class_name: 'HabtmChildNestedAttributeTest'
+
+  accepts_nested_attributes_for :foo
+end
+
+class HabtmChildNestedAttributeTest < ActiveRecord::Base
+  has_and_belongs_to_many :foo, class_name: 'HabtmParentNestedAttributeTest'
+end
+
 describe NestedAttributesExt, type: [:model] do
 
   migrate do
@@ -40,6 +50,19 @@ describe NestedAttributesExt, type: [:model] do
       t.references :nested_attribute_test
       t.references :single_nested_attribute_test
     end
+
+    create_table :habtm_parent_nested_attribute_tests do |t|
+      t.string :name
+    end
+
+    create_table :habtm_child_nested_attribute_tests do |t|
+      t.string :name
+    end
+
+    create_table :habtm_child_nested_attribute_tests_parent_nested_attribute_tests do |t|
+      t.belongs_to :habtm_parent_nested_attribute_test
+      t.belongs_to :habtm_child_nested_attribute_test
+    end
   end
 
   before(:all) do
@@ -53,6 +76,14 @@ describe NestedAttributesExt, type: [:model] do
       end
 
       factory :assoc_nested_attribute_test do
+        name { Faker::Name.name }
+      end
+
+      factory :habtm_child_nested_attribute_test do
+        name { Faker::Name.name }
+      end
+
+      factory :habtm_parent_nested_attribute_test do
         name { Faker::Name.name }
       end
     end
@@ -217,7 +248,20 @@ describe NestedAttributesExt, type: [:model] do
       record.reload.through_collection.count.should == 2
     end
 
-    it 'ignores habtm'
+    it 'ignores habtm' do
+      test = create(:habtm_parent_nested_attribute_test)
+      test.foo << create(:habtm_child_nested_attribute_test)
+      test.foo << create(:habtm_child_nested_attribute_test)
+      test.save!
+
+      test.reload.foo.count.should == 2
+
+      test.foo_attributes = [test.foo.first.as_json]
+
+      lambda { record.save! }.should_not raise_error
+
+      test.reload.foo.count.should == 2
+    end
 
     it 'allows removing all things from a collection'
 
