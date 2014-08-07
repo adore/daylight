@@ -89,7 +89,6 @@ module NestedAttributesExt
     def unassociate_missing_records(association_name, attributes_collection)
       # determine existing records, bail if there are none specified by 'id'
       attribute_ids = attributes_collection.map {|a| (a['id'] || a[:id]) }.compact
-      return if attribute_ids.empty?
 
       association = association(association_name)
 

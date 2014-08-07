@@ -263,7 +263,16 @@ describe NestedAttributesExt, type: [:model] do
       test.reload.foo.count.should == 2
     end
 
-    it 'allows removing all things from a collection'
+    it 'allows removing all things from a collection' do
+      record.collection_attributes = []
+
+      lambda { record.save! }.should_not raise_error
+
+      record.reload.collection.should be_empty
+
+      assoc1.reload.nested_attribute_test.should be_nil
+      assoc2.reload.nested_attribute_test.should be_nil
+    end
 
   end
 
