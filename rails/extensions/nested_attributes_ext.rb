@@ -104,14 +104,19 @@ module NestedAttributesExt
 
       return false unless association.reflection.options.has_key? :through
 
-      _, parent_reflection = association.reflection.parent_reflection
-      type = parent_reflection.try(:macro) || "has_many"
-
       logger.error <<-ERROR
 Attempt to modify "#{association_name}" collection on #{self.class.name}.
-  Ignoring modification for #{type} used with
+  Ignoring modification for #{assocation_type_name(association)} used with
   accepts_nested_attributes_for because it causes unexpected results.
 ERROR
+    end
+
+    def assocation_type_name(association)
+      habtm = association.reflection.has_and_belongs_to_many? rescue begin
+        _, parent_reflection = association.reflection.parent_reflection
+        parent_reflection.try(:macro) == :has_and_belongs_to_many
+      end
+      habtm ? 'has_and_belongs_to_many' : 'has_many'
     end
 end
 
