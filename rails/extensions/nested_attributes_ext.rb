@@ -99,25 +99,39 @@ module NestedAttributesExt
       association.delete(*removed_record_ids) unless removed_record_ids.empty?
     end
 
+    ##
+    # returns true if the collection is a has_many :through or has_and_belongs_to_many
+    # association.
+    #
+
     def is_collection_multilevel?(association_name)
       association = association(association_name)
 
-      return false unless association.reflection.options.has_key?(:through) ||
-                          association.reflection.try(:has_and_belongs_to_many?)
+      type = has_many_type(association)
+      return false unless type
 
       logger.error <<-ERROR
 Attempt to modify "#{association_name}" collection on #{self.class.name}.
-  Ignoring modification for #{assocation_type_name(association)} used with
+  Ignoring modification for #{type} used with
   accepts_nested_attributes_for because it causes unexpected results.
 ERROR
     end
 
-    def assocation_type_name(association)
-      habtm = association.reflection.has_and_belongs_to_many? rescue begin
-        _, parent_reflection = association.reflection.parent_reflection
-        parent_reflection.try(:macro) == :has_and_belongs_to_many
+    ##
+    # Return a description of the association if it is a has_and_belongs_to_many
+    # or a has_many :through.
+    #
+    # Takes differences between Rails 4.0 and 4.1 into account.
+
+    def has_many_type(association)
+      reflection = association.reflection
+      if reflection.try(:has_and_belongs_to_many?) ||
+         (reflection.parent_reflection &&
+          reflection.parent_reflection.last.try(:macro) == :has_and_belongs_to_many)
+        'has_and_belongs_to_many'
+      elsif reflection.options.has_key?(:through)
+        'has_many :through'
       end
-      habtm ? 'has_and_belongs_to_many' : 'has_many'
     end
 end
 
