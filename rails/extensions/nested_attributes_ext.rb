@@ -126,7 +126,7 @@ ERROR
     def has_many_type(association)
       reflection = association.reflection
       if reflection.try(:has_and_belongs_to_many?) ||
-         (reflection.parent_reflection &&
+         (reflection.try(:parent_reflection) &&
           reflection.parent_reflection.last.try(:macro) == :has_and_belongs_to_many)
         'has_and_belongs_to_many'
       elsif reflection.options.has_key?(:through)
