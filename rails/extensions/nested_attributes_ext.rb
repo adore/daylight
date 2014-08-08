@@ -102,7 +102,8 @@ module NestedAttributesExt
     def is_collection_multilevel?(association_name)
       association = association(association_name)
 
-      return false unless association.reflection.options.has_key? :through
+      return false unless association.reflection.options.has_key?(:through) ||
+                          association.reflection.try(:has_and_belongs_to_many?)
 
       logger.error <<-ERROR
 Attempt to modify "#{association_name}" collection on #{self.class.name}.
