@@ -181,12 +181,9 @@ class Daylight::ResourceProxy
       end
       resource_class.send(method_name, *args, &block)
     elsif Array.method_defined?(method_name)
-      array = to_a
-      count_before = array.count
-      response = array.send(method_name, *args, &block)
-      # update the association if the array has changed
-      association_resource.send("#{association_name}=", array) if association_name && count_before != array.count
-      response
+      wrap_array_method(method_name)
+      # resend call to newly wrapped method
+      send(method_name, *args, &block)
     else
       super
     end
@@ -214,5 +211,23 @@ class Daylight::ResourceProxy
       @current_params = old_params.deep_dup
       @records = nil
       self
+    end
+
+  private
+
+    ##
+    # Create a wrapper method around a called array method that updates the assocation
+    # resource if the array has changed.
+    # This way we can propagate those changes to the server when the client model is saved.
+
+    def wrap_array_method(method_name)
+      self.class.send(:define_method, method_name) do |*args, &block|
+        array = records.elements
+        count_before = array.count
+        response = array.send(method_name, *args, &block)
+        # update the association if the array has changed
+        association_resource.send("#{association_name}=", array) if association_name && count_before != array.count
+        response
+      end
     end
 end

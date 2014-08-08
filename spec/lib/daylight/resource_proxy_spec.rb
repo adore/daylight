@@ -53,12 +53,15 @@ describe Daylight::ResourceProxy do
   end
 
   describe "Array methods" do
-    it "supports through method_missing" do
+    it "supports through generated methods" do
       mock    = ProxyTestClass.new(name: 'three')
       results = ProxyTestClass.foo
 
       results.should_not respond_to(:push)
       results.push(mock).last.name.should == 'three'
+
+      # now has the delegate
+      results.should respond_to(:push)
     end
 
     it "supported as delegates" do
