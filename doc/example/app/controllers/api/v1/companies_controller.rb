@@ -3,6 +3,6 @@ class API::V1::CompaniesController < APIController
 
   private
     def company_params
-      params.require(:company).permit(:name)
+      params.fetch(:company, {}).permit(:name)
     end
 end

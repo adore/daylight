@@ -10,6 +10,6 @@ class API::V1::PostsController < APIController
 
   private
     def post_params
-      params.require(:post).permit!
+      params.fetch(:post, {}).permit!
     end
 end
