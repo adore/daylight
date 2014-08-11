@@ -19,17 +19,6 @@ class Daylight::ResourceProxy
   end
 
   ##
-  # Delegates appending to the association resource when available
-
-  def << value
-    if association_resource
-      association_resource.send("#{association_name}=", records.elements << value)
-    else
-      raise NoMethodError, "undefined method `<<' for #{self}"
-    end
-  end
-
-  ##
   # Sets `from` URL on a request
   def from from
     @from = from
@@ -183,8 +172,7 @@ class Daylight::ResourceProxy
 
   ##
   # Will attempt to fulfill the method if it exists on the resource or if it
-  # exists on an Array.  Defines or delegates the method on for subsequent
-  # execution.
+  # exists on an Array.  Delegates the method on for subsequent execution.
 
   def method_missing(method_name, *args, &block)
     if resource_class.respond_to?(method_name)
@@ -193,8 +181,9 @@ class Daylight::ResourceProxy
       end
       resource_class.send(method_name, *args, &block)
     elsif Array.method_defined?(method_name)
-      self.class.delegate method_name, :to => :to_a
-      to_a.send(method_name, *args, &block)
+      wrap_array_method(method_name)
+      # resend call to newly wrapped method
+      send(method_name, *args, &block)
     else
       super
     end
@@ -222,5 +211,23 @@ class Daylight::ResourceProxy
       @current_params = old_params.deep_dup
       @records = nil
       self
+    end
+
+  private
+
+    ##
+    # Create a wrapper method around a called array method that updates the assocation
+    # resource if the array has changed.
+    # This way we can propagate those changes to the server when the client model is saved.
+
+    def wrap_array_method(method_name)
+      self.class.send(:define_method, method_name) do |*args, &block|
+        array = records.elements
+        count_before = array.count
+        response = array.send(method_name, *args, &block)
+        # update the association if the array has changed
+        association_resource.send("#{association_name}=", array) if association_name && count_before != array.count
+        response
+      end
     end
 end
