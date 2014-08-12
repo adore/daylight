@@ -788,17 +788,18 @@ When saving this model from the client errors will be exposed similar to
 
 With the introduction of and use of
 [Strong Parameters](http://guides.rubyonrails.org/action_controller_overview.html#strong-parameters)
-unpermitted or missing attributes will be detected.
+unpermitted or missing attributes can be detected if `action_on_unpermitted_parameters` is set to `:raise`
+in configuration:
 
-> FUTURE [#8](https://github.com/att-cloud/daylight/issues/8):
-> Would be nice to know which parameter is raising the error and if it was a
-> _required_ parameter or an _unpermitted_ one.
+  ````ruby
+  config.action_controller.action_on_unpermitted_parameters = :raise
+  ````
 
 Lets say `created_at` is not permitted on the `PostController`:
   ````ruby
   post = API::Post.new(created_at: Time.now)
   post.save             # => false
-  post.errors.messages  # => {:base=>["Unpermitted or missing attribute"]}
+  post.errors.messages  # => {'created_at'=>['unpermitted parameter']}
   ````
 
 ### Bad Requests
