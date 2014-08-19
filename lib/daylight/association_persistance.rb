@@ -23,10 +23,14 @@ module Daylight::AssociationPersistance
     def include_child_updates
       self.class.reflection_names.each do |reflection_name|
         association = instance_variable_get("@#{reflection_name}")
+        attribute_name = "#{reflection_name}_attributes"
+        # ignore associations that have not been set
         next unless association
+        # don't overwrite associations that already exist in the attributes hash
+        next unless attributes[attribute_name].nil?
 
         # recurse into the child(ren)
-        attributes["#{reflection_name}_attributes"] =
+        attributes[attribute_name] =
           if Enumerable === association
             # currently we need to send ALL the children if any of them
             # have changed
