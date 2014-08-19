@@ -44,6 +44,7 @@ class Daylight::API < ActiveResource::Base
   include Daylight::ReadOnly
   include Daylight::Refinements
   include Daylight::Associations
+  prepend Daylight::AssociationPersistance
 
   class << self
     attr_reader    :version, :versions, :namespace
