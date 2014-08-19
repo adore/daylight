@@ -323,6 +323,8 @@ describe Daylight::APIController, type: :controller do
         map(&:values).
         map(&:first).
         map(&:with_indifferent_access)
+    rescue
+      raise ArgumentError.new(body)
     end
 
     def parse_record body

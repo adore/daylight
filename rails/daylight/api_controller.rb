@@ -78,7 +78,7 @@ class Daylight::APIController < ApplicationController
   ##
   # Ensure messaging when attributes have not been permitted on the controller
   rescue_from ActiveModel::ForbiddenAttributesError do |e|
-    render json: { errors: "parameters have not been permitted on this action #{e.backtrace.join('\n')}" }, status: :bad_request
+    render json: { errors: "parameters have not been permitted on this action #{e.backtrace.join("\n")}" }, status: :bad_request
   end
 
 
