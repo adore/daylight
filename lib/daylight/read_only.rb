@@ -29,8 +29,8 @@ module Daylight::ReadOnly
   # See
   # except_read_only
 
-  def serializable_hash(options={})
-    super(except_read_only(options))
+  def serializable_hash(options=nil)
+    super(except_read_only(options || {}))
   end
 
   ##
