@@ -49,6 +49,8 @@ class Daylight::APIController < ApplicationController
   include Daylight::Helpers
   include VersionedUrlFor
 
+  ALLOWED_WHERE_PARAMS = [:id, :order, :limit, :offset, :associated, :remoted, :format].freeze
+
   API_ACTIONS = [:index, :create, :show, :update, :destroy, :associated, :remoted].freeze
   class_attribute :record_name, :collection_name, :model_name, instance_predicate: false
 
@@ -200,6 +202,16 @@ class Daylight::APIController < ApplicationController
     end
 
     ##
+    # Permits known parameters for quering
+    # This has become necessary as of Rails 4.0.9 and 4.1.5 because of this security fix:
+    # https://groups.google.com/forum/#!topic/rubyonrails-security/M4chq5Sb540
+    def where_params
+      params.permit(*ALLOWED_WHERE_PARAMS,
+                    filters: params[:filters].try(:keys),
+                    scopes:  [])
+    end
+
+    ##
     # Instance-level delegate of the `primary_key` method
     #
     # See:
@@ -227,7 +239,7 @@ class Daylight::APIController < ApplicationController
     # See:
     # Daylight::Refiners.refine_by
     def index
-      render json: self.collection = model.refine_by(params)
+      render json: self.collection = model.refine_by(where_params)
     end
 
     ##
@@ -330,7 +342,7 @@ class Daylight::APIController < ApplicationController
     # Daylight::Helpers.associated_params
     # RouteOptions
     def associated
-      render json: self.collection = model.associated(params), root: associated_params
+      render json: self.collection = model.associated(where_params), root: associated_params
     end
 
     ##
@@ -350,6 +362,6 @@ class Daylight::APIController < ApplicationController
     # Daylight::Helpers.remoted_params
     # RouteOptions
     def remoted
-      render json: self.collection = model.remoted(params), root: remoted_params
+      render json: self.collection = model.remoted(where_params), root: remoted_params
     end
 end
