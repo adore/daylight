@@ -107,11 +107,16 @@ class Daylight::ResourceProxy
   end
 
   ##
-  # Sets the limit to the current parameters, and fetches the first result.
+  # If loaded, return the first element, otherwise -
+  # sets the limit to the current parameters, and fetches the first result.
   # Immediately issues the request to the API.
 
   def first
-    limit(1).to_a.first
+    if loaded?
+      to_a.first
+    else
+      limit(1).to_a.first
+    end
   end
 
   ##
@@ -229,5 +234,12 @@ class Daylight::ResourceProxy
         association_resource.send("#{association_name}=", array) if association_name && count_before != array.count
         response
       end
+    end
+
+    ##
+    # has this proxy loaded its data yet?
+
+    def loaded?
+      @records.present?
     end
 end

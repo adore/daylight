@@ -77,6 +77,19 @@ describe Daylight::ResourceProxy do
     it "supported through Enumerable methods" do
       ProxyTestClass.foo.map {|f| f.name}.should == %w[one two]
     end
+
+    it "pulls the first off of the array if it's already loaded" do
+      result = ProxyTestClass.foo
+      result.instance_variable_set('@records', [:yay, :boo])
+
+      result.first.should == :yay
+    end
+
+    it "does a request for first if it hasn't been loaded" do
+      result = ProxyTestClass.foo
+
+      result.first.name.should == 'one'
+    end
   end
 
   describe "results fetch" do
