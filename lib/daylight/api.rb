@@ -270,6 +270,30 @@ class Daylight::API < ActiveResource::Base
       end
     end
 
+    ##
+    # Load object(s) for a reflection name from the given values which could be
+    # an Array or a Hash
+
+    def load_attributes_for(name, value)
+      case value
+        when Array
+          resource = nil
+          value.map do |attrs|
+            if attrs.is_a?(Hash)
+              resource ||= find_or_create_resource_for_collection(name)
+              resource.new(attrs, true)
+            else
+              attrs.duplicable? ? attrs.dup : attrs
+            end
+          end
+        when Hash
+          resource = find_or_create_resource_for(name)
+          resource.new(value, true)
+        else
+          value.duplicable? ? value.dup : value
+      end
+    end
+
   private
 
     ##

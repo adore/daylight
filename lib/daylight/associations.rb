@@ -93,8 +93,14 @@ module Daylight::Associations
     # ActiveResource::Associations#belongs_to
 
     def belongs_to name, options={}
-      # continue to let the original do all the work.
-      super.tap do |reflection|
+      create_reflection(:belongs_to, name, options).tap do |reflection|
+
+        nested_attribute_key = "#{reflection.name}_attributes"
+
+        # setup the resource_proxy to fetch the results
+        define_cached_method reflection.name, cache_key: nested_attribute_key do
+          reflection.klass.find(send(reflection.foreign_key))
+        end
 
         # Defines a setter caching the value in an instance variable for later
         # retrieval.  Stash value directly in the attributes using the
@@ -236,7 +242,7 @@ module Daylight::Associations
           if instance_variable_defined?(ivar_name)
             instance_variable_get(ivar_name)
           elsif attributes.include?(cache_key)
-            attributes[cache_key]
+            instance_variable_set ivar_name, load_attributes_for(method_name, attributes[cache_key])
           else
             instance_variable_set ivar_name, send(uncached_method_name)
           end

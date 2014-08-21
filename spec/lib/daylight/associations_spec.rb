@@ -167,6 +167,7 @@ describe Daylight::Associations do
           parent_id: 456, # ignored because of parent_id method
           parent_attributes: {
             id: 456,
+            name: 'nested',
             grandparent_id: 3
           }
         }
@@ -190,12 +191,12 @@ describe Daylight::Associations do
       stub_request(:get, %r{#{RelatedTestClass.element_path(3)}}).to_return(body: related_data.merge(id: 3).to_json)
     end
 
-    it 'still fetches the parent object' do
+    it 'loads the parent object from the original response' do
       resource = AssociationsTestClass.find(1)
 
       resource.parent.should_not be_nil
       resource.parent.id.should   == 456
-      resource.parent.name.should == 'related'
+      resource.parent.name.should == 'nested'
     end
 
     it 'fetches the "through" object' do
