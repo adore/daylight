@@ -53,12 +53,6 @@ describe Daylight::Associations do
         collection.should be_a Array
       end
 
-      it "sets the associations directly the attributes hash" do
-        new_resource.related_test_classes = ["associated instances"]
-
-        new_resource.attributes['related_test_classes_attributes'].should == ["associated instances"]
-      end
-
       it "fetches the stored associations out of the attributes when they are set" do
         new_resource.related_test_classes = ["associated instances"]
 
@@ -107,12 +101,6 @@ describe Daylight::Associations do
         proxy.to_params[:filters].should == {wibble: 'wobble'}
       end
 
-      it "sets the associations directly the attributes hash" do
-        existing_resource.related_test_classes = ["associated instances"]
-
-        existing_resource.attributes['related_test_classes_attributes'].should == ["associated instances"]
-      end
-
       it "fetches the stored associations out of the attributes when they exist" do
         existing_resource.related_test_classes = ["associated instances"]
 
@@ -149,13 +137,6 @@ describe Daylight::Associations do
       resource.parent = RelatedTestClass.new(id: 789, name: 'new parent')
 
       resource.attributes['parent_id'].should == 789
-    end
-
-    it 'sets the parent directly in the nested attributes hash' do
-      resource = AssociationsTestClass.find(1)
-      resource.parent = RelatedTestClass.new(id: 789, name: 'new parent')
-
-      resource.attributes['parent_attributes'].should == resource.parent
     end
   end
 
@@ -260,13 +241,6 @@ describe Daylight::Associations do
       resource.associate = RelatedTestClass.new(id: 333, name: 'Rik Mayall')
 
       resource.associate.associations_test_class_id.should == resource.id
-    end
-
-    it 'sets the associate directly in the nested attributes hash' do
-      resource = AssociationsTestClass.find(1)
-      resource.associate = RelatedTestClass.new(id: 333, name: 'Rik Mayall')
-
-      resource.attributes['associate_attributes'].should == resource.associate
     end
   end
 

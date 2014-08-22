@@ -16,6 +16,7 @@ describe Daylight::AssociationPersistance do
     data = {id: 1, name: 'test'}
     stub_request(:get, %r{#{PersistanceTestClass.element_path(1)}}).to_return(body: data.to_json)
     stub_request(:get, %r{#{RelatedPersistanceTestClass.element_path(1)}}).to_return(body: data.to_json)
+    stub_request(:get, %r{#{RelatedPersistanceTestClass.element_path(2)}}).to_return(body: data.merge(id:2).to_json)
     stub_request(:get, %r{/persistance_test_classes/1/children\.json}).to_return(body: [data, data].to_json)
   end
 
@@ -100,10 +101,18 @@ describe Daylight::AssociationPersistance do
 
     it 'still includes has_one associations when persisted child object is set' do
       object.parent.should be_present
-      object.parent = RelatedPersistanceTestClass.find(1)
+      object.parent = RelatedPersistanceTestClass.find(2)
 
       object.send(:include_child_updates)
       object.attributes['parent_attributes'].should be_present
+    end
+
+    it 'does not include has_one associations when it is replaced with the same object' do
+      object.parent.should be_present
+      object.parent = RelatedPersistanceTestClass.find(1)
+
+      object.send(:include_child_updates)
+      object.attributes['parent_attributes'].should_not be_present
     end
   end
 

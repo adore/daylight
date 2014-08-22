@@ -187,7 +187,7 @@ class Daylight::API < ActiveResource::Base
       end
   end
 
-  attr_reader :metadata
+  attr_reader :metadata, :hashcode, :association_hashcodes
 
   ##
   # Extends ActiveResource to allow for saving metadata from the responses on
@@ -200,6 +200,9 @@ class Daylight::API < ActiveResource::Base
     extract_metadata!(attributes)
 
     super
+
+    @association_hashcodes = {}.with_indifferent_access
+    @hashcode = self.attributes.hash
   end
 
   ##

@@ -73,7 +73,6 @@ module Daylight::Associations
         # define setter that places the value directly in the attributes using
         # the nested_attributes functionality server-side
         define_method "#{reflection.name}=" do |value|
-          self.attributes[nested_attribute_key] = value
           instance_variable_set(:"@#{reflection.name}", value)
         end
 
@@ -107,7 +106,6 @@ module Daylight::Associations
         # nested_attributes functionality server-side.
         define_method "#{reflection.name}=" do |value|
           attributes[reflection.foreign_key] = value.id           # set the foreign key
-          attributes["#{reflection.name}_attributes"] = value     # set the nested_attributes
           instance_variable_set(:"@#{reflection.name}", value)    # set the cached value
         end
       end
@@ -204,7 +202,6 @@ module Daylight::Associations
         end
 
         define_method "#{reflection.name}=" do |value|
-          attributes["#{reflection.name}_attributes"] = value     # set the nested_attributes
           value.attributes[:"#{self.class.element_name}_id"] = self.id
           instance_variable_set(:"@#{reflection.name}", value)    # set the cached value
         end
@@ -239,13 +236,23 @@ module Daylight::Associations
           cache_key  = options[:cache_key] || method_name
           attributes = options.has_key?(:index) ? @attributes[options[:index]] : @attributes
 
-          if instance_variable_defined?(ivar_name)
-            instance_variable_get(ivar_name)
-          elsif attributes.include?(cache_key)
-            instance_variable_set ivar_name, load_attributes_for(method_name, attributes[cache_key])
-          else
-            instance_variable_set ivar_name, send(uncached_method_name)
-          end
+          return instance_variable_get(ivar_name) if instance_variable_defined?(ivar_name)
+
+          value =
+            if attributes.include?(cache_key)
+              load_attributes_for(method_name, attributes[cache_key])
+            else
+              send(uncached_method_name)
+            end
+
+          # Keep track of the association hashcode so we
+          # can see if it has changed
+          #
+          # If it's an Enumerable any changes to the entries
+          # is reflected in the hash code.
+          association_hashcodes[method_name] = value.hash
+
+          instance_variable_set ivar_name, value
         end
       end
 

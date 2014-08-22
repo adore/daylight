@@ -4,22 +4,14 @@ module Daylight::AssociationPersistance
     base.before_save :include_child_updates
   end
 
-  def load(attributes, remove_root = false, persisted = false)
-    super(attributes, remove_root, persisted)
-
-    @attribute_hash_on_load = self.attributes.hash
-
-    self
-  end
-
   # has our attributes changed since we were loaded?
   def changed?
-    new? || attributes.hash != @attribute_hash_on_load
+    new? || hashcode != attributes.hash
   end
 
   protected
 
-    # update the attributes for assocations if they have changed
+    # update the attributes for associations if they have changed
     def include_child_updates
       self.class.reflection_names.each do |reflection_name|
         association = instance_variable_get("@#{reflection_name}")
@@ -33,12 +25,16 @@ module Daylight::AssociationPersistance
             # currently we need to send ALL the children if any of them
             # have changed
             association.each {|child| child.include_child_updates }
-            association.map(&:serializable_hash) if attributes[reflection_attribute_name].present? || association.any?(&:changed?)
+            association.map(&:serializable_hash) if changed_associations.include?(reflection_name) || association.any?(&:changed?)
           else
             association.include_child_updates
-            association.serializable_hash if attributes[reflection_attribute_name].present? || association.changed?
+            association.serializable_hash if changed_associations.include?(reflection_name) || association.changed?
           end
       end
+    end
+
+    def changed_associations
+      association_hashcodes.select {|association, code| send(association).hash != code }
     end
 
 end
