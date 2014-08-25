@@ -1,18 +1,20 @@
 module Daylight::AssociationPersistance
 
-  def self.prepended(base)
-    base.before_save :include_child_updates
-  end
-
   # has our attributes changed since we were loaded?
   def changed?
     new? || hashcode != attributes.hash
   end
 
+  def serializable_hash(options=nil)
+    super((options || {}).merge(include: construct_include))
+  end
+
   protected
 
-    # update the attributes for associations if they have changed
-    def include_child_updates
+    # { include: { post: { include: { comment: {} } } }
+    def construct_include
+      include_hash = {}
+
       self.class.reflection_names.each do |reflection_name|
         association = instance_variable_get("@#{reflection_name}")
         reflection_attribute_name = "#{reflection_name}_attributes"
@@ -20,17 +22,27 @@ module Daylight::AssociationPersistance
         next unless association
 
         # recurse into the child(ren)
-        attributes[reflection_attribute_name] =
-          if Enumerable === association
-            # currently we need to send ALL the children if any of them
-            # have changed
-            association.each {|child| child.include_child_updates }
-            association.map(&:serializable_hash) if changed_associations.include?(reflection_name) || association.any?(&:changed?)
-          else
-            association.include_child_updates
-            association.serializable_hash if changed_associations.include?(reflection_name) || association.changed?
+        if Enumerable === association
+          # currently we need to send ALL the children if any of them
+          # have changed
+          children_includes = association.map {|child| child.construct_include }.compact
+          children_include_hash = children_includes.reduce(:merge) if children_includes.present?
+          if children_include_hash.present?
+            include_hash[reflection_attribute_name] = {include: children_include_hash}
+          elsif children_include_hash || changed_associations.include?(reflection_name)
+            include_hash[reflection_attribute_name] = {}
           end
+        else
+          child_include = association.construct_include
+          if !child_include.nil?
+            include_hash[reflection_attribute_name] = {include: child_include}
+          elsif changed_associations.include?(reflection_name)
+            include_hash[reflection_attribute_name] = {}
+          end
+        end
       end
+
+      include_hash if changed? || include_hash.present?
     end
 
     def changed_associations

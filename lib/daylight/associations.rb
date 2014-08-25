@@ -245,15 +245,14 @@ module Daylight::Associations
               send(uncached_method_name)
             end
 
-          # Keep track of the association hashcode so we
-          # can see if it has changed
-          #
-          # If it's an Enumerable any changes to the entries
-          # is reflected in the hash code.
+          # Track of the association hashcode for changes
           association_hashcodes[method_name] = value.hash
 
           instance_variable_set ivar_name, value
         end
+
+        # alias our wrapper so calls to the attributes work
+        alias_method "#{method_name}_attributes", method_name
       end
 
   end
