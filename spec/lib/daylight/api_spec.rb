@@ -119,13 +119,14 @@ describe Daylight::API do
 
     it "does not objectify a known reflection's attributes" do
       test = TestDescendant.find(1)
-      test.child_attributes['id'].should == 2
+      test.attributes['child_attributes']['id'].should == 2
     end
 
     it "objectifies hashes within a known reflection's attributes" do
       test = TestDescendant.find(1)
-      test.child_attributes['toy'].should be_kind_of(ActiveResource::Base)
-      test.child_attributes['toy'].attributes.should == {'id' => 5, 'name' => 'slinky'}
+      toy = test.attributes['child_attributes']['toy']
+      toy.should be_kind_of(ActiveResource::Base)
+      toy.attributes.should == {'id' => 5, 'name' => 'slinky'}
     end
 
     it "still objectifies other attributes" do
