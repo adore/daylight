@@ -365,8 +365,9 @@ server-side.
 Daylight adds additional functionality directly on the association:
 * add new resources
 * update existing resources
-* add a new resource to a collection
+* add a resource to a collection
 * associate two existing resources
+* delete from an association
 
 Currently, `ActiveResource` will only let you associate a resource by setting
 the `foreign_key` directly on a model.
@@ -485,47 +486,26 @@ You can also add a nested object to an existing collection:
 
 #### Updating a Nested Resource
 
-Updates to nested resources are not saved by saving the parent resource.
-You must save the nested resources directly:
+Updates to nested resources are saved by saving the parent resource.
 
   ````ruby
     post = API::Post.first
     post.author.full_name = "Reid MacDonald"
-    post.author.save #=> true
+    post.save #=> true
 
     post = API::Post.first
     post.author.full_name #=> "Reid MacDonald"
   ````
-
-This is the same as saying:
-
-  ````ruby
-    post = API::Post.first
-
-    author = post.author
-    author.full_name = "Reid MacDonald"
-    author.save #=> true
-
-    post = API::Post.first
-    post.author.full_name #=> "Reid MacDonald"
-  ````
-
 The same is true of nested objects in collections:
 
   ````ruby
     post = API::Post.first
-
-    first_comment = post.comments.first
-    first_comment.message = "First!"
-    first_comment.save #=> true
+    post.comments.first.message = "First!"
+    post.save #=> true
 
     post = API::Post.first
     post.comments.first.message #=> "First!"
   ````
-
-> FUTURE [#5](https://github.com/att-cloud/daylight/issues/5):
-> Updates to the associated nested resource do not get saved when the parent
-> resources are saved and they should be.
 
 #### Associating an Existing Nested Resources
 
@@ -557,8 +537,31 @@ This also will work to add to a collection on a new or existing resource:
     post.commenters.find {|c| c.username == 'reidmix'} # #<API::V1::User:0x007fe2cfc45ce8 ..>
   ````
 
-> FUTURE [#15](https://github.com/att-cloud/daylight/issues/15):
-> There is no way to remove an nested resource from a collection nor empty the collection.
+#### Deleting Nested Resources
+
+A nested resource can be removed from a collection:
+
+  ````ruby
+    post = API::Post.first
+    post.comments.count #=> 4
+    post.comments.shift
+    post.save #=> true
+
+    post = API::Post.first
+    post.comments.count #=> 3
+  ````
+
+A collection can also be reset:
+
+  ````ruby
+    post = API::Post.first
+    post.comments.count #=> 4
+    post.comments = []
+    post.save #=> true
+
+    post = API::Post.first
+    post.comments.count #=> 0
+  ````
 
 ### More Chaining
 
