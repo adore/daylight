@@ -11,6 +11,10 @@ module Daylight::AssociationPersistance
 
   protected
 
+    # returns nil if no changes (ourself or our children)
+    # returns empty hash if we've changed, but our children haven't
+    # returns include key if some of our children have changed
+    #
     # { include: { post: { include: { comment: {} } } }
     def construct_include
       include_hash = {}
@@ -22,23 +26,19 @@ module Daylight::AssociationPersistance
         next unless association
 
         # recurse into the child(ren)
-        if Enumerable === association
-          # currently we need to send ALL the children if any of them
-          # have changed
-          children_includes = association.map {|child| child.construct_include }.compact
-          children_include_hash = children_includes.reduce(:merge) if children_includes.present?
-          if children_include_hash.present?
-            include_hash[reflection_attribute_name] = {include: children_include_hash}
-          elsif children_include_hash || changed_associations.include?(reflection_name)
-            include_hash[reflection_attribute_name] = {}
+        child_include_hash =
+          if association.respond_to?(:to_ary)
+            # merge all the includes from all the children
+            children_includes = association.to_ary.map {|child| child.construct_include }.compact
+            children_includes.reduce(:merge) if children_includes.present?
+          else
+            association.construct_include
           end
-        else
-          child_include = association.construct_include
-          if !child_include.nil?
-            include_hash[reflection_attribute_name] = {include: child_include}
-          elsif changed_associations.include?(reflection_name)
-            include_hash[reflection_attribute_name] = {}
-          end
+
+        if child_include_hash.present?
+          include_hash[reflection_attribute_name] = {include: child_include_hash}
+        elsif child_include_hash || changed_associations.include?(reflection_name)
+          include_hash[reflection_attribute_name] = {}
         end
       end
 
