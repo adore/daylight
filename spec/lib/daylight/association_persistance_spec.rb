@@ -2,7 +2,11 @@ require 'spec_helper'
 
 describe Daylight::AssociationPersistance do
 
+  class GrandchildPersistanceTestClass < Daylight::API
+  end
+
   class RelatedPersistanceTestClass < Daylight::API
+    has_many :grandchildren, class_name: GrandchildPersistanceTestClass
   end
 
   class PersistanceTestClass < Daylight::API
@@ -18,6 +22,7 @@ describe Daylight::AssociationPersistance do
     stub_request(:get, %r{#{RelatedPersistanceTestClass.element_path(1)}}).to_return(body: data.to_json)
     stub_request(:get, %r{#{RelatedPersistanceTestClass.element_path(2)}}).to_return(body: data.merge(id:2).to_json)
     stub_request(:get, %r{/persistance_test_classes/1/children\.json}).to_return(body: [data, data].to_json)
+    stub_request(:get, %r{/related_persistance_test_classes/1/grandchildren\.json}).to_return(body: [data, data].to_json)
   end
 
   let(:object) { PersistanceTestClass.find(1) }
@@ -113,6 +118,12 @@ describe Daylight::AssociationPersistance do
 
       hash = object.serializable_hash
       hash['parent_attributes'].should_not be_present
+    end
+
+    it 'handles grandchild modifications' do
+      object.children[0].grandchildren[0].name = 'updated name'
+      hash = object.serializable_hash
+      hash['children_attributes'][0]['grandchildren_attributes'][0]['name'].should == 'updated name'
     end
   end
 
