@@ -44,6 +44,7 @@ class Daylight::API < ActiveResource::Base
   include Daylight::ReadOnly
   include Daylight::Refinements
   include Daylight::Associations
+  prepend Daylight::AssociationPersistance
 
   class << self
     attr_reader    :version, :versions, :namespace
@@ -186,7 +187,7 @@ class Daylight::API < ActiveResource::Base
       end
   end
 
-  attr_reader :metadata
+  attr_reader :metadata, :hashcode, :association_hashcodes
 
   ##
   # Extends ActiveResource to allow for saving metadata from the responses on
@@ -199,6 +200,9 @@ class Daylight::API < ActiveResource::Base
     extract_metadata!(attributes)
 
     super
+
+    @association_hashcodes = {}.with_indifferent_access
+    @hashcode = self.attributes.hash
   end
 
   ##
@@ -266,6 +270,30 @@ class Daylight::API < ActiveResource::Base
         extract_metadata!(decoded_body)
         load(decoded_body, true, true)
         @persisted = true
+      end
+    end
+
+    ##
+    # Load object(s) for a reflection name from the given values which could be
+    # an Array or a Hash
+
+    def load_attributes_for(name, value)
+      case value
+        when Array
+          resource = nil
+          value.map do |attrs|
+            if attrs.is_a?(Hash)
+              resource ||= find_or_create_resource_for_collection(name)
+              resource.new(attrs, true)
+            else
+              attrs.duplicable? ? attrs.dup : attrs
+            end
+          end
+        when Hash
+          resource = find_or_create_resource_for(name)
+          resource.new(value, true)
+        else
+          value.duplicable? ? value.dup : value
       end
     end
 

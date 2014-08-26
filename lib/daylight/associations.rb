@@ -73,7 +73,6 @@ module Daylight::Associations
         # define setter that places the value directly in the attributes using
         # the nested_attributes functionality server-side
         define_method "#{reflection.name}=" do |value|
-          self.attributes[nested_attribute_key] = value
           instance_variable_set(:"@#{reflection.name}", value)
         end
 
@@ -93,15 +92,20 @@ module Daylight::Associations
     # ActiveResource::Associations#belongs_to
 
     def belongs_to name, options={}
-      # continue to let the original do all the work.
-      super.tap do |reflection|
+      create_reflection(:belongs_to, name, options).tap do |reflection|
+
+        nested_attribute_key = "#{reflection.name}_attributes"
+
+        # setup the resource_proxy to fetch the results
+        define_cached_method reflection.name, cache_key: nested_attribute_key do
+          reflection.klass.find(send(reflection.foreign_key))
+        end
 
         # Defines a setter caching the value in an instance variable for later
         # retrieval.  Stash value directly in the attributes using the
         # nested_attributes functionality server-side.
         define_method "#{reflection.name}=" do |value|
           attributes[reflection.foreign_key] = value.id           # set the foreign key
-          attributes["#{reflection.name}_attributes"] = value     # set the nested_attributes
           instance_variable_set(:"@#{reflection.name}", value)    # set the cached value
         end
       end
@@ -198,7 +202,6 @@ module Daylight::Associations
         end
 
         define_method "#{reflection.name}=" do |value|
-          attributes["#{reflection.name}_attributes"] = value     # set the nested_attributes
           value.attributes[:"#{self.class.element_name}_id"] = self.id
           instance_variable_set(:"@#{reflection.name}", value)    # set the cached value
         end
@@ -233,14 +236,23 @@ module Daylight::Associations
           cache_key  = options[:cache_key] || method_name
           attributes = options.has_key?(:index) ? @attributes[options[:index]] : @attributes
 
-          if instance_variable_defined?(ivar_name)
-            instance_variable_get(ivar_name)
-          elsif attributes.include?(cache_key)
-            attributes[cache_key]
-          else
-            instance_variable_set ivar_name, send(uncached_method_name)
-          end
+          return instance_variable_get(ivar_name) if instance_variable_defined?(ivar_name)
+
+          value =
+            if attributes.include?(cache_key)
+              load_attributes_for(method_name, attributes[cache_key])
+            else
+              send(uncached_method_name)
+            end
+
+          # Track of the association hashcode for changes
+          association_hashcodes[method_name] = value.hash
+
+          instance_variable_set ivar_name, value
         end
+
+        # alias our wrapper so calls to the attributes work
+        alias_method "#{method_name}_attributes", method_name
       end
 
   end

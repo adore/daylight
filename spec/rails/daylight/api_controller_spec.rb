@@ -14,7 +14,7 @@ class SuitesController < Daylight::APIController
 
   private
     def suite_params
-      params.require(:suite).permit(:name, :switch)
+      params.fetch(:suite, {}).permit(:name, :switch)
     end
 end
 

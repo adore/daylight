@@ -53,12 +53,6 @@ describe Daylight::Associations do
         collection.should be_a Array
       end
 
-      it "sets the associations directly the attributes hash" do
-        new_resource.related_test_classes = ["associated instances"]
-
-        new_resource.attributes['related_test_classes_attributes'].should == ["associated instances"]
-      end
-
       it "fetches the stored associations out of the attributes when they are set" do
         new_resource.related_test_classes = ["associated instances"]
 
@@ -107,12 +101,6 @@ describe Daylight::Associations do
         proxy.to_params[:filters].should == {wibble: 'wobble'}
       end
 
-      it "sets the associations directly the attributes hash" do
-        existing_resource.related_test_classes = ["associated instances"]
-
-        existing_resource.attributes['related_test_classes_attributes'].should == ["associated instances"]
-      end
-
       it "fetches the stored associations out of the attributes when they exist" do
         existing_resource.related_test_classes = ["associated instances"]
 
@@ -150,13 +138,6 @@ describe Daylight::Associations do
 
       resource.attributes['parent_id'].should == 789
     end
-
-    it 'sets the parent directly in the nested attributes hash' do
-      resource = AssociationsTestClass.find(1)
-      resource.parent = RelatedTestClass.new(id: 789, name: 'new parent')
-
-      resource.attributes['parent_attributes'].should == resource.parent
-    end
   end
 
   describe :belongs_to_through do
@@ -167,6 +148,7 @@ describe Daylight::Associations do
           parent_id: 456, # ignored because of parent_id method
           parent_attributes: {
             id: 456,
+            name: 'nested',
             grandparent_id: 3
           }
         }
@@ -190,12 +172,12 @@ describe Daylight::Associations do
       stub_request(:get, %r{#{RelatedTestClass.element_path(3)}}).to_return(body: related_data.merge(id: 3).to_json)
     end
 
-    it 'still fetches the parent object' do
+    it 'loads the parent object from the original response' do
       resource = AssociationsTestClass.find(1)
 
       resource.parent.should_not be_nil
       resource.parent.id.should   == 456
-      resource.parent.name.should == 'related'
+      resource.parent.name.should == 'nested'
     end
 
     it 'fetches the "through" object' do
@@ -259,13 +241,6 @@ describe Daylight::Associations do
       resource.associate = RelatedTestClass.new(id: 333, name: 'Rik Mayall')
 
       resource.associate.associations_test_class_id.should == resource.id
-    end
-
-    it 'sets the associate directly in the nested attributes hash' do
-      resource = AssociationsTestClass.find(1)
-      resource.associate = RelatedTestClass.new(id: 333, name: 'Rik Mayall')
-
-      resource.attributes['associate_attributes'].should == resource.associate
     end
   end
 

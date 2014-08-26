@@ -119,13 +119,14 @@ describe Daylight::API do
 
     it "does not objectify a known reflection's attributes" do
       test = TestDescendant.find(1)
-      test.child_attributes['id'].should == 2
+      test.attributes['child_attributes']['id'].should == 2
     end
 
     it "objectifies hashes within a known reflection's attributes" do
       test = TestDescendant.find(1)
-      test.child_attributes['toy'].should be_kind_of(ActiveResource::Base)
-      test.child_attributes['toy'].attributes.should == {'id' => 5, 'name' => 'slinky'}
+      toy = test.attributes['child_attributes']['toy']
+      toy.should be_kind_of(ActiveResource::Base)
+      toy.attributes.should == {'id' => 5, 'name' => 'slinky'}
     end
 
     it "still objectifies other attributes" do
@@ -186,6 +187,40 @@ describe Daylight::API do
     it "is extracted from the response on a create" do
       test = TestDescendant.create(name: 'foo')
       test.metadata.should be_present
+    end
+  end
+
+  describe :load_attributes_for do
+    let(:test) { TestDescendant.new }
+
+    it 'creates a resource from a Hash based on the name' do
+      obj = test.send(:load_attributes_for, :test_descendant, {name: 'foo'})
+      obj.should be_instance_of(TestDescendant)
+      obj.name.should == 'foo'
+    end
+
+    it 'creates a resource for each Hash in an array' do
+      obj = test.send(:load_attributes_for, :test_descendants, [{name: 'foo'}, {name: 'bar'}])
+      obj.size.should == 2
+      obj.first.should be_instance_of(TestDescendant)
+      obj.first.name.should == 'foo'
+    end
+
+    it 'dups each object in a given array if it is not a Hash' do
+      data = %w[one two three]
+      obj = test.send(:load_attributes_for, :test_descendants, data)
+      obj.size.should == 3
+      obj.first.should be_instance_of(String)
+      obj.first.should == 'one'
+      obj.object_id.should_not == data.first.object_id
+    end
+
+    it 'otherwise creates a dup of the given value' do
+      my_string = 'my string'
+      obj = test.send(:load_attributes_for, :test_descendant, my_string)
+      obj.should be_instance_of(String)
+      obj.should == 'my string'
+      obj.object_id.should_not == my_string.object_id
     end
   end
 end
