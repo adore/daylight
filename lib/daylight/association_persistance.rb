@@ -6,7 +6,7 @@ module Daylight::AssociationPersistance
   end
 
   def serializable_hash(options=nil)
-    super((options || {}).merge(include: association_includes))
+    super((options || {}).reverse_merge(include: association_includes))
   end
 
   protected
