@@ -500,12 +500,17 @@ The same is true of nested objects in collections:
 
   ````ruby
     post = API::Post.first
-    post.comments.first.message = "First!"
+    post.comments[0].message = "First!"
     post.save #=> true
 
     post = API::Post.first
-    post.comments.first.message #=> "First!"
+    post.comments[0].message #=> "First!"
   ````
+
+> NOTE: In the previous example the following will NOT work:
+> `post.comments.first.message = "First!"`
+> The collection isn't loaded when you use `first`, so Daylight cannot
+> save any changes to the collection.
 
 #### Associating an Existing Nested Resources
 
