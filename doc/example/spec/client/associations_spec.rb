@@ -84,7 +84,7 @@ describe 'associations' do
       )
     end
 
-    it 'updates through the parent' do
+    it 'saves the child' do
       post.author.name = 'Reid MacDonald'
       post.author.save.should be_true
 
@@ -92,22 +92,22 @@ describe 'associations' do
       post.author.name.should == 'Reid MacDonald'
     end
 
-    it 'updates through the child' do
-      author = post.author
-      author.name = 'Reid MacDonald'
-      author.save.should be_true
+    it 'saves recusively' do
+      post.author.name = 'Reid MacDonald'
+      post.save.should be_true
 
       post = API::Post.first
       post.author.name.should == 'Reid MacDonald'
     end
 
-    it 'updates in collections' do
-      first_comment = post.comments.first
-      first_comment.content = 'First!'
-      first_comment.save.should be_true
+    it 'saves recusively in collections' do
+      # calling first sends limit=1 so the comments collection isn't loaded
+      # onto post, so saving will not update the content
+      post.comments[0].content = 'First!'
+      post.save.should be_true
 
       post = API::Post.first
-      post.comments.first.content.should == 'First!'
+      post.comments[0].content.should == 'First!'
     end
   end
 
@@ -141,6 +141,39 @@ describe 'associations' do
 
       post = API::Post.first
       post.commenters.find {|c| c.name == 'dmcinnes'}.should be_present
+    end
+  end
+
+  describe 'deleting nested resources' do
+    before do
+      Post.create(
+        title: 'Runaway Textile Connector Inflation',
+        comments: [
+          Comment.create(content:'Say what'),
+          Comment.create(content:'No way')
+        ]
+      )
+    end
+
+    it 'allows association members to be deleted' do
+      post = API::Post.first
+      post.comments.count.should == 2
+      post.comments.shift
+      post.save.should be_true
+
+      post = API::Post.first
+      post.comments.count.should == 1
+    end
+
+    it 'allows associations to be reset' do
+      post = API::Post.first
+      post.comments.count.should == 2
+      post.comments = [API::Comment.new(content:'yay!')]
+      post.save.should be_true
+
+      post = API::Post.first
+      post.comments.count.should == 1
+      post.comments.first.content.should == 'yay!'
     end
   end
 
