@@ -168,12 +168,11 @@ describe 'associations' do
     it 'allows associations to be reset' do
       post = API::Post.first
       post.comments.count.should == 2
-      post.comments = [API::Comment.new(content:'yay!')]
+      post.comments = []
       post.save.should be_true
 
       post = API::Post.first
-      post.comments.count.should == 1
-      post.comments.first.content.should == 'yay!'
+      post.comments.should be_empty
     end
   end
 

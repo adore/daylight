@@ -561,19 +561,13 @@ A collection can also be reset:
   ````ruby
     post = API::Post.first
     post.comments.count #=> 4
-    post.comments = [API::Comment.new(content:'yay!')]
+    post.comments = []
 
     post.save #=> true
 
     post = API::Post.first
-    post.comments.count #=> 1
-    post.comments.first.content #=> 'yay!'
+    post.comments.count #=> 0
   ````
-
-> NOTE: In the previous example the following will NOT work currently:
-> `post.comments = []`
-> This is because of a known bug in Rails:
-> https://github.com/rails/rails/issues/13420
 
 ### More Chaining
 
