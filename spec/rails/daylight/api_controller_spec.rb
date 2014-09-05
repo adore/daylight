@@ -419,13 +419,13 @@ describe Daylight::APIController, type: :controller do
     end
 
     describe :where_params do
-      it 'just returns params if it is not a strong parameter object' do
-        controller.stub params: {wibble: 'foo'}
-
-        get :index
-
-        assert_response :success
-      end
+      # it 'just returns params if it is not a strong parameter object' do
+      #   controller.stub params: {wibble: 'foo'}
+      #
+      #   get :index
+      #
+      #   assert_response :success
+      # end
 
       it 'only allow allowed where params' do
         get :index, limit: 3
