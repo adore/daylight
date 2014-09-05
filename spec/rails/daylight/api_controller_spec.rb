@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 class Suite < ActiveRecord::Base
-  # scope :all_suites, -> { all }
+  scope :all_suites, -> { all }
   has_many :cases
 
   def odd_cases
@@ -319,11 +319,8 @@ describe Daylight::APIController, type: :controller do
     let!(:suite2) { create(:suite, switch: false) }
     let!(:suite3) { create(:suite, switch: true)  }
 
-    def parse_collection body, root='anonymous'
-      JSON.parse(body).values.first.
-        map(&:values).
-        map(&:first).
-        map(&:with_indifferent_access)
+    def parse_collection body
+      JSON.parse(body).values.first.map(&:with_indifferent_access)
     end
 
     def parse_record body
@@ -408,8 +405,6 @@ describe Daylight::APIController, type: :controller do
     it 'retrieves remoted records' do
       get :remoted, id: suite1.id, remoted: 'odd_cases'
 
-      puts response.body
-
       results = parse_collection(response.body)
       results.size.should == 2
 
@@ -441,11 +436,11 @@ describe Daylight::APIController, type: :controller do
         assert_response :success
       end
 
-      # it 'allows any scopes' do
-      #   get :index, scopes: ['all_suites']
-      #
-      #   assert_response :success
-      # end
+      it 'allows any scopes' do
+        get :index, scopes: ['all_suites']
+
+        assert_response :success
+      end
 
       it 'knocks back bad params' do
         get :index, an_unpermitted_param: 'foo'

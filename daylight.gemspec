@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'haml',                     '~> 4.0.5'
   s.add_runtime_dependency 'actionpack-page_caching',  '~> 1.0.2'
   s.add_runtime_dependency 'hanna-bootstrap',          '~> 0.0.5'
-  s.add_runtime_dependency 'active_model_serializers', '~> 0.8.1'
+  s.add_runtime_dependency 'active_model_serializers', '~> 0.8.2'
 
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'rspec-rails',    '~> 2.14.0'
