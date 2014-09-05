@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 class Suite < ActiveRecord::Base
-  scope :all_suites, -> { all }
+  # scope :all_suites, -> { all }
   has_many :cases
 
   def odd_cases
@@ -441,11 +441,11 @@ describe Daylight::APIController, type: :controller do
         assert_response :success
       end
 
-      it 'allows any scopes' do
-        get :index, scopes: ['all_suites']
-
-        assert_response :success
-      end
+      # it 'allows any scopes' do
+      #   get :index, scopes: ['all_suites']
+      #
+      #   assert_response :success
+      # end
 
       it 'knocks back bad params' do
         get :index, an_unpermitted_param: 'foo'
