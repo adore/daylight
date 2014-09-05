@@ -206,6 +206,7 @@ class Daylight::APIController < ApplicationController
     # This has become necessary as of Rails 4.0.9 and 4.1.5 because of this security fix:
     # https://groups.google.com/forum/#!topic/rubyonrails-security/M4chq5Sb540
     def where_params
+      return params unless params.respond_to? :permit
       params.permit(*ALLOWED_WHERE_PARAMS,
                     filters: params[:filters].try(:keys),
                     scopes:  [])

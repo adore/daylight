@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 class Suite < ActiveRecord::Base
+  scope :all_suites, -> { all }
   has_many :cases
 
   def odd_cases
@@ -88,7 +89,7 @@ describe Daylight::APIController, type: :controller do
   describe "rescues errors" do
     # rspec-rails does not honor the tests(controller) function
     def self.controller_class
-     TestErrorsController
+      TestErrorsController
     end
 
     before do
@@ -415,6 +416,41 @@ describe Daylight::APIController, type: :controller do
       ids = results.map {|suite| suite["test_id"] }
       ids.should be_include(odd_case_ids.first)
       ids.should be_include(odd_case_ids.last)
+    end
+
+    describe :where_params do
+      it 'just returns params if it is not a strong parameter object' do
+        controller.stub params: {wibble: 'foo'}
+
+        get :index
+
+        assert_response :success
+      end
+
+      it 'only allow allowed where params' do
+        get :index, limit: 3
+
+        assert_response :success
+      end
+
+      it 'allows filters' do
+        get :index, filters: {name: 'bar'}
+
+        assert_response :success
+      end
+
+      it 'allows any scopes' do
+        get :index, scopes: ['all_suites']
+
+        assert_response :success
+      end
+
+      it 'knocks back bad params' do
+        get :index, an_unpermitted_param: 'foo'
+
+        assert_response :unprocessable_entity
+        JSON.parse(response.body)['errors']['an_unpermitted_param'].should == ['unpermitted parameter']
+      end
     end
   end
 
