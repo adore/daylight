@@ -13,6 +13,8 @@ describe Daylight::ResourceProxy do
 
   class RelatedProxyTestClass < Daylight::API
     scopes :baz
+
+    belongs_to :proxy_test_class
   end
 
   class ProxyTestClass1 < Daylight::API ; end
@@ -248,6 +250,13 @@ describe Daylight::ResourceProxy do
 
       limit.to_params.should == {limit: 1, scopes: [:foo, :bar]}
       proxy.to_params.should == {scopes: [:foo]}
+    end
+
+    it "supports objects as values in the where clause by coverting keys to ids" do
+      object = ProxyTestClass.first
+      proxy = RelatedProxyTestClass.where(proxy_test_class: object)
+
+      proxy.to_params[:filters].should == {proxy_test_class_id: object}
     end
   end
 

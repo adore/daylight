@@ -70,7 +70,7 @@ class Daylight::ResourceProxy
   def where conditions
     spawn.tap do |proxy|
       proxy.current_params[:filters] ||= {}
-      proxy.current_params[:filters].merge! conditions
+      proxy.current_params[:filters].merge! identifize_filters(conditions)
     end
   end
 
@@ -241,5 +241,18 @@ class Daylight::ResourceProxy
 
     def loaded?
       @records.present?
+    end
+
+    ##
+    # Convert any object value filters to *_id keys
+
+    def identifize_filters(params)
+      params = params.dup
+      filters = params.find_all {|_, value| Daylight::API === value }
+      filters.each do |key, value|
+        params.delete(key)
+        params["#{key}_id".to_sym] = value
+      end
+      params
     end
 end
