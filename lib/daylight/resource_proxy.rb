@@ -248,10 +248,10 @@ class Daylight::ResourceProxy
 
     def identifize_filters(params)
       params = params.dup
-      filters = params.find_all {|_, value| Daylight::API === value }
+      filters = params.find_all {|_, value| value.respond_to? :id }
       filters.each do |key, value|
-        params.delete(key)
-        params["#{key}_id".to_sym] = value
+        reflection = reflections[key.to_sym]
+        params[reflection.foreign_key.to_sym] = params.delete(key) if reflection
       end
       params
     end

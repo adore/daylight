@@ -15,6 +15,7 @@ describe Daylight::ResourceProxy do
     scopes :baz
 
     belongs_to :proxy_test_class
+    belongs_to :other_thing, class: 'ProxyTestClass', foreign_key: 'foo_id'
   end
 
   class ProxyTestClass1 < Daylight::API ; end
@@ -257,6 +258,20 @@ describe Daylight::ResourceProxy do
       proxy = RelatedProxyTestClass.where(proxy_test_class: object)
 
       proxy.to_params[:filters].should == {proxy_test_class_id: object}
+    end
+
+    it "uses the foreign key for the reference" do
+      object = ProxyTestClass.first
+      proxy = RelatedProxyTestClass.where(other_thing: object)
+
+      proxy.to_params[:filters].should == {foo_id: object}
+    end
+
+    it "doesn't convert keys to ids if the reference is not an association" do
+      object = ProxyTestClass.first
+      proxy = RelatedProxyTestClass.where(foo: object)
+
+      proxy.to_params[:filters].should == {foo: object}
     end
   end
 
