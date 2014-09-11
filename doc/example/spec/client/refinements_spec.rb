@@ -33,6 +33,12 @@ describe 'refinements' do
       posts.first.author_id.should == server_author.id
       posts.first.blog_id.should == server_blog.id
     end
+
+    it 'can use conditions based on results of other searches' do
+      posts = API::Post.where(author: API::User.first)
+      posts.size.should == 1
+      posts.first.title.should == "5 amazing things you probably didn't know about APIs"
+    end
   end
 
   describe 'order' do
