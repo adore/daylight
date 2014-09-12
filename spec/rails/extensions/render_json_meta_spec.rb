@@ -5,6 +5,8 @@ end
 
 class RenderJsonMetaTest < ActiveRecord::Base
   has_many :children, class_name: 'AssociatedRenderJsonMetaTest'
+
+  accepts_nested_attributes_for :children
 end
 
 # this implicitly tests read_only attributes
@@ -80,27 +82,53 @@ describe RenderJsonMeta, type: [:controller, :routing] do
   let!(:record2)    { create(:render_json_meta_test) }
   let!(:associated) { create(:associated_render_json_meta_test, render_json_meta_test_id: record1.id) }
 
-  it 'renders readonly on record' do
-    get :show, id: record1.id
+  describe "read_only" do
+    it 'renders on record' do
+      get :show, id: record1.id
 
-    # tests for no '?' on valid in both the attribute and read_only names
-    json = JSON.parse(response.body)
-    json['render_json_meta_test'].keys.should include('valid')
-    json['meta']['read_only'].should == {'render_json_meta_test' => ['name', 'valid'] }
+      # tests for no '?' on valid in both the attribute and read_only names
+      json = JSON.parse(response.body)
+      json['render_json_meta_test'].keys.should include('valid')
+      json['meta']['render_json_meta_test'].should include({'read_only' => ['name', 'valid']})
+    end
+
+    it 'renders on collection' do
+      get :index
+
+      json = JSON.parse(response.body)
+      json['meta']['render_json_meta_test'].should include({'read_only' => ['name', 'valid'] })
+    end
+
+    it 'renders no metadata' do
+      get :child, id: associated.id
+
+      json = JSON.parse(response.body)
+      json.keys.should_not include('meta')
+    end
   end
 
-  it 'renders readonly on collection' do
-    get :index
+  describe "nested_resources" do
+    it 'renders on record' do
+      get :show, id: record1.id
 
-    json = JSON.parse(response.body)
-    json['meta']['read_only'].should == {'render_json_meta_test' => ['name', 'valid'] }
-  end
+      # tests for no '?' on valid in both the attribute and read_only names
+      json = JSON.parse(response.body)
+      json['meta']['render_json_meta_test'].should include({'nested_resources' => ['children']})
+    end
 
-  it 'renders no readonly metadata' do
-    get :child, id: associated.id
+    it 'renders on collection' do
+      get :index
 
-    json = JSON.parse(response.body)
-    json.keys.should_not include('meta')
+      json = JSON.parse(response.body)
+      json['meta']['render_json_meta_test'].should include({'nested_resources' => ['children']})
+    end
+
+    it 'renders no metadata' do
+      get :child, id: associated.id
+
+      json = JSON.parse(response.body)
+      json.keys.should_not include('meta')
+    end
   end
 
   it 'renders where_values' do

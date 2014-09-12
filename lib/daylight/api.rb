@@ -44,6 +44,7 @@ class Daylight::API < ActiveResource::Base
   include Daylight::ReadOnly
   include Daylight::Refinements
   include Daylight::Associations
+  prepend Daylight::AssociationPersistance
 
   class << self
     attr_reader    :version, :versions, :namespace
@@ -53,7 +54,7 @@ class Daylight::API < ActiveResource::Base
     DEFAULT_CONFIG = {
       namespace: 'API',
       endpoint:  'http://localhost',
-      versions:  %w[v1],
+      versions:  %w[v1]
     }.freeze
 
     ##
@@ -101,14 +102,12 @@ class Daylight::API < ActiveResource::Base
       self.version   = config[:version] || config[:versions].last  # specify or use most recent version
       self.timeout   = config[:timeout] if config[:timeout]        # default read_timeout is 60
 
-      # API requires JSON request to emit a root node named after the object’s type
-      # this is different from `include_root_in_json` where every ActiveResource
-      # supplies its root.
+      # Only "parent" elements required to emit a root node
       self.request_root_in_json = config[:request_root_in_json] || true
 
       headers['X-Daylight-Framework'] = Daylight::VERSION
 
-      # alias_apis if config[:alias_apis]
+      alias_apis unless config[:no_alias_apis]
     end
 
     ##
@@ -123,10 +122,20 @@ class Daylight::API < ActiveResource::Base
     end
 
     ##
+    ##
     # Whether to show root for the request
     #
+    # API requires JSON request to emit a root node named after the object’s
+    # type this is different from `include_root_in_json` where _every_
+    # `ActiveResource` supplies its root.
+    #
+    # This causes problems with `accepts_nessted_attributes_for` where the
+    # *_attributes do not need it (and is broken by having a root elmenet)
+    #
     # Turned on by default when transmitting JSON requests.
-
+    #
+    # See:
+    # encode
     def request_root_in_json?
       request_root_in_json && format.extension == 'json'
     end
@@ -143,45 +152,42 @@ class Daylight::API < ActiveResource::Base
           raise "Unsupported version #{v} is not one of #{versions.join(', ')}"
         end
 
-        @version     = v.upcase
-        version_path = "/#{v.downcase}/".gsub(/\/+/, '/')
+        # Set the version string as the path prefix.
+        #
+        # Explicitly adding the endpoint.path here because ActiveResource ignores it
+        # when a prefix path has been set.
+        set_prefix "/#{endpoint.path}/#{v.downcase}/".gsub(/\/+/, '/')
 
-        set_prefix version_path
+        @version = v.upcase
       end
 
       ##
-      # Alias the configured Client API constants to be references without a
+      # Alias the configured client API constants to be references without a
       # version number for the active version:
       #
       # For example, if the active version is 'v1':
       #
-      #     ClientAPI::Zone   # => Daylight::V1::Zone
+      #     API::Post   # => API::V1::Post
+      #
+      # Assumes all your model classes are loaded (defined)
 
       def alias_apis
-        api_classes.each do |api|
-          Daylight.const_set(api, "#{namespace}::#{version}::#{api}".constantize)
+        api_classes   = "#{namespace}::#{version}".constantize.constants
+        api_namespace = namespace.constantize
+
+        api_classes.each do |api_class|
+          api_namespace.const_set(api_class, "#{namespace}::#{version}::#{api_class}".constantize)
         end
 
         true
-      end
+      rescue => e
+        logger.error("Could not alias_apis #{e.class}:\n\t#{e.message}") if logger
 
-      ##
-      # Load and return the Client APIs for the configured version.
-      #
-      # Searches in the `lib` directory of the Client API under the namespace
-      # and version.  By default, searches Client models in 'lib/api/v1' and
-      # loads them.
-
-      def api_classes
-        api_files = File.join(File.dirname(__FILE__), version.downcase, "**/*.rb")
-
-        Dir[api_files].each { |filename| load filename }
-
-        "#{namespace}::#{version}".constantize.constants
+        false
       end
   end
 
-  attr_reader :metadata
+  attr_reader :metadata, :hashcode, :association_hashcodes
 
   ##
   # Extends ActiveResource to allow for saving metadata from the responses on
@@ -191,13 +197,23 @@ class Daylight::API < ActiveResource::Base
   # Concern cannot call `super` from module to base class (we think)
 
   def initialize(attributes={}, persisted = false)
-    if Hash === attributes && attributes.has_key?('meta')
-      # save and strip any metadata supplied in the response
-      metadata = (attributes.delete('meta')||{}).with_indifferent_access
-    end
-    @metadata = metadata || {}
+    extract_metadata!(attributes)
 
     super
+
+    @association_hashcodes = {}.with_indifferent_access
+    @hashcode = self.attributes.hash
+  end
+
+  ##
+  # Get the list of nested_resources from the metadata attribute.
+  # If there are none then an empty array is supplied.
+  #
+  # See:
+  # metadata
+
+  def nested_resources
+    @nested_resources ||= metadata[:nested_resources] || []
   end
 
   ##
@@ -237,5 +253,72 @@ class Daylight::API < ActiveResource::Base
   def encode(options={})
     super(self.class.request_root_in_json? ? { :root => self.class.element_name }.merge(options) : options)
   end
+
+  protected
+    ##
+    # Override `ActiveResource` method so it strips the meta attributes for create and update actions.
+    #
+    # Solves problem where `remove_root` was not performing because meta was still in the response.
+    # For GET objects, this is handled by `initialize` but that's too late in this case.
+    #
+    # See:
+    # ActiveResource::Base#load_attributes_from_response
+
+    def load_attributes_from_response(response)
+      if response_loadable?(response)
+        decoded_body = self.class.format.decode(response.body)
+        extract_metadata!(decoded_body)
+        load(decoded_body, true, true)
+        @persisted = true
+      end
+    end
+
+    ##
+    # Load object(s) for a reflection name from the given values which could be
+    # an Array or a Hash
+
+    def load_attributes_for(name, value)
+      case value
+        when Array
+          resource = nil
+          value.map do |attrs|
+            if attrs.is_a?(Hash)
+              resource ||= find_or_create_resource_for_collection(name)
+              resource.new(attrs, true)
+            else
+              attrs.duplicable? ? attrs.dup : attrs
+            end
+          end
+        when Hash
+          resource = find_or_create_resource_for(name)
+          resource.new(value, true)
+        else
+          value.duplicable? ? value.dup : value
+      end
+    end
+
+  private
+
+    ##
+    # Does this response actaully have a body?
+
+    def response_loadable?(response)
+      response_code_allows_body?(response.code) &&
+      (response['Content-Length'].nil? || response['Content-Length'] != "0") &&
+      !response.body.nil? &&
+      response.body.strip.size > 0
+    end
+
+    ##
+    # Extract meta attribute from attributes and save it
+
+    def extract_metadata!(attributes)
+      if Hash === attributes && attributes.has_key?('meta')
+        # save and strip any metadata supplied in the response
+        metadata = (attributes.delete('meta')||{}).with_indifferent_access
+        metadata.merge!(metadata.delete(self.class.element_name) || {})
+      end
+      @metadata = metadata || {}
+    end
 end
 

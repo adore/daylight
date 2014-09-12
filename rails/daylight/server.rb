@@ -4,6 +4,7 @@
 require 'extensions/array_ext'                  # non-destructive version of `extract_options`
 require 'extensions/inflections'                # custom inflections for the ActiveSupport::Inflector
 require 'extensions/autosave_association_fix'   # fix for autosaving `inverse_of` associations
+require 'extensions/deep_munge_fix'             # fix to maintain empty arrays in deep_munge
 require 'extensions/has_one_serializer_ext'     # serializer recognizes belong_to :through association
 require 'extensions/nested_attributes_ext'      # associates two previously existing records
 require 'extensions/read_only_attributes'       # serializer support for `read_only` attributes
@@ -19,12 +20,14 @@ module Daylight
 
   autoload :Helpers
   autoload :Params
-  autoload :Refiners
   autoload :APIController
+
+  eager_autoload do
+    autoload :Refiners
+  end
 end
 
 # A convinience alias that will avoids any name collisions
 APIController = Daylight::APIController unless defined?(APIController)
 
-# Hook into ActiveRecord::Base `inherited` chain to extend subclasses
-ActiveRecord::Base.send(:include, Daylight::Refiners::Extension)
+Daylight.eager_load!

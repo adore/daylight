@@ -14,78 +14,116 @@ class Daylight::ResourceProxy
   private_class_method :new
 
   def initialize association={}
-    @current_params    = {}
+    @current_params = {}
     @association_name, @association_resource = association.first
   end
 
-  def << value
-    if association_resource
-      association_resource.send("#{association_name}=", records.elements << value)
-    else
-      raise NoMethodError, "undefined method `<<' for #{self}"
-    end
-  end
-
+  ##
+  # Sets `from` URL on a request
   def from from
     @from = from
     self
   end
 
+  ##
+  # Loads records from server based on current paremeters and from URL
   def load
     resource_class.find(:all, params: to_params, from: @from)
   end
 
+  ##
+  # Returns a copy of the current parameters used to fetch records
   def to_params
     current_params.dup
   end
 
+  ##
+  # Returns the records, requests them from server if not fetched
   def records
     @records ||= load
   end
 
+  ##
+  # Returns the records, forces fetch from server
   def reload
     @records = load
   end
 
+  ##
+  # Converts records to an Array
   def to_a
     records.to_a
   end
 
+  ##
+  # Adds scopes to the current parameters
   def append_scope scope
-    current_params[:scopes] ||= []
-    current_params[:scopes] << scope
-    current_params[:scopes].uniq!
-    self
+    spawn.tap do |proxy|
+      proxy.current_params[:scopes] ||= []
+      proxy.current_params[:scopes] << scope
+      proxy.current_params[:scopes].uniq!
+    end
   end
 
+  ##
+  # Merges conditions to the current parameters
   def where conditions
-    current_params[:filters] ||= {}
-    current_params[:filters].merge! conditions
-    self
+    spawn.tap do |proxy|
+      proxy.current_params[:filters] ||= {}
+      proxy.current_params[:filters].merge! identifize_filters(conditions)
+    end
   end
+
+  ##
+  # Sets limit in the current parameters
+  def limit value
+    spawn.tap do |proxy|
+      proxy.current_params[:limit] = value
+    end
+  end
+
+  ##
+  # Sets order in the current parameters
+  def order value
+    spawn.tap do |proxy|
+      proxy.current_params[:order] = value
+    end
+  end
+
+  ##
+  # Sets offset in the current parameters
+  def offset value
+    spawn.tap do |proxy|
+      proxy.current_params[:offset] = value
+    end
+  end
+
+  ##
+  # Merges conditions to the current parameters, and fetches the first result.
+  # Immediately issues the request to the API.
 
   def find_by conditions
     where(conditions).limit(1).first
   end
 
-  def limit value
-    current_params[:limit] = value
-    self
-  end
-
-  def order value
-    current_params[:order] = value
-    self
-  end
-
-  def offset value
-    current_params[:offset] = value
-    self
-  end
+  ##
+  # If loaded, return the first element, otherwise -
+  # sets the limit to the current parameters, and fetches the first result.
+  # Immediately issues the request to the API.
 
   def first
-    limit(1).to_a.first
+    if loaded?
+      to_a.first
+    else
+      limit(1).to_a.first
+    end
   end
+
+  ##
+  # Special inspect that shows the fetched results (up to 10 fo them) and the
+  # current params to fetch those results.
+  #
+  # Immediately issues the request to the API.
 
   def inspect
     records = to_a.take(11)
@@ -108,7 +146,7 @@ class Daylight::ResourceProxy
     # instances:
     #
     #    ResourceProxy[User].new
-    #
+
     def [] resource_class
       if resource_class.const_defined?(:ResourceProxy)
         return resource_class.const_get(:ResourceProxy)
@@ -137,6 +175,10 @@ class Daylight::ResourceProxy
     alias_method :inspect, :name
   end
 
+  ##
+  # Will attempt to fulfill the method if it exists on the resource or if it
+  # exists on an Array.  Delegates the method on for subsequent execution.
+
   def method_missing(method_name, *args, &block)
     if resource_class.respond_to?(method_name)
       self.class.send(:define_method, method_name) do |*method_args, &method_block|
@@ -144,13 +186,73 @@ class Daylight::ResourceProxy
       end
       resource_class.send(method_name, *args, &block)
     elsif Array.method_defined?(method_name)
-      self.class.delegate method_name, :to => :to_a
-      to_a.send(method_name, *args, &block)
+      wrap_array_method(method_name)
+      # resend call to newly wrapped method
+      send(method_name, *args, &block)
     else
       super
     end
   end
 
-  private
+  protected
     attr_accessor :current_params
+
+    ##
+    # Clone current ResourceProxy and with `current_params` to keep its query
+    # context
+    #
+    # See
+    # reset
+
+    def spawn
+      clone.reset(current_params)
+    end
+
+    ##
+    # Resets a ResourceProxy marked to refetch results based on blank or
+    # supplied `current_params`
+
+    def reset old_params={}
+      @current_params = old_params.deep_dup
+      @records = nil
+      self
+    end
+
+  private
+
+    ##
+    # Create a wrapper method around a called array method that updates the assocation
+    # resource if the array has changed.
+    # This way we can propagate those changes to the server when the client model is saved.
+
+    def wrap_array_method(method_name)
+      self.class.send(:define_method, method_name) do |*args, &block|
+        array = records.elements
+        count_before = array.count
+        response = array.send(method_name, *args, &block)
+        # update the association if the array has changed
+        association_resource.send("#{association_name}=", array) if association_name && count_before != array.count
+        response
+      end
+    end
+
+    ##
+    # has this proxy loaded its data yet?
+
+    def loaded?
+      @records.present?
+    end
+
+    ##
+    # Convert any object value filters to *_id keys
+
+    def identifize_filters(params)
+      params = params.dup
+      filters = params.find_all {|_, value| value.respond_to? :id }
+      filters.each do |key, value|
+        reflection = reflections[key.to_sym]
+        params[reflection.foreign_key.to_sym] = params.delete(key) if reflection
+      end
+      params
+    end
 end

@@ -1,6 +1,6 @@
 ##
 # Common conntroller built on top of `ApplicationController` that assists with
-# setting up standard, convential REST and Daylight supported actions.
+# setting up standard, conventional REST and Daylight supported actions.
 #
 # Have your API Controllers subclass from APIController:
 #
@@ -34,8 +34,8 @@
 # controller name.  If you need to customize these, you can change them:
 #
 #   class ExampleController < APIController
-#     self.model_name  = :news
-#     self.record_name = :post
+#     set_model_name  :news
+#     set_record_name :post
 #
 #     handles :index
 #   end
@@ -49,8 +49,10 @@ class Daylight::APIController < ApplicationController
   include Daylight::Helpers
   include VersionedUrlFor
 
+  ALLOWED_WHERE_PARAMS = [:id, :order, :limit, :offset, :associated, :remoted, :format].freeze
+
   API_ACTIONS = [:index, :create, :show, :update, :destroy, :associated, :remoted].freeze
-  class_attribute :record_name, :model_name
+  class_attribute :record_name, :collection_name, :model_name, instance_predicate: false
 
   ##
   # Ensure messaging when sending unknown attributes or improper SQL
@@ -69,12 +71,25 @@ class Daylight::APIController < ApplicationController
 
   ##
   # Ensure messaging when there unpermitted attributes on save and update
+  rescue_from ActionController::UnpermittedParameters do |e|
+    errors = {}
+    e.params.each { |key| errors[key] = ['unpermitted parameter'] }
+    render json: { errors: errors }, status: :unprocessable_entity
+  end
+
+  ##
+  # Ensure messaging when attributes have not been permitted on the controller
   rescue_from ActiveModel::ForbiddenAttributesError do |e|
-    render json: { errors: 'unpermitted or missing attribute' }, status: :unprocessable_entity
+    render json: { errors: 'parameters have not been permitted on this action' }, status: :bad_request
   end
 
 
   class << self
+
+    alias_method :set_record_name,     :record_name=      #:nodoc:
+    alias_method :set_collection_name, :collection_name=  #:nodoc:
+    alias_method :set_model_name,      :model_name=       #:nodoc:
+
     protected
       ##
       # Turns on common actions based on subclass needs (sets them as public methods).
@@ -85,15 +100,16 @@ class Daylight::APIController < ApplicationController
       #--
       # `public` is called in context of the subclass
       def handles *actions
+        actions = API_ACTIONS.dup if actions.any? {|a| a == :all }
+
         whitelisted = actions.map(&:to_sym) & API_ACTIONS
-        whitelisted = API_ACTIONS.dup if actions.any? {|a| a == :all }
 
         if (unhandled = actions - whitelisted).present?
           logger.warn "Daylight::APIController isn't handling unwhitelisted actions"
           logger.warn "\tspecified in #{self.name}#handles: #{unhandled.join(',')}"
         end
 
-        public *whitelisted if whitelisted.present?
+        public(*whitelisted) if whitelisted.present?
       end
 
       ##
@@ -122,8 +138,11 @@ class Daylight::APIController < ApplicationController
       # See:
       # ActionController::Base.controller_name
       def inherited api
-        api.model_name  = api.controller_name
-        api.record_name = api.controller_name
+        name = api.controller_name.singularize
+
+        api.model_name      = name
+        api.record_name     = name
+        api.collection_name = 'collection'
       end
   end
 
@@ -138,6 +157,18 @@ class Daylight::APIController < ApplicationController
     # Sets the value for the `record_name` instance variable
     def record= value
       instance_variable_set("@#{record_name}", value)
+    end
+
+    ##
+    # Retrieves the value for the `record_name` instance variable
+    def collection
+      instance_variable_get("@#{collection_name}")
+    end
+
+    ##
+    # Sets the value for the `record_name` instance variable
+    def collection= value
+      instance_variable_set("@#{collection_name}", value)
     end
 
     ##
@@ -167,7 +198,18 @@ class Daylight::APIController < ApplicationController
     # Ex. params[:post]
     def model_params
       model_params_name = "#{model_key}_params"
-      respond_to?(model_params_name) ? send(model_params_name) : params[model_key]
+      respond_to?(model_params_name, true) ? send(model_params_name) : params[model_key]
+    end
+
+    ##
+    # Permits known parameters for quering
+    # This has become necessary as of Rails 4.0.9 and 4.1.5 because of this security fix:
+    # https://groups.google.com/forum/#!topic/rubyonrails-security/M4chq5Sb540
+    def where_params
+      return params unless params.respond_to? :permit
+      params.permit(*ALLOWED_WHERE_PARAMS,
+                    filters: params[:filters].try(:keys),
+                    scopes:  [])
     end
 
     ##
@@ -198,7 +240,7 @@ class Daylight::APIController < ApplicationController
     # See:
     # Daylight::Refiners.refine_by
     def index
-      render json: model.refine_by(params)
+      render json: self.collection = model.refine_by(where_params)
     end
 
     ##
@@ -216,7 +258,7 @@ class Daylight::APIController < ApplicationController
     #     render json: @post, status: :created, location: @post
     #   end
     def create
-      record = model.new(model_params)
+      self.record = model.new(model_params)
       record.save!
 
       render json: record, status: :created, location: record
@@ -237,7 +279,7 @@ class Daylight::APIController < ApplicationController
     #     render json: Post.find(params[Post.primary_key])
     #   end
     def show
-      render json: model.find(params[primary_key])
+      render json: self.record = model.find(params[primary_key])
     end
 
     ##
@@ -257,7 +299,7 @@ class Daylight::APIController < ApplicationController
     #     head :no_content
     #   end
     def update
-      model.find(params[primary_key]).update!(model_params)
+      (self.record = model.find(params[primary_key])).update!(model_params)
 
       head :no_content
     end
@@ -279,7 +321,7 @@ class Daylight::APIController < ApplicationController
     #     head :no_content
     #   end
     def destroy
-      model.find(params[primary_key]).destroy
+      (self.record = model.find(params[primary_key])).destroy
 
       head :no_content
     end
@@ -301,12 +343,12 @@ class Daylight::APIController < ApplicationController
     # Daylight::Helpers.associated_params
     # RouteOptions
     def associated
-      render json: model.associated(params), root: associated_params
+      render json: self.collection = model.associated(where_params), root: associated_params
     end
 
     ##
-    # Retrieves the collection for the associated records for a `model` with
-    # any refinements in the params passed to `associated`.  Accessed via:
+    # Retrieves the collection returned by the `remoted` method with
+    # any refinements in the params passed to `remoted`.  Accessed via:
     #
     #   GET /posts/1/all_authorized_users.json
     #
@@ -321,6 +363,6 @@ class Daylight::APIController < ApplicationController
     # Daylight::Helpers.remoted_params
     # RouteOptions
     def remoted
-      render json: model.remoted(params), root: remoted_params
+      render json: self.collection = model.remoted(where_params), root: remoted_params
     end
 end

@@ -9,12 +9,12 @@ require File.expand_path("../dummy/config/environment.rb",  __FILE__)
 require 'rspec/rails'
 require 'rspec/autorun'
 
-# Make sure WebMock is disabled
-# -- is used by Daylight::Mock to route requests to the user's web application
-#    but it wrecks havoc with FakeWeb
-WebMock.disable!
+require 'webmock/rspec'
 
-FakeWeb.allow_net_connect = false
+require 'factory_girl'
+require 'faker'
+
+WebMock.disable_net_connect!
 
 # Load additional rspec configuration files first
 Dir.glob(File.expand_path('../config/**/*.rb', __FILE__)).each { |f| require f }
@@ -22,6 +22,10 @@ Dir.glob(File.expand_path('../config/**/*.rb', __FILE__)).each { |f| require f }
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
 Dir.glob(File.expand_path('../support/**/*.rb', __FILE__)).each { |f| require f }
+
+# make unpermitted parameters raise exceptions so we can test them!
+# See https://github.com/att-cloud/daylight/issues/8
+ActionController::Parameters.action_on_unpermitted_parameters = :raise
 
 RSpec.configure do |config|
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
@@ -39,9 +43,4 @@ RSpec.configure do |config|
   # the seed, which is printed after each run.
   #     --seed 1234
   config.order = "random"
-
-  # clean up after every test
-  config.after(:each) do
-    FakeWeb.clean_registry
-  end
 end

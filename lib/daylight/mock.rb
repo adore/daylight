@@ -1,5 +1,4 @@
 require 'rack'
-require 'fakeweb'
 
 ##
 # Simple mocking framework that simplifies the process of writing tests for code that uses the Daylight client library.
@@ -91,6 +90,8 @@ module Daylight
             :created
           when :put
             :updated
+          when :patch
+            :patched
           when :delete
             :deleted
           end
@@ -98,6 +99,9 @@ module Daylight
 
       private
         def model_class(model_name)
+          candidate_name = [Daylight::API.namespace, Daylight::API.version, model_name.classify].join("::")
+          candidate_name.constantize
+        rescue
           model_name.classify.constantize
         end
 
@@ -140,6 +144,14 @@ module Daylight
           @target_object = new_record(clazz, data.merge(id: path_parts.id.to_i))
 
           respond_with(status: 201)
+        end
+
+        def process_patched
+          clazz = model_class(path_parts.resource)
+          data = post_data[path_parts.resource.singularize]
+          @target_object = new_record(clazz, data.merge(id: path_parts.id.to_i))
+
+          respond_with(status: 204)
         end
 
         def process_deleted
@@ -191,7 +203,7 @@ module Daylight
         end
       end
 
-      %w[created updated associated indexed shown deleted].each do |action|
+      %w[created updated patched associated indexed shown deleted].each do |action|
         define_method action do |resource|
           @storage[action.to_s][resource.to_s.pluralize]
         end
@@ -244,7 +256,7 @@ module Daylight
         def setup_minitest
           require 'webmock/minitest'
 
-          clazz = MiniTest::Test rescue MiniTest::Unit::TestCase
+          clazz = MiniTest::Test rescue Minitest::Test
 
           clazz.class_eval do
             include Daylight::Mock
@@ -275,7 +287,7 @@ module Daylight
       # it does matching.
       def site_with_credentials
         @site_with_credentials ||= Daylight::API.site.dup.tap do |site|
-          site.userinfo = "#{Daylight::API.user}:#{Daylight::API.password}"
+          site.userinfo = [Daylight::API.user, Daylight::API.password].compact.join(':')
           site.to_s
         end
       end

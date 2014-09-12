@@ -2,29 +2,17 @@ require 'spec_helper'
 require 'daylight/mock'
 
 describe Daylight::Mock do
-  class MiniTest::Spec ; end
-  class MiniTest::Test ; end
+  class Minitest::Spec ; end
+  class Minitest::Test ; end
 
   class TestClient < Daylight::API
-    has_many :test_client_children, through: :associated, class_name: 'TestClientChild'
+    has_many :test_client_children, class_name: 'TestClientChild'
   end
 
   class TestClientChild < Daylight::API ; end
 
   # All clients will do this in their spec_helper.rb/test_helper.rb
   Daylight::Mock.setup
-
-  # Fakeweb and Webmock conflict with each other, so we only enable
-  # WebMock durning these tests.
-  WebMock.disable!
-
-  before do
-    WebMock.enable!
-  end
-
-  after do
-    WebMock.disable!
-  end
 
   describe 'return values' do
     describe 'show' do
@@ -73,6 +61,15 @@ describe Daylight::Mock do
       it "returns a new object with the updated attributes" do
         object = TestClient.find(1)
         object.update_attributes(name: 'wibble').should be_true
+      end
+    end
+
+    describe 'patch' do
+      let(:data) { {test_client: {name: 'wibble'}}.to_json }
+
+      it "updates the attributes" do
+        object = TestClient.find(1)
+        object.patch(:test, {}, data).should be_true
       end
     end
 
@@ -137,11 +134,10 @@ describe Daylight::Mock do
         daylight_mock.last_created(:test_clients).target_object.code.should == 'foo'
       end
     end
-
   end
 
   describe 'minitest setup' do
-    let(:minitest) { Minitest::Test.new }
+    let(:minitest) { Minitest::Test.new(:foo) rescue MiniTest::Test.new }
 
     it "adds our mock methods to Minitest::Test" do
       minitest.should respond_to(:daylight_mock)
@@ -152,5 +148,4 @@ describe Daylight::Mock do
       minitest.before_setup
     end
   end
-
 end

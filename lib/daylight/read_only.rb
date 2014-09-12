@@ -19,22 +19,18 @@ module Daylight::ReadOnly
   # metadata
 
   def read_only
-    @read_only ||= begin
-      metadata[:read_only][self.class.element_name] || []
-    rescue
-      []
-    end
+    metadata[:read_only] || []
   end
 
   ##
-  # Adds API specific options when generating json.
+  # Adds API specific options when generating a serializable hash.
   # Removes read_only attributes for requests.
   #
   # See
   # except_read_only
 
-  def as_json(options={})
-    super(except_read_only(options))
+  def serializable_hash(options=nil)
+    super(except_read_only(options || {}))
   end
 
   ##
@@ -47,6 +43,7 @@ module Daylight::ReadOnly
   def to_xml(options={})
     super(except_read_only(options))
   end
+
 
   ##
   # Writers for read_only attributes are not included as methods
@@ -79,7 +76,7 @@ module Daylight::ReadOnly
     ##
     # Ensures that read_only attributes are merged in with `:except` options.
 
-    def except_read_only options
+    def except_read_only options={}
       options.merge(except: (options[:except]||[]).push(*read_only))
     end
 

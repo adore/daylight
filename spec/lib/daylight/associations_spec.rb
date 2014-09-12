@@ -3,18 +3,16 @@ require 'spec_helper'
 describe Daylight::Associations do
 
   class RelatedTestClass < Daylight::API
-    self.password = nil
     self.include_format_in_path = false
   end
 
   class AssociationsTestClass < Daylight::API
-    self.password = nil
     self.include_format_in_path = false
 
-    has_many   :related_test_classes, through: :associated
-    has_many   :things,        class_name: 'RelatedTestClass', through: :associated
+    has_many   :related_test_classes
+    has_many   :things,        class_name: 'RelatedTestClass'
     belongs_to :parent,        class_name: 'RelatedTestClass'
-    belongs_to :grandparent,   class_name: 'RelatedTestClass', through: :parent
+    has_one    :grandparent,   class_name: 'RelatedTestClass', through: :parent
     has_one    :associate,     class_name: 'RelatedTestClass'
     remote     :remote_stuff,  class_name: 'RelatedTestClass'
 
@@ -27,69 +25,87 @@ describe Daylight::Associations do
     before do
       data = [{name: 'one'}, {name: 'two'}]
       [RelatedTestClass, AssociationsTestClass].each do |clazz|
-        FakeWeb.register_uri(:get, %r{#{clazz.site}}, body: data.to_json)
+        stub_request(:get, %r{#{clazz.site}}).to_return(body: data.to_json)
       end
     end
 
-    it "creates a method that construts an ResourceProxy for the association" do
-      proxy = AssociationsTestClass.new.related_test_classes
-
-      proxy.should be_is_a Daylight::ResourceProxy
-      proxy.resource_class.should == RelatedTestClass
-    end
-
-    it "creates a method that construts an ResourceProxy with context about the association" do
-      resource = AssociationsTestClass.new
-      proxy    = resource.related_test_classes
-
-      proxy.association_name.should == :related_test_classes
-      proxy.association_resource.should == resource
-    end
-
-    it "hits the association api endpoint" do
-      AssociationsTestClass.new.related_test_classes.load
-
-      FakeWeb.last_request.path.should == "/v1/associations_test_classes/123/related_test_classes.json"
-    end
-
-    it "caches the results of the association" do
-      instance = AssociationsTestClass.new
-      proxy = instance.related_test_classes
-      instance.related_test_classes.should == proxy
-    end
 
     it "fetches the results out of the attributes if they exist" do
-      object = AssociationsTestClass.new
+      object = AssociationsTestClass.first
       object.attributes['related_test_classes_attributes'] = ['yay']
-      assocation = object.related_test_classes
-      assocation.should be_instance_of(Array)
-      assocation.first.should == 'yay'
+      collection = object.related_test_classes
+      collection.should be_instance_of(Array)
+      collection.first.should == 'yay'
     end
 
-    it "supports the :class_name option" do
-      proxy = AssociationsTestClass.new.things
-      proxy.resource_class.should == RelatedTestClass
+    describe "with new resource" do
+      let(:new_resource) { AssociationsTestClass.new }
+
+
+      it "caches the results of the association" do
+        collection = new_resource.related_test_classes
+        new_resource.related_test_classes.should == collection
+      end
+
+      it "creates a method that construts an Array for the collection" do
+        collection = new_resource.related_test_classes
+
+        collection.should be_a Array
+      end
+
+      it "fetches the stored associations out of the attributes when they are set" do
+        new_resource.related_test_classes = ["associated instances"]
+
+        new_resource.related_test_classes.should == ["associated instances"]
+      end
     end
 
-    it "chains using the proxy class for the associated model" do
-      proxy = AssociationsTestClass.new.related_test_classes.where(wibble: 'wobble')
 
-      proxy.resource_class.should == RelatedTestClass
-      proxy.to_params[:filters].should == {wibble: 'wobble'}
-    end
+    describe "with existing resource" do
+      let(:existing_resource) { AssociationsTestClass.first }
 
-    it "sets the associations directly the attributes hash" do
-      resource = AssociationsTestClass.new
-      resource.related_test_classes = ["associated instances"]
+      it "creates a method that construts an ResourceProxy for the association" do
+        proxy = existing_resource.related_test_classes
 
-      resource.attributes['related_test_classes_attributes'].should == ["associated instances"]
-    end
+        proxy.should be_a Daylight::ResourceProxy
+        proxy.resource_class.should == RelatedTestClass
+      end
 
-    it "fetches the stored associations out of the attributes when they exist" do
-      resource = AssociationsTestClass.new
-      resource.related_test_classes = ["associated instances"]
+      it "creates a method that construts an ResourceProxy with context about the association" do
+        proxy = existing_resource.related_test_classes
 
-      resource.related_test_classes.should == ["associated instances"]
+        proxy.association_name.should == :related_test_classes
+        proxy.association_resource.should == existing_resource
+      end
+
+      it "hits the association api endpoint" do
+        existing_resource.related_test_classes.load
+
+        a_request(:get, "http://daylight.test/v1/associations_test_classes/123/related_test_classes.json").should have_been_made
+      end
+
+      it "caches the results of the association" do
+        proxy = existing_resource.related_test_classes
+        existing_resource.related_test_classes.should == proxy
+      end
+
+      it "supports the :class_name option" do ## THIS ONE
+        proxy = existing_resource.things
+        proxy.resource_class.should == RelatedTestClass
+      end
+
+      it "chains using the proxy class for the associated model" do
+        proxy = existing_resource.related_test_classes.where(wibble: 'wobble')
+
+        proxy.resource_class.should == RelatedTestClass
+        proxy.to_params[:filters].should == {wibble: 'wobble'}
+      end
+
+      it "fetches the stored associations out of the attributes when they exist" do
+        existing_resource.related_test_classes = ["associated instances"]
+
+        existing_resource.related_test_classes.should == ["associated instances"]
+      end
     end
   end
 
@@ -98,7 +114,7 @@ describe Daylight::Associations do
     before do
       data = { parent: {name: 'three'}}
       [RelatedTestClass, AssociationsTestClass].each do |clazz|
-        FakeWeb.register_uri(:get, %r{#{clazz.site}}, body: data.to_json)
+        stub_request(:get, %r{#{clazz.site}}).to_return(body: data.to_json)
       end
     end
 
@@ -122,13 +138,6 @@ describe Daylight::Associations do
 
       resource.attributes['parent_id'].should == 789
     end
-
-    it 'sets the parent directly in the nested attributes hash' do
-      resource = AssociationsTestClass.find(1)
-      resource.parent = RelatedTestClass.new(id: 789, name: 'new parent')
-
-      resource.attributes['parent_attributes'].should == resource.parent
-    end
   end
 
   describe :belongs_to_through do
@@ -139,6 +148,7 @@ describe Daylight::Associations do
           parent_id: 456, # ignored because of parent_id method
           parent_attributes: {
             id: 456,
+            name: 'nested',
             grandparent_id: 3
           }
         }
@@ -156,18 +166,18 @@ describe Daylight::Associations do
 
       related_data = {id: nil, name: 'related'}
 
-      FakeWeb.register_uri(:get, %r{#{AssociationsTestClass.element_path(1)}}, body: association_data.to_json)
-      FakeWeb.register_uri(:get, %r{#{AssociationsTestClass.element_path(2)}}, body: embedded_data.to_json)
-      FakeWeb.register_uri(:get, %r{#{RelatedTestClass.element_path(456)}},    body: related_data.merge(id: 456).to_json)
-      FakeWeb.register_uri(:get, %r{#{RelatedTestClass.element_path(3)}},      body: related_data.merge(id: 3).to_json)
+      stub_request(:get, %r{#{AssociationsTestClass.element_path(1)}}).to_return(body: association_data.to_json)
+      stub_request(:get, %r{#{AssociationsTestClass.element_path(2)}}).to_return(body: embedded_data.to_json)
+      stub_request(:get, %r{#{RelatedTestClass.element_path(456)}}).to_return(body: related_data.merge(id: 456).to_json)
+      stub_request(:get, %r{#{RelatedTestClass.element_path(3)}}).to_return(body: related_data.merge(id: 3).to_json)
     end
 
-    it 'still fetches the parent object' do
+    it 'loads the parent object from the original response' do
       resource = AssociationsTestClass.find(1)
 
       resource.parent.should_not be_nil
       resource.parent.id.should   == 456
-      resource.parent.name.should == 'related'
+      resource.parent.name.should == 'nested'
     end
 
     it 'fetches the "through" object' do
@@ -205,10 +215,10 @@ describe Daylight::Associations do
     before do
       associated = { id: nil, name: 'Hardy', associate_attributes: { id: 100 } }
       related    = { id: 100, name: 'Laurel' }
-      FakeWeb.register_uri(:get, %r{#{AssociationsTestClass.element_path(1)}}, body: associated.to_json)
+      stub_request(:get, %r{#{AssociationsTestClass.element_path(1)}}).to_return(body: associated.to_json)
       # It uses the filter method instead of default ActiveResource behavior
       # http://daylight.test/v1/related_test_classes?filters%5Bassociations_test_class_id%5D=123&limit=1
-      FakeWeb.register_uri(:get, %r{filters%5Bassociations_test_class_id%5D=123}, body: [related].to_json)
+      stub_request(:get, %r{filters%5Bassociations_test_class_id%5D=123}).to_return(body: [related].to_json)
     end
 
     it 'still fetches the associate object' do
@@ -232,19 +242,12 @@ describe Daylight::Associations do
 
       resource.associate.associations_test_class_id.should == resource.id
     end
-
-    it 'sets the associate directly in the nested attributes hash' do
-      resource = AssociationsTestClass.find(1)
-      resource.associate = RelatedTestClass.new(id: 333, name: 'Rik Mayall')
-
-      resource.attributes['associate_attributes'].should == resource.associate
-    end
   end
 
   describe :remote do
 
     def respond_with(data)
-      FakeWeb.register_uri(:get, %r{#{AssociationsTestClass.site}}, body: data.to_json)
+      stub_request(:get, %r{#{AssociationsTestClass.site}}).to_return(body: data.to_json)
     end
 
     let(:subject) { AssociationsTestClass.new }

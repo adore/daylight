@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 class Suite < ActiveRecord::Base
+  scope :all_suites, -> { all }
   has_many :cases
 
   def odd_cases
@@ -12,9 +13,10 @@ end
 class SuitesController < Daylight::APIController
   handles :all
 
-  def suite_params
-    params.require(:suite).permit(:name, :switch)
-  end
+  private
+    def suite_params
+      params.fetch(:suite, {}).permit(:name, :switch)
+    end
 end
 
 class Case < ActiveRecord::Base
@@ -26,15 +28,16 @@ end
 class TestCasesController < Daylight::APIController
   handles :create, :update, :destroy
 
-  self.model_name  = :case
-  self.record_name = :results
+  set_model_name      :case
+  set_record_name     :result
+  set_collection_name :results
 end
 
 class TestAppRecord < ActiveResource::Base
 end
 
 class TestErrorsController < Daylight::APIController
-  self.model_name  = :test_app_record
+  set_model_name :test_app_record
 
   def raise_argument_error
     raise ArgumentError.new('this is my message')
@@ -86,7 +89,7 @@ describe Daylight::APIController, type: :controller do
   describe "rescues errors" do
     # rspec-rails does not honor the tests(controller) function
     def self.controller_class
-     TestErrorsController
+      TestErrorsController
     end
 
     before do
@@ -128,9 +131,34 @@ describe Daylight::APIController, type: :controller do
       end
     end
 
+    describe "rescue from UnpermittedParameters error" do
+      def self.controller_class
+        SuitesController
+      end
+
+      before do
+        @routes.draw do
+          resources :suites
+        end
+      end
+
+      it "has status of unprocessable_entity" do
+        post :create, suite: {unpermitted: 'attr'}
+
+        assert_response :unprocessable_entity
+      end
+
+      it "reports errors for unpermitted attributes" do
+        post :create, suite: {unpermitted: 'attr'}
+
+        body = JSON.parse(response.body)
+        body['errors']['unpermitted'].should == ['unpermitted parameter']
+      end
+    end
+
     describe "rescue from ForbiddenAttributesError" do
       def self.controller_class
-       TestCasesController
+        TestCasesController
       end
 
       before do
@@ -142,16 +170,16 @@ describe Daylight::APIController, type: :controller do
       it "has status of unprocessable_entity" do
         post :create, case: {suite_id: 0}
 
-        assert_response :unprocessable_entity
+        assert_response :bad_request
       end
 
       it "returns the record's errors as JSON" do
         post :create, case: {name: 'unpermitted'}
 
-        assert_response :unprocessable_entity
+        assert_response :bad_request
 
         body = JSON.parse(response.body)
-        body['errors'].should == 'unpermitted or missing attribute'
+        body['errors'].should == 'parameters have not been permitted on this action'
       end
     end
   end
@@ -160,11 +188,15 @@ describe Daylight::APIController, type: :controller do
     let(:controller) { SuitesController }
 
     it "uses controller name for record name" do
-      controller.record_name.should == 'suites'
+      controller.record_name.should == 'suite'
     end
 
     it "uses controller name for model name" do
-      controller.model_name.should == 'suites'
+      controller.model_name.should == 'suite'
+    end
+
+    it "uses 'collection' for collection name" do
+      controller.collection_name.should == 'collection'
     end
 
     it "uses controller name for model key" do
@@ -184,7 +216,15 @@ describe Daylight::APIController, type: :controller do
 
       c.send(:record=, 'foo')
       c.send(:record).should == 'foo'
-      c.instance_variable_get('@suites').should == c.send(:record)
+      c.instance_variable_get('@suite').should == c.send(:record)
+    end
+
+    it 'access collection ivar' do
+      c = controller.new
+
+      c.send(:collection=, %w[foo bar])
+      c.send(:collection).should == %w[foo bar]
+      c.instance_variable_get('@collection').should == c.send(:collection)
     end
   end
 
@@ -192,7 +232,11 @@ describe Daylight::APIController, type: :controller do
     let(:controller) { TestCasesController }
 
     it "overrides record name" do
-      controller.record_name.should == :results
+      controller.record_name.should == :result
+    end
+
+    it "overrides collection name" do
+      controller.collection_name.should == :results
     end
 
     it "overrides model name" do
@@ -216,7 +260,15 @@ describe Daylight::APIController, type: :controller do
 
       c.send(:record=, 'foo')
       c.send(:record).should == 'foo'
-      c.instance_variable_get('@results').should == c.send(:record)
+      c.instance_variable_get('@result').should == c.send(:record)
+    end
+
+    it 'access collection ivar' do
+      c = controller.new
+
+      c.send(:collection=, %w[foo bar])
+      c.send(:collection).should == %w[foo bar]
+      c.instance_variable_get('@results').should == c.send(:collection)
     end
   end
 
@@ -254,7 +306,7 @@ describe Daylight::APIController, type: :controller do
   describe "common actions" do
     # rspec-rails does not honor the tests(controller) function
     def self.controller_class
-     SuitesController
+      SuitesController
     end
 
     before do
@@ -267,11 +319,8 @@ describe Daylight::APIController, type: :controller do
     let!(:suite2) { create(:suite, switch: false) }
     let!(:suite3) { create(:suite, switch: true)  }
 
-    def parse_collection body, root='anonymous'
-      JSON.parse(body).values.first.
-        map(&:values).
-        map(&:first).
-        map(&:with_indifferent_access)
+    def parse_collection body
+      JSON.parse(body).values.first.map(&:with_indifferent_access)
     end
 
     def parse_record body
@@ -364,6 +413,41 @@ describe Daylight::APIController, type: :controller do
       ids = results.map {|suite| suite["test_id"] }
       ids.should be_include(odd_case_ids.first)
       ids.should be_include(odd_case_ids.last)
+    end
+
+    describe :where_params do
+      it 'just returns params if it is not a strong parameter object' do
+        controller.stub params: {wibble: 'foo'}
+
+        get :index
+
+        assert_response :success
+      end
+
+      it 'only allow allowed where params' do
+        get :index, limit: 3
+
+        assert_response :success
+      end
+
+      it 'allows filters' do
+        get :index, filters: {name: 'bar'}
+
+        assert_response :success
+      end
+
+      it 'allows any scopes' do
+        get :index, scopes: ['all_suites']
+
+        assert_response :success
+      end
+
+      it 'knocks back bad params' do
+        get :index, an_unpermitted_param: 'foo'
+
+        assert_response :unprocessable_entity
+        JSON.parse(response.body)['errors']['an_unpermitted_param'].should == ['unpermitted parameter']
+      end
     end
   end
 

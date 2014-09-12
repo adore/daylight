@@ -5,7 +5,7 @@ describe DaylightDocumentation::DocumentationHelper do
   class TestModel < ActiveRecord::Base
     include Daylight::Associations
 
-    has_many :users
+    has_many :users, use: 'resource'
 
     # override attribute names so we don't have to mock
     # out the database table
@@ -65,6 +65,18 @@ describe DaylightDocumentation::DocumentationHelper do
     it "handles remoted" do
       helper.action_definition({action:'remoted', remoted:'baz'}, TestModel).should ==
         "Calls test model's remote method baz"
+    end
+  end
+
+  describe :client_namespace do
+    it "returns the client namespace" do
+      helper.client_namespace.should == 'test_api'
+    end
+  end
+
+  describe :api_version do
+    it "returns the api version" do
+      helper.api_version.should == 'v1'
     end
   end
 end

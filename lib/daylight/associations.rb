@@ -55,14 +55,17 @@ module Daylight::Associations
     # ActiveResource::Associations#has_many
 
     def has_many name, options={}
-      through = options.delete(:through).to_s
-      return super unless through == 'associated'
+      through = options.delete(:use).to_s
+      return super if through == 'resource'
 
       create_reflection(:has_many, name, options).tap do |reflection|
         nested_attribute_key = "#{reflection.name}_attributes"
 
         # setup the resource_proxy to fetch the results
         define_cached_method reflection.name, cache_key: nested_attribute_key do
+          # return a empty collection if this is a new record
+          return self.send("#{reflection.name}=", []) if new?
+
           resource_proxy = resource_proxy_for(reflection, self)
           resource_proxy.from(association_path(reflection))
         end
@@ -70,7 +73,6 @@ module Daylight::Associations
         # define setter that places the value directly in the attributes using
         # the nested_attributes functionality server-side
         define_method "#{reflection.name}=" do |value|
-          self.attributes[nested_attribute_key] = value
           instance_variable_set(:"@#{reflection.name}", value)
         end
 
@@ -87,31 +89,33 @@ module Daylight::Associations
     #    comment.creator = current_user
     #
     # See:
-    # #belongs_to_through
     # ActiveResource::Associations#belongs_to
 
     def belongs_to name, options={}
-      return belongs_to_through(name, options) if options.has_key? :through
+      create_reflection(:belongs_to, name, options).tap do |reflection|
 
-      # continue to let the original do all the work.
-      super.tap do |reflection|
+        nested_attribute_key = "#{reflection.name}_attributes"
+
+        # setup the resource_proxy to fetch the results
+        define_cached_method reflection.name, cache_key: nested_attribute_key do
+          reflection.klass.find(send(reflection.foreign_key))
+        end
 
         # Defines a setter caching the value in an instance variable for later
         # retrieval.  Stash value directly in the attributes using the
         # nested_attributes functionality server-side.
         define_method "#{reflection.name}=" do |value|
           attributes[reflection.foreign_key] = value.id           # set the foreign key
-          attributes["#{reflection.name}_attributes"] = value     # set the nested_attributes
           instance_variable_set(:"@#{reflection.name}", value)    # set the cached value
         end
       end
     end
 
     ##
-    # Adds getter and setter methods for `belongs_to` associations that are
-    # through another `belongs_to` association.  Assumes that the information
-    # about the association is generated in the nested attributes by a
-    # HasOneThrough serializer.
+    # Adds getter and setter methods for `has_one` associations that are
+    # through a `belongs_to` association.  Assumes that the information about
+    # the association is generated in the nested attributes by a HasOneThrough
+    # serializer.
     #
     # In this example, if we did not go through the identity association the
     # primary keys would be generated, but upon save, an error would be thrown
@@ -120,23 +124,22 @@ module Daylight::Associations
     #
     # For example, consider `user_id` and `zone_id` primary keys:
     #
-    #   class KeyPairSerializer < ActiveModel::Serializer
+    #   class PostSerializer < ActiveModel::Serializer
     #     embed :ids
     #
-    #     has_one :identity
-    #     has_one :user, :zone through: :identity
+    #     has_one :blog
+    #     has_one :company, :zone through: :blog
     #    end
     #
     # It will generate the following json:
     #
     #    {
-    #      "key_pair": {
+    #      "post": {
     #        "id": 1,
-    #        "identity_id": 2,
-    #        "identity_attributes": {
+    #        "blog_id": 2,
+    #        "blog_attributes": {
     #          "id": 2,
-    #          "user_id": 3,
-    #          "zone_id": 2
+    #          "company_id": 3
     #        }
     #      }
     #    }
@@ -144,28 +147,26 @@ module Daylight::Associations
     # An ActiveResource can define `belongs_to` with :through to read from
     # nested attributes for fetching by primary_key or setting to save.
     #
-    #   class KeyPair < ActiveResource::Base
-    #     belongs_to :identity
-    #     belongs_to :user, through: :identity
-    #     belongs_to :zone, through: :identity
+    #   class Post < Daylight::API
+    #     belongs_to :blog
+    #     has_one    :company, through: :blog
     #   end
     #
     #  So that:
     #
-    #   kp = KeyPair.find(1)
-    #   kp.identity  # => #<Identity @attributes={"id"=>1}>
-    #   kp.user      # => #<User @attributes={"id"=>3}>
-    #   kp.zone      # => #<Zone @attributes={"id"=>2}>
+    #   p = Post.find(1)
+    #   p.blog      # => #<Blog @attributes={"id"=>1}>
+    #   p.company   # => #<Company @attributes={"id"=>3}>
     #
     #  And setting these associations will work with passing validations:
     #
-    #   kp.user = User.find(1)
-    #   kp.save                 # => true
+    #   p.company = Company.find(1)
+    #   p.save  # => true
 
-    def belongs_to_through name, options
+    def has_one_through name, options
       through = options.delete(:through).to_s
 
-      create_reflection(:belongs_to, name, options).tap do |reflection|
+      create_reflection(:has_one, name, options).tap do |reflection|
         nested_attributes_key  = "#{reflection.name}_attributes"
         through_attributes_key = "#{through}_attributes"
 
@@ -186,15 +187,21 @@ module Daylight::Associations
     ##
     # Fix bug in has_one that is not creating the request correctly.
     # Use `where` functionality as it peforms the function that is needed
+    #
+    # Allows the has_one :through association.
+    #
+    # See:
+    # has_one_through
 
     def has_one(name, options = {})
+      return has_one_through(name, options) if options.has_key? :through
+
       create_reflection(:has_one, name, options).tap do |reflection|
         define_cached_method reflection.name do
           reflection.klass.where(:"#{self.class.element_name}_id" => self.id).first
         end
 
         define_method "#{reflection.name}=" do |value|
-          attributes["#{reflection.name}_attributes"] = value     # set the nested_attributes
           value.attributes[:"#{self.class.element_name}_id"] = self.id
           instance_variable_set(:"@#{reflection.name}", value)    # set the cached value
         end
@@ -206,7 +213,7 @@ module Daylight::Associations
     #
     # Example:
     #
-    #   remote :all_members, class_name: 'user'
+    #   remote :posts_by_popularity, class_name: 'post'
     #
 
     def remote name, options
@@ -218,7 +225,7 @@ module Daylight::Associations
     end
 
     private
-      def define_cached_method method_name, options={},  &block
+      def define_cached_method method_name, options={}, &block
         # define an uncached method to call
         uncached_method_name = :"#{method_name}_without_cache"
         define_method(uncached_method_name, block)
@@ -229,14 +236,23 @@ module Daylight::Associations
           cache_key  = options[:cache_key] || method_name
           attributes = options.has_key?(:index) ? @attributes[options[:index]] : @attributes
 
-          if instance_variable_defined?(ivar_name)
-            instance_variable_get(ivar_name)
-          elsif attributes.include?(cache_key)
-            attributes[cache_key]
-          else
-            instance_variable_set ivar_name, send(uncached_method_name)
-          end
+          return instance_variable_get(ivar_name) if instance_variable_defined?(ivar_name)
+
+          value =
+            if attributes.include?(cache_key)
+              load_attributes_for(method_name, attributes[cache_key])
+            else
+              send(uncached_method_name)
+            end
+
+          # Track of the association hashcode for changes
+          association_hashcodes[method_name] = value.hash
+
+          instance_variable_set ivar_name, value
         end
+
+        # alias our wrapper so calls to the attributes work
+        alias_method "#{method_name}_attributes", method_name
       end
 
   end

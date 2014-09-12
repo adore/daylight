@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 class RefinerMockActiveRecordBase
-  include Daylight::Refiners::Extension
+  prepend Daylight::Refiners
 
   def self.scope(name, body, &block); end
   def self.where(*args); end
@@ -56,8 +56,19 @@ describe Daylight::Refiners::AttributeSeive do
 end
 
 describe Daylight::Refiners do
+  class AnotherRefinersTestClass < RefinerMockActiveRecordBase
+    scope :scope_c, -> { 'c' }
+  end
+
   it 'tracks registered scopes' do
     RefinersTestClass.registered_scopes.should == %w[scope_a scope_b]
+  end
+
+  it 'keeps track of different scopes on different classes' do
+    RefinersTestClass.registered_scopes.should == %w[scope_a scope_b]
+    AnotherRefinersTestClass.registered_scopes.should == %w[scope_c]
+
+    RefinerMockActiveRecordBase.scope :scope_x, -> { 'x' }
   end
 
   it 'returns true if scoped? finds a match' do
@@ -100,7 +111,7 @@ describe Daylight::Refiners do
     end
 
     it 'raises an error if an unknown attribute is supplied' do
-      expect { RefinersTestClass.filter_by(baz: 'wibble') }.to raise_error(ArgumentError, 'Unknown key: baz')
+      expect { RefinersTestClass.filter_by(baz: 'wibble') }.to raise_error(ArgumentError, /Unknown key: "?baz"?/)
     end
 
     it 'applies where clause for all supplied attributes' do
@@ -150,19 +161,20 @@ describe Daylight::Refiners do
   end
 
   describe :remoted_methods do
-    it "keeps track of remoted methods" do
+    before do
       RefinersTestClass.add_remoted(:foo)
+    end
 
+    it "keeps track of remoted methods" do
       RefinersTestClass.remoted?(:foo).should be_true
       RefinersTestClass.remoted?(:not_a_remoted_method).should be_false
 
       RefinersTestClass.remoted_methods.should == [:foo]
     end
-  end
 
-  describe :remoted do
-    before do
-      RefinersTestClass.add_remoted(:foo)
+    it "does not set up non-existent methods as remotes" do
+      RefinersTestClass.add_remoted(:unknown)
+      RefinersTestClass.remoted_methods.should_not include(:unknown)
     end
 
     it "raises an error if an unknown remoted is supplied" do
