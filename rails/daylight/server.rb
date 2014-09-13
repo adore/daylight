@@ -11,7 +11,6 @@ require 'extensions/read_only_attributes'       # serializer support for `read_o
 require 'extensions/render_json_meta'           # adds metadata to the json response
 require 'extensions/route_options'              # adds associated, remoted options to routes
 require 'extensions/versioned_url_for'          # uses versioned paths for `url_for`
-require 'daylight/serializers'
 
 ##
 # Include into Rails server to handle Daylight::API queries
@@ -24,6 +23,7 @@ module Daylight
 
   eager_autoload do
     autoload :Refiners
+    autoload :Serializers
   end
 end
 
