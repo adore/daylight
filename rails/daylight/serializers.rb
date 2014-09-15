@@ -9,6 +9,9 @@ module Daylight::Serializers
 
   private
 
+    ##
+    # Create a simple serializer that sends all attributes and has_one and belongs_to associations
+
     def auto_generate_serializer
       model_class = self.class
       @auto_generated_serializer ||=
