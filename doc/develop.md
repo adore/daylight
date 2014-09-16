@@ -124,17 +124,45 @@ and most information on how to use and customize it can be found in their
 Serialize only the attributes you want to be public in your API.  This allows
 you to have a separation between the model data and the API data.
 
-> NOTE: Make sure to include `:id` as an attribute so that Daylight will be
-> able to make updates to the models correctly.
+By default Daylight will serialize all your model's attributes and `has_one` or
+`belongs_to` associations.
 
-For example, `id`, `title` and `body` are exposed but there all other
-attributes are not serialized:
+For example, for this model:
+  ````ruby
+    class Post < ActiveRecord::Base
+      belongs_to :blog
+      has_many :comments
+      has_one :company, through: :blog
+
+      # this has attributes id, title, body, summary
+    end
+  ````
+
+Will dynamically generate this default serializer if one doesn't exist:
+  ````ruby
+    class PostSerializer < ActiveModel::Serializer
+      embed :ids
+
+      attributes :id, :title, :body, :summary
+
+      has_one :blog
+      has_one :company, through: :blog
+    end
+  ````
+
+To customize this behavior create your own serializer.
+
+For example, `id`, `title` and `body` are exposed but all other attributes are
+not serialized:
 
   ````ruby
     class PostSerializer < ActiveModel::Serializer
       attributes :id, :title, :body
     end
   ````
+
+> NOTE: Make sure to include `:id` as an attribute so that Daylight will be
+> able to make updates to the models correctly.
 
 We encourage you to embed only ids to keep payloads down. Daylight will make
 additional requests for the associated objects when accessed:

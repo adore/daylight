@@ -49,7 +49,7 @@ module ActiveModel::Serializer::Associations
     end
 
     def key
-      "#{through}_attributes"
+      :"#{through}_attributes"
     end
 
     def through

@@ -23,6 +23,7 @@ module Daylight
 
   eager_autoload do
     autoload :Refiners
+    autoload :Serializers
   end
 end
 
