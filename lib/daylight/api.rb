@@ -55,7 +55,7 @@ class Daylight::API < ActiveResource::Base
     end
 
     def generate
-      @request_id = [SecureRandom.uuid, @client_id].compact.join('-')
+      @request_id = [SecureRandom.uuid, client_id].compact.join('/')
     end
     alias_method :to_s, :generate
 
