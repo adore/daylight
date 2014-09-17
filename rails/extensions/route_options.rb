@@ -28,12 +28,14 @@ module RouteOptions
 
     end
 
-    def get_remoted_model
-      controller = "#{parent_resource.name}_controller".classify.constantize rescue nil
-      controller && controller.respond_to?(:model) ? controller.send(:model) : parent_resource.name.classify.constantize
-    rescue
-      Rails.logger.warn "Could not lookup model for #{parent_resource.name} to apply remoted."
-    end
+    private
+
+      def get_remoted_model
+        controller = "#{parent_resource.name}_controller".classify.constantize rescue nil
+        controller && controller.respond_to?(:model) ? controller.send(:model) : parent_resource.name.classify.constantize
+      rescue
+        Rails.logger.warn "Could not lookup model for #{parent_resource.name} to apply remoted."
+      end
 
   end
 end
