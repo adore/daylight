@@ -19,9 +19,10 @@ module Daylight::Serializers
           embed :ids
           attributes(*model_class.column_names.map(&:to_sym))
           model_class.reflections.each_pair do |name, reflection|
+            options = reflection.options
             case reflection.macro
             when :has_one, :belongs_to
-              has_one name, reflection.options.slice(:through)
+              has_one name, key: options[:foreign_key], through: options[:through]
             end
           end
         end

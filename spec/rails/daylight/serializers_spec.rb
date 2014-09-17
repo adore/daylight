@@ -4,7 +4,7 @@ describe Daylight::Serializers do
 
   class SerializerTest < ActiveRecord::Base
     belongs_to :serializer_test_with_custom
-    has_one :single, class_name: 'SerializerTestWithCustom', foreign_key: :single_id
+    has_one :single, class_name: 'SerializerTestWithCustom', foreign_key: :another_id
     has_one :serializer_through_test, through: :serializer_test_with_custom
   end
 
@@ -29,7 +29,7 @@ describe Daylight::Serializers do
 
     create_table :serializer_test_with_customs do |t|
       t.string :name
-      t.integer :single_id
+      t.integer :another_id
       t.integer :serializer_through_test_id
     end
 
@@ -58,8 +58,8 @@ describe Daylight::Serializers do
     SerializerTestWithCustom.new.active_model_serializer.should == TestCustomSerializer
   end
 
-  it "embeds ids" do
-    json[:single_id].should be_present
+  it "handles custom ids" do
+    json[:another_id].should be_present
   end
 
   it "includes attributes" do
