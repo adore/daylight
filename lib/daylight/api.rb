@@ -70,7 +70,7 @@ class Daylight::API < ActiveResource::Base
 
   class << self
     attr_reader    :version, :versions, :namespace
-    cattr_accessor :request_root_in_json
+    cattr_accessor :request_root_in_json, :request_id
     alias_method   :endpoint, :site
 
     DEFAULT_CONFIG = {
@@ -157,14 +157,8 @@ class Daylight::API < ActiveResource::Base
 
     ##
     # Set a client-wide identifier to be sent with a Request IDs
-    def client_id= client_id=nil
-      @request_id = RequestID.new(client_id)
-    end
-
-    ##
-    # Request ID
-    def request_id
-      @request_id ||= RequestID.new
+    def client_id= id=nil
+      self.request_id = RequestID.new(id)
     end
 
     ##
