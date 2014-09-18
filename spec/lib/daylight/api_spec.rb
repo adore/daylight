@@ -93,7 +93,7 @@ describe Daylight::API do
     outer.encode.should == '{"test_api_descendant_json":{"name":"outer","tests":[{"name":"inner"}]}}'
   end
 
-  it "doesn't set the client_id by default" do
+  it "doesn't set a client_id by default on the request_id" do
     Daylight::API.request_id.client_id.should be_nil
     TestAPIDescendantJSON.request_id.client_id.should be_nil
     TestAPIDescendantXML.request_id.client_id.should be_nil
