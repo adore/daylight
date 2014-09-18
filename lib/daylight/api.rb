@@ -46,28 +46,6 @@ class Daylight::API < ActiveResource::Base
   include Daylight::Associations
   prepend Daylight::AssociationPersistance
 
-  class RequestID
-    delegate :strip, to: :to_s
-    attr_accessor :client_id
-
-    def initialize client_id=nil
-      @client_id = client_id
-    end
-
-    def generate
-      @request_id = [SecureRandom.uuid, client_id].compact.join('/')
-    end
-    alias_method :to_s, :generate
-
-    def previous
-      @request_id ||= generate
-    end
-
-    def inspect
-      "\"#{generate}\""
-    end
-  end
-
   class << self
     attr_reader    :version, :versions, :namespace
     cattr_accessor :request_root_in_json, :request_id
@@ -158,7 +136,7 @@ class Daylight::API < ActiveResource::Base
     ##
     # Set a client-wide identifier to be sent with a Request IDs
     def client_id= id=nil
-      self.request_id = RequestID.new(id)
+      self.request_id = Daylight::RequestId.new(id)
     end
 
     ##

@@ -11,15 +11,18 @@ module Daylight
 
   eager_autoload do
     autoload :Version
+
     autoload :Associations
+    autoload :AssociationPersistance
     autoload :Collection
     autoload :Errors
     autoload :Inflections
     autoload :Refinements
     autoload :ReadOnly
-    autoload :ResourceProxy
     autoload :ReflectionExt
-    autoload :AssociationPersistance
+    autoload :RequestId
+    autoload :ResourceProxy
+
     autoload :API
   end
 end

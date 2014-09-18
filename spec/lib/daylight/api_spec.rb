@@ -99,50 +99,15 @@ describe Daylight::API do
     TestAPIDescendantXML.request_id.client_id.should be_nil
   end
 
-  it "caches the request_id generator" do
-    Daylight::API.request_id.should == Daylight::API.request_id
-  end
-
-  UUID_REGEX             = /\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/
-  UUID_W_CLIENT_ID_REGEX = /\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/daylight-test\z/
-
-  describe :request_id do
-    it "generates a uuid" do
-      Daylight::API.request_id.to_s.should =~ UUID_REGEX
-      TestAPIDescendantJSON.request_id.to_s.should =~ UUID_REGEX
-      TestAPIDescendantXML.request_id.to_s.should =~ UUID_REGEX
+  it 'appends the client_id to the request_id' do
+    silence_warnings do
+      Daylight::API.setup! endpoint: 'http://api.daylight.test/', client_id: 'daylight-test'
     end
 
-    it "generates a new uuid with each to_s/inspect" do
-      Daylight::API.request_id.to_s.should_not == Daylight::API.request_id.to_s
-      Daylight::API.request_id.inspect.should_not == Daylight::API.request_id.inspect
-    end
-
-    it "stores the previous uuid" do
-      Daylight::API.request_id.to_s.should == Daylight::API.request_id.previous
-    end
-
-    it 'sets the client_id' do
-      silence_warnings do
-        Daylight::API.setup! endpoint: 'http://api.daylight.test/', client_id: 'daylight-test'
-      end
-
-      Daylight::API.request_id.client_id.should == 'daylight-test'
-      TestAPIDescendantJSON.request_id.client_id.should == 'daylight-test'
-      TestAPIDescendantXML.request_id.client_id.should == 'daylight-test'
-    end
-
-
-    it 'sets appends the client_id to the uuid' do
-      silence_warnings do
-        Daylight::API.setup! endpoint: 'http://api.daylight.test/', client_id: 'daylight-test'
-      end
-
-      Daylight::API.request_id.should be_a(Daylight::API::RequestID)
-      Daylight::API.request_id.to_s.should =~ UUID_W_CLIENT_ID_REGEX
-      TestAPIDescendantJSON.request_id.to_s.should =~ UUID_W_CLIENT_ID_REGEX
-      TestAPIDescendantXML.request_id.to_s.should =~ UUID_W_CLIENT_ID_REGEX
-    end
+    Daylight::API.request_id.should be_a(Daylight::RequestId)
+    Daylight::API.request_id.to_s.should =~ /\/daylight-test\z/
+    TestAPIDescendantJSON.request_id.to_s.should =~  /\/daylight-test\z/
+    TestAPIDescendantXML.request_id.to_s.should =~  /\/daylight-test\z/
   end
 
   describe :headers do
@@ -155,9 +120,15 @@ describe Daylight::API do
 
     it "adds X-Request-Id header" do
       Daylight::API.headers['X-Request-Id'].should_not be_nil
-      Daylight::API.headers['X-Request-Id'].should be_a(Daylight::API::RequestID)
-      TestAPIDescendantJSON.headers['X-Request-Id'].should be_a(Daylight::API::RequestID)
-      TestAPIDescendantXML.headers['X-Request-Id'].should be_a(Daylight::API::RequestID)
+      Daylight::API.headers['X-Request-Id'].should be_a(Daylight::RequestId)
+      TestAPIDescendantJSON.headers['X-Request-Id'].should be_a(Daylight::RequestId)
+      TestAPIDescendantXML.headers['X-Request-Id'].should be_a(Daylight::RequestId)
+    end
+
+    it "reuses the same Daylight::RequstId instance when headers are generated" do
+      Daylight::API.headers['X-Request-Id'].should         == Daylight::API.headers['X-Request-Id']
+      TestAPIDescendantJSON.headers['X-Request-Id'].should == Daylight::API.headers['X-Request-Id']
+      TestAPIDescendantXML.headers['X-Request-Id'].should  == Daylight::API.headers['X-Request-Id']
     end
   end
 
