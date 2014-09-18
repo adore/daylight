@@ -1,24 +1,24 @@
 require 'spec_helper'
 
 describe Daylight::RequestId do
-  UUID_REGEX_FORMAT = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 
+  let(:uuid_regex) { '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' }
   let(:request_id) { Daylight::RequestId.new }
   let(:client_id)  { Daylight::RequestId.new('daylight-test') }
 
   describe :request_id do
     it 'generates a uuid' do
-      request_id.generate.should =~ /^#{UUID_REGEX_FORMAT}$/
-      request_id.current.should  =~ /^#{UUID_REGEX_FORMAT}$/
-      request_id.to_s.should     =~ /^#{UUID_REGEX_FORMAT}$/
-      request_id.inspect.should  =~ /^"#{UUID_REGEX_FORMAT}"$/
+      request_id.generate.should =~ /^#{uuid_regex}$/
+      request_id.current.should  =~ /^#{uuid_regex}$/
+      request_id.to_s.should     =~ /^#{uuid_regex}$/
+      request_id.inspect.should  =~ /^"#{uuid_regex}"$/
     end
 
     it 'generates a uuid with client_id' do
-      client_id.generate.should =~ /^#{UUID_REGEX_FORMAT}\/daylight-test$/
-      client_id.current.should  =~ /^#{UUID_REGEX_FORMAT}\/daylight-test$/
-      client_id.to_s.should     =~ /^#{UUID_REGEX_FORMAT}\/daylight-test$/
-      client_id.inspect.should  =~ /^"#{UUID_REGEX_FORMAT}\/daylight-test"$/
+      client_id.generate.should =~ /^#{uuid_regex}\/daylight-test$/
+      client_id.current.should  =~ /^#{uuid_regex}\/daylight-test$/
+      client_id.to_s.should     =~ /^#{uuid_regex}\/daylight-test$/
+      client_id.inspect.should  =~ /^"#{uuid_regex}\/daylight-test"$/
     end
 
     it 'stores the previous uuid' do

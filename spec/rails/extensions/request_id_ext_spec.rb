@@ -1,9 +1,7 @@
 require 'spec_helper'
 
 describe Daylight::RequestIdExt, type: [:controller] do
-  UUID_REGEX_FORMAT = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
-
-
+  let(:uuid_regex) { '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' }
   let(:headers)    { {} }
   let(:app)        { double(:app, call: [nil,headers,nil]) }
   let(:middleware) { ActionDispatch::RequestId.new(app) }
@@ -12,13 +10,13 @@ describe Daylight::RequestIdExt, type: [:controller] do
   it 'continues to set the action_dispatch.request_id env var' do
     middleware.call(env={})
 
-    env['action_dispatch.request_id'].should =~ /\A#{UUID_REGEX_FORMAT}\z/
+    env['action_dispatch.request_id'].should =~ /\A#{uuid_regex}\z/
   end
 
   it 'continues to set the X-Request-Id header' do
     middleware.call({})
 
-    headers['X-Request-Id'].should =~ /\A#{UUID_REGEX_FORMAT}\z/
+    headers['X-Request-Id'].should =~ /\A#{uuid_regex}\z/
   end
 
   it 'continues to allow X-Request-Id header to be customized' do
