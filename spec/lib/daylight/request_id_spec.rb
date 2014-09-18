@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Daylight::RequestId do
-  UUID_REGEX_FORMAT      = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+  UUID_REGEX_FORMAT = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 
   let(:request_id) { Daylight::RequestId.new }
   let(:client_id)  { Daylight::RequestId.new('daylight-test') }
