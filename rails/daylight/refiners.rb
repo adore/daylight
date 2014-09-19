@@ -68,6 +68,22 @@ module Daylight::Refiners
     end
 
     ##
+    # Returns list of whitelisted scopes, defaults to all registered scopes
+    def whitelisted_scopes
+      @whitelisted_scopes ||= registered_scopes
+    end
+
+    ##
+    # Whitelist particular scopes
+    def whitelist_scopes *scope_names
+      scopes = scope_names.map(&:to_s)
+      if (unknown_scopes = scopes - registered_scopes).present?
+        Rails.logger.warn "Attempted to whitelist unknown #{'scope'.pluralize(unknown_scopes.count)} '#{unknown_scopes.join(', ')}' in #{self.name}!"
+      end
+      @whitelisted_scopes = scopes & registered_scopes
+    end
+
+    ##
     # Remember the name of +scopes+ that are defined by the model
     # This is a method chain and will call ActiveRecord.scope
     def scope(name, body, &block)
@@ -85,7 +101,7 @@ module Daylight::Refiners
     # Calls defined scopes on the model and returns the resulting +ActiveRecord::Relation+.
     # Raises +ArgumentError+ if the model scope is unknown.
     def scoped_by *scope_names
-      seive = AttributeSeive.new(registered_scopes, scope_names)
+      seive = AttributeSeive.new(whitelisted_scopes, scope_names)
       raise ArgumentError, "Unknown scope: #{seive.invalid_attributes.join(',')}" unless seive.attributes_valid?
 
       seive.valid_attributes.inject(all) do |scopes, scope_name|
