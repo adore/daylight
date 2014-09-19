@@ -21,6 +21,7 @@ This is the same as specifying `setup!` with the following defaults:
 
     Daylight::API.setup!({
       namespace: 'API',
+      client_id: nil,
       password:  nil,
       endpoint:  'http://localhost',
       version:   'v1',
@@ -33,6 +34,7 @@ You can customize each of these options:
 * `namespace` is the module to which you wish ActiveResource client models to belong
 * `password` supplied in the `X-Http-Authentication` header to be used for simple authentication
 * `endpoint` is the URL where your server is running (a synonym for `ActiveResource#site`)
+* `client_id` will append any tag/text to the request_id to help identify requests
 * `version` is the active version of your API client models
 * `version` the set of all versions of your API client models
 * `timeout` the duration in seconds in which to timeout a request
@@ -49,6 +51,15 @@ In an initializer add the Daylight's Rails extensions and patches:
 
   ````ruby
     require 'daylight/server'
+  ````
+To log each Daylight client's `request_id` you can configure your server
+to use `log_tags`.  This is part of
+[Rails General Configuration](http://guides.rubyonrails.org/configuring.html#rails-general-configuration)
+In your appropriate environment file add or modify the following
+configuration to include `:uuid`:
+
+  ````ruby
+    config.log_tags = [ :uuid ]
   ````
 
 ## API Documentation
