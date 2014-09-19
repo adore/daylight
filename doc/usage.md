@@ -97,11 +97,11 @@ examples unless otherwise noted.
 
 ### `request_id`
 
-Daylight will generate and send an 'X-Request-Id' header with each call to
-API server.  The value will be a generated v4 UUID.
+Daylight will generate a UUID and send an 'X-Request-Id' header with each
+request to API server.  No other steps are neccessary.
 
-If your application is already using a `request_id` you can tell Daylight to
-use it for each request.  Put the following in your Rack middleware or
+If your application is already using a `request_id` you can tell Daylight
+to use it for its requests.  Put the following in your Rack middleware or
 `around_filter`:
 
    ````ruby
@@ -109,7 +109,9 @@ use it for each request.  Put the following in your Rack middleware or
        yield
      end
   ````
-Additionally, you could allow Daylight to generate a UUID for you:
+
+Optionally, you could allow Daylight to generate a UUID for you for use
+in your application:
 
    ````ruby
      Daylight::API.request_id.use do |uuid|
