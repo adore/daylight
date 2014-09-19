@@ -12,7 +12,7 @@ module RouteOptions
 
       associated = parent_resource.options[:associated] || []
       remoted    = parent_resource.options[:remoted]    || []
-      scopes     = parent_resource.options[:scopes]     || []
+      scopes     = parent_resource.options[:scopes]
 
       model_class = controller_model_class
       model_class.whitelist_scopes(*scopes) if scopes.present?
