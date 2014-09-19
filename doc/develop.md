@@ -626,6 +626,21 @@ routing options.
     end
   ````
 
+By default all model scopes are available but you can whitelist particular
+scopes you want available to the client.
+
+  ````ruby
+    API::Application.routes.draw do
+      namespace :v1 do
+        resources :users,     associated: [:comments, :posts]
+        resources :posts,     associated: [:authors, :comments, :commenters],
+                                 remoted: [:top_comments],
+                                  scopes: [:published, :edited]
+        resources :comments,      except: [:index, :destroy]
+      end
+    end
+  ````
+
 As you can see when you develop your API, the routes file becomes a
 specification of what is exposed to the client.
 
