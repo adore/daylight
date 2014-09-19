@@ -60,8 +60,26 @@ describe Daylight::Refiners do
     scope :scope_c, -> { 'c' }
   end
 
+  before do
+    RefinersTestClass.instance_variable_set('@whitelisted_scopes', nil)
+  end
+
   it 'tracks registered scopes' do
     RefinersTestClass.registered_scopes.should == %w[scope_a scope_b]
+  end
+
+  it 'allows whitelisting of scopes' do
+    RefinersTestClass.whitelist_scopes :scope_a
+    RefinersTestClass.whitelisted_scopes.should == %w[scope_a]
+  end
+
+  it 'does not whitelist non-registered scopes' do
+    RefinersTestClass.whitelist_scopes :scope_b, :unknown_scope
+    RefinersTestClass.whitelisted_scopes.should == %w[scope_b]
+  end
+
+  it 'defaults to whitelisting all registered scopes' do
+    RefinersTestClass.whitelisted_scopes.should == RefinersTestClass.registered_scopes
   end
 
   it 'keeps track of different scopes on different classes' do
