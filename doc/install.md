@@ -34,7 +34,7 @@ You can customize each of these options:
 * `namespace` is the module to which you wish ActiveResource client models to belong
 * `password` supplied in the `X-Http-Authentication` header to be used for simple authentication
 * `endpoint` is the URL where your server is running (a synonym for `ActiveResource#site`)
-* `client_id` will append any tag/text to the request_id to help identify requests
+* `client_id` will append a `client_id` to the `X-Request-Id` to help identify a request source
 * `version` is the active version of your API client models
 * `version` the set of all versions of your API client models
 * `timeout` the duration in seconds in which to timeout a request
