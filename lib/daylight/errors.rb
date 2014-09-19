@@ -11,7 +11,7 @@ module Daylight::Errors
     ##
     # Error messages from the root cause
     # :attr: messages
-    attr_reader :messages
+    attr_reader :messages, :request_id
 
     ##
     # Parses the messages from the response
@@ -25,7 +25,8 @@ module Daylight::Errors
     # Attaches the root cause messaging to included Client message
     def to_s
       super.tap do |message|
-        message << "  Root Cause = #{messages.join(', ')}" if messages?
+        message << "  Root Cause = #{messages.join(', ')}." if messages?
+        message << "  Request-Id = #{request_id}." if request_id
       end
     end
 
@@ -36,10 +37,13 @@ module Daylight::Errors
     private
       ##
       # Sets the error messages when there is a payload on the response and a format that is handled
+      # Saves the request_id of the error if available.
       #--
       # "application/xml; charset=utf-8"
       # "application/json; charset=utf-8"
       def parse response
+        @request_id = response.header['x-request-id']
+
         _, subtype = CONTENT_TYPE_FORMAT.match(response.header['content-type']).captures rescue nil
         return unless subtype.present? && response.body.present?
 

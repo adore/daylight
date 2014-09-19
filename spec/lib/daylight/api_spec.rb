@@ -31,6 +31,7 @@ describe Daylight::API do
     @original_namespace = Daylight::API.namespace
     @original_password  = Daylight::API.password
     @original_endpoint  = Daylight::API.endpoint
+    @original_client_id = Daylight::API.request_id.client_id
     @original_version   = Daylight::API.version.downcase
   end
 
@@ -38,9 +39,10 @@ describe Daylight::API do
     silence_warnings do
       Daylight::API.setup!({
         namespace: @original_namespace,
-        endpoint: @original_endpoint,
-        version: @original_version,
-        password: @original_password
+        endpoint:  @original_endpoint,
+        version:   @original_version,
+        client_id: @original_client_id,
+        password:  @original_password
       })
     end
   end
@@ -89,6 +91,45 @@ describe Daylight::API do
     outer = TestAPIDescendantJSON.new(name: 'outer', tests: [inner])
 
     outer.encode.should == '{"test_api_descendant_json":{"name":"outer","tests":[{"name":"inner"}]}}'
+  end
+
+  it "doesn't set a client_id by default on the request_id" do
+    Daylight::API.request_id.client_id.should be_nil
+    TestAPIDescendantJSON.request_id.client_id.should be_nil
+    TestAPIDescendantXML.request_id.client_id.should be_nil
+  end
+
+  it 'appends the client_id to the request_id' do
+    silence_warnings do
+      Daylight::API.setup! endpoint: 'http://api.daylight.test/', client_id: 'daylight-test'
+    end
+
+    Daylight::API.request_id.should be_a(Daylight::RequestId)
+    Daylight::API.request_id.to_s.should =~ /\/daylight-test\z/
+    TestAPIDescendantJSON.request_id.to_s.should =~  /\/daylight-test\z/
+    TestAPIDescendantXML.request_id.to_s.should =~  /\/daylight-test\z/
+  end
+
+  describe :headers do
+    it "adds X-Daylight-Framework header" do
+      Daylight::API.headers['X-Daylight-Framework'].should_not be_nil
+      Daylight::API.headers['X-Daylight-Framework'].should == Daylight::VERSION
+      TestAPIDescendantJSON.headers['X-Daylight-Framework'].should == Daylight::VERSION
+      TestAPIDescendantXML.headers['X-Daylight-Framework'].should == Daylight::VERSION
+    end
+
+    it "adds X-Request-Id header" do
+      Daylight::API.headers['X-Request-Id'].should_not be_nil
+      Daylight::API.headers['X-Request-Id'].should be_a(Daylight::RequestId)
+      TestAPIDescendantJSON.headers['X-Request-Id'].should be_a(Daylight::RequestId)
+      TestAPIDescendantXML.headers['X-Request-Id'].should be_a(Daylight::RequestId)
+    end
+
+    it "reuses the same Daylight::RequstId instance when headers are generated" do
+      Daylight::API.headers['X-Request-Id'].should         == Daylight::API.headers['X-Request-Id']
+      TestAPIDescendantJSON.headers['X-Request-Id'].should == Daylight::API.headers['X-Request-Id']
+      TestAPIDescendantXML.headers['X-Request-Id'].should  == Daylight::API.headers['X-Request-Id']
+    end
   end
 
   # works also when querying a belongs_to foreign key

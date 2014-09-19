@@ -16,6 +16,7 @@ refer to the [installation steps](install.md) for options.
 #### Table of Contents
 * [Client Model Example](#client-model-example)
   * [Namespace and Version](#namespace-and-version)
+  * [`request_id`](#request_id)
 * [ActiveResource Overview](#activeresource-overview)
 * [Refinements](#refinements)
   * [Conditions Additions](#condition-additions)
@@ -92,6 +93,35 @@ for your convinience:
 
 We will use the _aliased_ version of the constant names in the following
 examples unless otherwise noted.
+
+
+### `request_id`
+
+Daylight will generate a UUID and send an 'X-Request-Id' header with each
+request to API server.  No other steps are neccessary.
+
+If your application is already using a `request_id` you can tell Daylight
+to use it for its requests.  Put the following in your Rack middleware or
+`around_filter`:
+
+   ````ruby
+     Daylight::API.request_id.use(my_request_uuid) do
+       yield
+     end
+  ````
+
+Optionally, you could allow Daylight to generate a UUID for you for use
+in your application:
+
+   ````ruby
+     Daylight::API.request_id.use do |uuid|
+       puts uuid                     # => 3a336db1-973e-4e5f-b82f-53de6cfb4c6c
+       puts Daylight::API.request_id # => 3a336db1-973e-4e5f-b82f-53de6cfb4c6c
+       yield
+     end
+  ````
+
+More information can be found in to rdocs for [RequestId](../lib/daylight/request_id.rb)
 
 ---
 

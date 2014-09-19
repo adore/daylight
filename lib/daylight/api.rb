@@ -48,7 +48,7 @@ class Daylight::API < ActiveResource::Base
 
   class << self
     attr_reader    :version, :versions, :namespace
-    cattr_accessor :request_root_in_json
+    cattr_accessor :request_root_in_json, :request_id
     alias_method   :endpoint, :site
 
     DEFAULT_CONFIG = {
@@ -98,14 +98,13 @@ class Daylight::API < ActiveResource::Base
       self.namespace = config[:namespace]
       self.password  = config[:password]
       self.endpoint  = config[:endpoint]
+      self.client_id = config[:client_id]
       self.versions  = config[:versions].freeze
       self.version   = config[:version] || config[:versions].last  # specify or use most recent version
       self.timeout   = config[:timeout] if config[:timeout]        # default read_timeout is 60
 
       # Only "parent" elements required to emit a root node
       self.request_root_in_json = config[:request_root_in_json] || true
-
-      headers['X-Daylight-Framework'] = Daylight::VERSION
 
       alias_apis unless config[:no_alias_apis]
     end
@@ -119,6 +118,25 @@ class Daylight::API < ActiveResource::Base
     def find_single(scope, options)
       return if scope.nil?
       super
+    end
+
+    ##
+    # Add Daylight custom headers which includes "Request-Id" and
+    # "X-Daylight-Framework"
+    #
+    # See:
+    # Daylight::VERSION
+    # #request_id
+    def headers
+      super.merge! \
+        "X-Request-Id"         => request_id,
+        'X-Daylight-Framework' => Daylight::VERSION
+    end
+
+    ##
+    # Set a client-wide identifier to be sent with a Request IDs
+    def client_id= id=nil
+      self.request_id = Daylight::RequestId.new(id)
     end
 
     ##
