@@ -235,6 +235,17 @@ class Daylight::API < ActiveResource::Base
   end
 
   ##
+  # Get the `natural_key` for this resource, if there isn't one specified
+  # then it will return nil.
+  #
+  # See:
+  # metadata
+
+  def natural_key
+    @natural_key ||= metadata[:natural_key]
+  end
+
+  ##
   # Used to assist `find_or_create_resource_for` to use embedded attributes
   # to new Daylight::API model objects.
   #
