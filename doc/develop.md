@@ -112,6 +112,35 @@ using the model-based associations, because it:
 > `ActiveRecord::Base`.  At this time there is no way to exclude this module
 > from any model. It does not modify existing ActiveRecord functionality.
 
+#### Natural Key
+
+You can specify a column that can be used to look-up a record by a `natural_key`
+or "non-id dereferencing".  This will allow records to be looked up by a unique
+id that is not the artificial (primary) key.
+
+Set the natural key on the model (there can only be one):
+
+  ````ruby
+    class Post
+      set_natural_key :slug
+    end
+  ````
+
+Within the client you will now be able to look up using both the artifical key
+and the natural key:
+
+  ````ruby
+    p = API::Post.find(1)
+    p.slug    # => "100-best-albums-of-2014"
+
+    p = API::Post.find("100-best-albums-of-2014")
+    p.id      # => 1
+  ````
+
+If the column values for the natural key is not unique, then the first will be
+returned by Rails.  For consitent results, use natural key for only those
+columns that are unique.
+
 ---
 
 ### Serializers
