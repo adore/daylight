@@ -198,6 +198,23 @@ describe Daylight::API do
     end
   end
 
+  describe "natural_key" do
+    before do
+      data = {
+        test_descendant: { id: 1, name: "foo" },
+        meta: { test_descendant: { natural_key: "name" } }
+      }
+
+      stub_request(:get, %r{#{TestDescendant.site}}).to_return(body: data.to_json)
+    end
+
+    it "is defined" do
+      test = TestDescendant.find(1)
+
+      test.natural_key.should == "name"
+    end
+  end
+
   describe 'metadata' do
     before do
       data = {

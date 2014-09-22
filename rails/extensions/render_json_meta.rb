@@ -39,7 +39,7 @@ module RenderJsonMeta
   module MetadataNaturalKey
     def _add_metadata(resource, metadata)
       _collect_metadata(:natural_key, resource, metadata) do |model|
-        model.class.natural_key if model.class.natural_key
+        model.class.natural_key if model.class.respond_to?(:natural_key) && model.class.natural_key
       end
     end
   end
