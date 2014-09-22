@@ -10,6 +10,8 @@ class RefinerMockActiveRecordBase
 end
 
 class RefinersTestClass < RefinerMockActiveRecordBase
+  set_natural_key :name
+
   scope :scope_a, -> { 'a' }
   scope :scope_b, -> { 'b' }
 
@@ -74,6 +76,10 @@ describe Daylight::Refiners do
   it 'returns true if scoped? finds a match' do
     RefinersTestClass.should be_scoped(:scope_a)
     RefinersTestClass.should_not be_scoped(:foo)
+  end
+
+  it 'tracks natural_key' do
+    RefinersTestClass.natural_key.should == :name
   end
 
   describe :scope_by do

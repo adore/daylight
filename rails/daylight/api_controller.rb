@@ -132,6 +132,12 @@ class Daylight::APIController < ApplicationController
       end
 
       ##
+      # Delegates to `model#natural_key`
+      def natural_key
+        model.natural_key
+      end
+
+      ##
       # Sets the default `model_name` and `record_name` by default.
       # By default, they are based on the value determined by `controller_name`
       #
@@ -213,6 +219,15 @@ class Daylight::APIController < ApplicationController
     end
 
     ##
+    # Constructs parameters for record lookup
+    #
+    # See
+    # show
+    def id_params
+      { (natural_key? && natural_key || primary_key) => params[primary_key] }
+    end
+
+    ##
     # Instance-level delegate of the `primary_key` method
     #
     # See:
@@ -220,6 +235,26 @@ class Daylight::APIController < ApplicationController
     def primary_key
       self.class.send(:primary_key)
     end
+
+    ##
+    # Instance-level delegate of the `natural_key` method
+    #
+    # See:
+    # #natural_key
+    def natural_key
+      self.class.send(:natural_key)
+    end
+
+    ##
+    # Determines if the `natural_key` should be used based on parameters
+    # or fallback to `primary_key` lookup.
+    #
+    # By default, all `primary_keys` are integers, override if your
+    # if determination differs.
+    def natural_key?
+      !Integer(params[primary_key]) rescue true
+    end
+
   private
     #
     # The common actions for Daylight::APIController
@@ -279,7 +314,7 @@ class Daylight::APIController < ApplicationController
     #     render json: Post.find(params[Post.primary_key])
     #   end
     def show
-      render json: self.record = model.find(params[primary_key])
+      render json: self.record = model.find_by!(id_params)
     end
 
     ##

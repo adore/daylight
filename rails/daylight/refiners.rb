@@ -61,6 +61,10 @@ module Daylight::Refiners
   module ClassMethods
     include Daylight::Params
 
+    # support for setting a natural key to use in addition to a `primary_key`
+    attr_accessor :natural_key
+    alias_method :set_natural_key, :natural_key=
+
     ##
     # Returns currently registered scopes or empty Array
     def registered_scopes

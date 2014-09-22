@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 class Suite < ActiveRecord::Base
+  set_natural_key :name
+
   scope :all_suites, -> { all }
   has_many :cases
 
@@ -315,9 +317,9 @@ describe Daylight::APIController, type: :controller do
       end
     end
 
-    let!(:suite1) { create(:suite, switch: true)  }
-    let!(:suite2) { create(:suite, switch: false) }
-    let!(:suite3) { create(:suite, switch: true)  }
+    let!(:suite1) { create(:suite, switch: true,  name: 'foo') }
+    let!(:suite2) { create(:suite, switch: false, name: 'bar') }
+    let!(:suite3) { create(:suite, switch: true,  name: 'baz') }
 
     def parse_collection body
       JSON.parse(body).values.first.map(&:with_indifferent_access)
@@ -360,13 +362,33 @@ describe Daylight::APIController, type: :controller do
       response.headers['Location'].should == "/suites/#{result['id']}"
     end
 
-    it 'shows a record' do
-      post :show, id: suite2.id
+    describe :id_params do
+      it 'shows a record' do
+        get :show, id: suite2.id
 
-      result = parse_record(response.body)
-      result[:id].should     == suite2[:id]
-      result[:name].should   == suite2[:name]
-      result[:switch].should == suite2[:switch]
+        result = parse_record(response.body)
+        result[:id].should     == suite2[:id]
+        result[:name].should   == suite2[:name]
+        result[:switch].should == suite2[:switch]
+      end
+
+      it 'shows a record by natural_key' do
+        get :show, id: suite2.name
+
+        result = parse_record(response.body)
+        result[:id].should     == suite2[:id]
+        result[:name].should   == suite2[:name]
+        result[:switch].should == suite2[:switch]
+      end
+
+      it 'throws error when no record' do
+        no_record_id = Suite.maximum(:id) + 1
+        expect { get :show, id: no_record_id }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      it 'throws error when no record by natural_id' do
+        expect { get :show, id: 'wibble' }.to raise_error(ActiveRecord::RecordNotFound)
+      end
     end
 
     it 'updates a record' do
