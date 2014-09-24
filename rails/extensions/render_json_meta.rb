@@ -35,6 +35,16 @@ module RenderJsonMeta
   end
 
   ##
+  # Returns the `natural_key` for the resource
+  module MetadataNaturalKey
+    def _add_metadata(resource, metadata)
+      _collect_metadata(:natural_key, resource, metadata) do |model|
+        model.class.natural_key if model.class.respond_to?(:natural_key) && model.class.natural_key
+      end
+    end
+  end
+
+  ##
   # For AssociationRelations, add known `nested_resource_names` to the meta data
   module MetadataNestedResources
     def _add_metadata(resource, metadata)
@@ -93,6 +103,7 @@ ActiveSupport.on_load(:action_controller) do
   # Modules could not be included within the concern, likely
   # because the context is lost from her in the on_load block
   include ::RenderJsonMeta::MetadataDefault
+  include ::RenderJsonMeta::MetadataNaturalKey
   include ::RenderJsonMeta::MetadataWhereValues
   include ::RenderJsonMeta::MetadataNestedResources
   include ::RenderJsonMeta::MetadataReadOnly

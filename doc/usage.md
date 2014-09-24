@@ -216,6 +216,23 @@ on a retrieved instance:
     post.attributes.keys #=> ["id", "blog_id", "title", "body", "slug",  "published", "published_on", "created_by"]
   ````
 
+If there is a `natural_key` specified for the class, you can use a value to look
+up by `natural_key` in addition to the `primary_key`, like so:
+
+  ````ruby
+    post = API::Post.find(1)
+    post.id          #=> 123
+    post.natural_key #=> 'slug'
+    post.slug        #=> '100-best-albums-of-2014'
+
+    # look up using natural_key
+    post = API::Post.find('100-best-albums-of-2014')
+    post.id          #=> 123
+  ````
+
+Like `primary_key` lookup, `ActiveResource::ResourceNotFound` will be thrown when
+the record cannot be found with the supplied value.
+
 If you know there to be one result or only need the first result, use `find_by`:
 
   ````ruby
