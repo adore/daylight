@@ -41,6 +41,8 @@ module RenderJsonMeta
       _collect_metadata(:natural_key, resource, metadata) do |model|
         model.class.natural_key if model.class.respond_to?(:natural_key) && model.class.natural_key
       end
+
+      super
     end
   end
 
