@@ -41,11 +41,11 @@ module DaylightDocumentation::DocumentationHelper
   end
 
   def client_namespace
-    Daylight::API.namespace
+    Daylight::Documentation.namespace
   end
 
   def api_version
-    Daylight::API.version.downcase
+    Daylight::Documentation.version.downcase
   end
 
   private

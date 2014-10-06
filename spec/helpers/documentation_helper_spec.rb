@@ -70,12 +70,12 @@ describe DaylightDocumentation::DocumentationHelper do
 
   describe :client_namespace do
     it "returns the client namespace" do
-      helper.client_namespace.should == 'test_api'
+      helper.client_namespace.should == 'API'
     end
   end
 
   describe :api_version do
-    it "returns the api version" do
+    it "returns the api version, downcased" do
       helper.api_version.should == 'v1'
     end
   end

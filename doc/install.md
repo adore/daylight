@@ -80,8 +80,16 @@ And mount it in your routes:
       mount Daylight::Documentation => '/docs/api'
   ````
 
-You will also need to include your client models in your application through
-Bundler or some other method.
+You will also need to include and configure your client models in your application
+through Bundler or some other method so the version and namespace are correct in
+the examples. Alternatively you can configure them in an initializer:
+
+  ````ruby
+      require 'daylight/documentation'
+
+      Daylight::Documentation.version   = 'v3'
+      Daylight::Documentation.namespace = 'MyAPI'
+  ````
 
 ### Rake Tasks
 
