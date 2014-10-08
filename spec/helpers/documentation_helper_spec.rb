@@ -16,7 +16,7 @@ describe DaylightDocumentation::DocumentationHelper do
 
   before do
     # create routes for our test model
-    Daylight::Documentation.routes.draw do
+    Rails.application.routes.draw do
       resources :test_models, associated: [:users]
     end
   end
