@@ -74,4 +74,8 @@ describe Daylight::Serializers do
     json[:serializer_test_with_custom_attributes][:serializer_through_test_id].should ==
       model.serializer_test_with_custom.serializer_through_test.id
   end
+
+  it "correctly reports the model class" do
+    model.active_model_serializer.model_class.should == SerializerTest
+  end
 end
