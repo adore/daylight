@@ -14,14 +14,30 @@ class DaylightDocumentation::DocumentationController < ActionController::Base
   ##
   # Model description
   def model
-    model_name = params[:model]
-    @model = models.find { |model| model.name.underscore == model_name }
+    @model  = find_model
+    @schema = model_schema
+  end
+
+  ##
+  # Schema
+  def schema
+    render json: model_schema
   end
 
   private
 
-  def models
-    Rails.application.eager_load!
-    ActiveRecord::Base.descendants
-  end
+    def models
+      Rails.application.eager_load!
+      ActiveRecord::Base.descendants
+    end
+
+    def find_model
+      model_name = params[:model]
+      models.find { |model| model.name.underscore == model_name }
+    end
+
+    def model_schema
+      find_model.new.active_model_serializer.schema
+    end
+
 end

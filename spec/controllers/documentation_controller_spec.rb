@@ -2,7 +2,14 @@ require 'spec_helper'
 
 describe DaylightDocumentation::DocumentationController do
 
-  class TestModel < ActiveRecord::Base
+  class DocumentationTestModel < ActiveRecord::Base
+  end
+
+  migrate do
+    create_table :documentation_test_models do |t|
+      t.string  :name
+      t.integer :number
+    end
   end
 
   it "renders an index" do
@@ -10,15 +17,24 @@ describe DaylightDocumentation::DocumentationController do
 
     assert_response :success
 
-    assigns[:models].should include(TestModel)
+    assigns[:models].should include(DocumentationTestModel)
   end
 
   it "renders a model view" do
-    get :model, model: 'test_model', :use_route => :daylight
+    get :model, model: 'documentation_test_model', :use_route => :daylight
 
     assert_response :success
 
-    assigns[:model].should == TestModel
+    assigns[:model].should == DocumentationTestModel
+  end
+
+  it "renders json schema for the given model" do
+    get :schema, model: 'documentation_test_model', :use_route => :daylight
+
+    assert_response :success
+
+    json = JSON.parse response.body
+    json['attributes']['number'].should == 'integer'
   end
 
 end
