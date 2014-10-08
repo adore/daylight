@@ -8,9 +8,17 @@
       .page-header
         %h1= @model.name
 
+      #schema.panel.panel-default
+        .panel-heading
+          %h3.panel-title Schema
+        .panel-body
+          %pre= JSON.pretty_generate @schema
+        .panel-footer
+          = link_to 'Download', schema_path(@model.name.downcase)
+
       #api.panel.panel-default
         .panel-heading
-          %h3 API
+          %h3.panel-title API
         %table.table.table-condensed
           - model_verbs_and_routes(@model) do |verb, path, defaults|
             %tr
@@ -103,6 +111,8 @@
     #navigation.col-md-3
       %ul.nav.nav-pills.nav-stacked.affix
         %li.active
+          %a{href:'#schema'} Schema
+        %li
           %a{href:'#api'} API
         %li
           %a{href:'#filters'} Filters

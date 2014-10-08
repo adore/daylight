@@ -21,7 +21,7 @@ class DaylightDocumentation::DocumentationController < ActionController::Base
   ##
   # Schema
   def schema
-    render json: model_schema
+    render json: model_schema, content_type: 'application/schema+json'
   end
 
   private
