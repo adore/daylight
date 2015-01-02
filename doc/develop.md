@@ -98,7 +98,7 @@ there is:
 
 1. A configured foreign_key as in `favorites`
 2. A through association as in `commenters`
-3. A condindition block as `commenters` and `suppressed_comments` (eg. `uniq`
+3. A condition block as `commenters` and `suppressed_comments` (eg. `uniq`
    and `where`)
 4. A class_name in all three `favorites`, `commenters`, and `suppressed_comments`
 
@@ -327,7 +327,7 @@ To configure the `PostSerializer` to mark these attributes as read only:
   ````
 
 These attributes will be marked as read only in a special
-[Metadata](#resposne-metadata) section in the object's JSON.
+[Metadata](#response-metadata) section in the object's JSON.
 
 The client will be able to read each of these values but will raise a
 `NoMethodError` when attempting to write to them.
