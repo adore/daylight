@@ -20,6 +20,10 @@ describe Daylight::Associations do
     def parent_id; 456; end
   end
 
+  class AnotherAssociationTestClass < Daylight::API
+    belongs_to :parent, class_name: 'RelatedTestClass'
+  end
+
   describe :has_many do
 
     before do
@@ -116,6 +120,7 @@ describe Daylight::Associations do
       [RelatedTestClass, AssociationsTestClass].each do |clazz|
         stub_request(:get, %r{#{clazz.site}}).to_return(body: data.to_json)
       end
+      stub_request(:get, %r{#{AnotherAssociationTestClass.site}}).to_return(body: { parent: data }.to_json)
     end
 
     it 'still fetches the parent object' do
@@ -137,6 +142,13 @@ describe Daylight::Associations do
       resource.parent = RelatedTestClass.new(id: 789, name: 'new parent')
 
       resource.attributes['parent_id'].should == 789
+    end
+
+    it 'fetches the parent object if no foreign key attr is present' do
+      resource = AnotherAssociationTestClass.find(1)
+
+      resource.parent.should_not be_nil
+      resource.parent.name.should == 'three'
     end
   end
 

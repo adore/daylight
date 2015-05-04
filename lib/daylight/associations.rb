@@ -98,7 +98,11 @@ module Daylight::Associations
 
         # setup the resource_proxy to fetch the results
         define_cached_method reflection.name, cache_key: nested_attribute_key do
-          reflection.klass.find(send(reflection.foreign_key))
+          if attributes.include? name
+            attributes[name]
+          else
+            reflection.klass.find(send(reflection.foreign_key))
+          end
         end
 
         # Defines a setter caching the value in an instance variable for later
