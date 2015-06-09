@@ -313,7 +313,7 @@ describe Daylight::APIController, type: :controller do
 
     before do
       @routes.draw do
-        resources :suites, associated: [:cases], remoted: [:odd_cases], controller: :suites
+        resources :suites, associated: [:cases], remoted: [:get_odd_cases], controller: :suites
       end
     end
 
