@@ -10,14 +10,19 @@ describe Daylight::Associations do
     self.include_format_in_path = false
 
     has_many   :related_test_classes
-    has_many   :things,        class_name: 'RelatedTestClass'
-    belongs_to :parent,        class_name: 'RelatedTestClass'
-    has_one    :grandparent,   class_name: 'RelatedTestClass', through: :parent
-    has_one    :associate,     class_name: 'RelatedTestClass'
-    remote     :remote_stuff,  class_name: 'RelatedTestClass'
+    has_many   :things,       class_name: 'RelatedTestClass'
+    belongs_to :parent,       class_name: 'RelatedTestClass'
+    has_one    :grandparent,  class_name: 'RelatedTestClass', through: :parent
+    has_one    :associate,    class_name: 'RelatedTestClass'
+    remote     :remote_stuff, class_name: 'RelatedTestClass', verb: :get
 
     def id;        123; end
     def parent_id; 456; end
+  end
+
+  class AnotherAssociationTestClass < Daylight::API
+    belongs_to :parent,   class_name: 'RelatedTestClass'
+    remote :patch_remote, class_name: 'AnotherAssociationTestClass', verb: :patch
   end
 
   describe :has_many do
@@ -116,6 +121,7 @@ describe Daylight::Associations do
       [RelatedTestClass, AssociationsTestClass].each do |clazz|
         stub_request(:get, %r{#{clazz.site}}).to_return(body: data.to_json)
       end
+      stub_request(:get, %r{#{AnotherAssociationTestClass.site}}).to_return(body: { parent: data }.to_json)
     end
 
     it 'still fetches the parent object' do
@@ -137,6 +143,13 @@ describe Daylight::Associations do
       resource.parent = RelatedTestClass.new(id: 789, name: 'new parent')
 
       resource.attributes['parent_id'].should == 789
+    end
+
+    it 'fetches the parent object if no foreign key attr is present' do
+      resource = AnotherAssociationTestClass.find(1)
+
+      resource.parent.should_not be_nil
+      resource.parent.name.should == 'three'
     end
   end
 
@@ -246,51 +259,68 @@ describe Daylight::Associations do
 
   describe :remote do
 
-    def respond_with(data)
-      stub_request(:get, %r{#{AssociationsTestClass.site}}).to_return(body: data.to_json)
+    context 'get' do
+      def respond_with(verb, data)
+        stub_request(verb, %r{#{AssociationsTestClass.site}}).to_return(body: data.to_json)
+      end
+
+      let(:subject)  { AssociationsTestClass.new }
+
+      it "loads data from the remote" do
+        respond_with(:get, {remote_stuff: {id: 2, foo: 'bar'}})
+
+        subject.remote_stuff.foo.should == 'bar'
+      end
+
+      it "handles collections" do
+        respond_with(:get, {remote_stuff: [{id: 2, foo: 'first'}, {id: 3, foo: 'second'}]})
+
+        subject.remote_stuff.first.foo.should == 'first'
+        subject.remote_stuff.last.foo.should == 'second'
+      end
+
+      it "caches the data" do
+        respond_with(:get, {remote_stuff: {cache: 'cachey cache'}})
+
+        subject.should_receive(:get).once.and_call_original
+
+        subject.remote_stuff.cache.should == 'cachey cache'
+        subject.remote_stuff.cache.should == 'cachey cache'
+      end
+
+      it "handles metadata with an object" do
+        respond_with(:get, {remote_stuff: {id: 2, foo: 'bar'}, meta: {}})
+
+        subject.remote_stuff.foo.should == 'bar'
+      end
+
+      it "handles metadata with a collection" do
+        respond_with(:get, {remote_stuff: [{id: 2, foo: 'first'}, {id: 3, foo: 'second'}], meta: {}})
+
+        subject.remote_stuff.first.foo.should == 'first'
+        subject.remote_stuff.last.foo.should == 'second'
+      end
+
+      it "returns data from the attributes if that already exists" do
+        subject.attributes[:remote_stuff] = 'wibble'
+
+        subject.remote_stuff.should == 'wibble'
+      end
     end
 
-    let(:subject) { AssociationsTestClass.new }
+    context 'patch' do
+      def respond_with(verb, data)
+        stub_request(verb, %r{#{AnotherAssociationTestClass.site}}).to_return(:body => data.to_json)
+      end
 
-    it "loads data from the remote" do
-      respond_with({remote_stuff: {id: 2, foo: 'bar'}})
+      let(:subject)  { AnotherAssociationTestClass.new }
 
-      subject.remote_stuff.foo.should == 'bar'
-    end
+      it "responds successfully from the remote" do
+        stub = respond_with(:patch, {patch_remote: {id: 2}})
+        subject.patch_remote({data: 'foo', more_data: 'bar'})
 
-    it "handles collections" do
-      respond_with({remote_stuff: [{id: 2, foo: 'first'}, {id: 3, foo: 'second'}]})
-
-      subject.remote_stuff.first.foo.should == 'first'
-      subject.remote_stuff.last.foo.should == 'second'
-    end
-
-    it "caches the data" do
-      respond_with({remote_stuff: {cache: 'cachey cache'}})
-
-      subject.should_receive(:get).once.and_call_original
-
-      subject.remote_stuff.cache.should == 'cachey cache'
-      subject.remote_stuff.cache.should == 'cachey cache'
-    end
-
-    it "handles metadata with an object" do
-      respond_with({remote_stuff: {id: 2, foo: 'bar'}, meta: {}})
-
-      subject.remote_stuff.foo.should == 'bar'
-    end
-
-    it "handles metadata with a collection" do
-      respond_with({remote_stuff: [{id: 2, foo: 'first'}, {id: 3, foo: 'second'}], meta: {}})
-
-      subject.remote_stuff.first.foo.should == 'first'
-      subject.remote_stuff.last.foo.should == 'second'
-    end
-
-    it "returns data from the attributes if that already exists" do
-      subject.attributes[:remote_stuff] = 'wibble'
-
-      subject.remote_stuff.should == 'wibble'
+        expect(stub).to have_been_requested
+      end
     end
 
   end

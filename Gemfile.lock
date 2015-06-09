@@ -45,7 +45,7 @@ GEM
       minitest (~> 5.1)
       thread_safe (~> 0.1)
       tzinfo (~> 1.1)
-    addressable (2.3.6)
+    addressable (2.3.8)
     arel (5.0.1.20140414130214)
     builder (3.2.2)
     coderay (1.1.0)
@@ -79,10 +79,15 @@ GEM
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
+    method_source (0.8.2)
     mime-types (1.25.1)
     minitest (5.4.1)
     multi_json (1.10.1)
     polyglot (0.3.5)
+    pry (0.10.1)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
     rack (1.5.2)
     rack-test (0.6.2)
       rack (>= 1.0)
@@ -120,7 +125,7 @@ GEM
       rspec-core (~> 2.14.0)
       rspec-expectations (~> 2.14.0)
       rspec-mocks (~> 2.14.0)
-    safe_yaml (1.0.3)
+    safe_yaml (1.0.4)
     sass (3.4.3)
     simplecov (0.9.0)
       docile (~> 1.1.0)
@@ -129,6 +134,7 @@ GEM
     simplecov-html (0.8.0)
     simplecov-rcov (0.2.3)
       simplecov (>= 0.4.1)
+    slop (3.6.0)
     sprockets (2.12.1)
       hike (~> 1.2)
       multi_json (~> 1.0)
@@ -147,7 +153,7 @@ GEM
       polyglot (>= 0.3.1)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
-    webmock (1.18.0)
+    webmock (1.21.0)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
 
@@ -158,10 +164,14 @@ DEPENDENCIES
   daylight!
   factory_girl
   faker
+  pry
   rails (~> 4.1.0, >= 4.0.1)
   rake
   rspec
   rspec-rails (~> 2.14.0)
   simplecov-rcov (~> 0.2.3)
   sqlite3
-  webmock (~> 1.18.0)
+  webmock (~> 1.21.0)
+
+BUNDLED WITH
+   1.10.2

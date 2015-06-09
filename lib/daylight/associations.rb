@@ -21,8 +21,8 @@ module Daylight::Associations
         "#{prefix}#{collection_name}/#{member_id}/#{reflection.name}.#{extension}"
       end
 
-      def call_remote(remoted_method, model)
-        response = get(remoted_method)
+      def call_remote(remoted_method, model, verb, args)
+        response = self.method(verb).call(remoted_method, args)
         # strip the root, but take into consideration metadata
         if Hash === response && response.has_key?(remoted_method.to_s)
           response = response[remoted_method.to_s]
@@ -98,7 +98,11 @@ module Daylight::Associations
 
         # setup the resource_proxy to fetch the results
         define_cached_method reflection.name, cache_key: nested_attribute_key do
-          reflection.klass.find(send(reflection.foreign_key))
+          if attributes.include? name
+            attributes[name]
+          else
+            reflection.klass.find(send(reflection.foreign_key))
+          end
         end
 
         # Defines a setter caching the value in an instance variable for later
@@ -209,17 +213,22 @@ module Daylight::Associations
     end
 
     ##
-    # Adds a method to the model that calls the remote action for its data.
+    # Adds a method to the model that calls the remote action that either
+    # gets or mutates data
     #
     # Example:
     #
-    #   remote :posts_by_popularity, class_name: 'post'
+    #   remote :posts_by_popularity, class_name: 'post', verb: :get
+    #
+    #   or
+    #
+    #   remote :posts_by_popularity, class_name: 'post', verb: :patch
     #
 
     def remote name, options
       create_reflection(:remote, name, options).tap do |reflection|
-        define_cached_method reflection.name do
-          call_remote(reflection.name, reflection.klass)
+        define_cached_method(reflection.name) do |args=nil|
+          call_remote(reflection.name, reflection.klass, reflection.options[:verb], args)
         end
       end
     end
@@ -231,7 +240,7 @@ module Daylight::Associations
         define_method(uncached_method_name, block)
 
         # define the cached wrapper around the uncached method
-        define_method method_name do
+        define_method method_name do |args=nil|
           ivar_name  = :"@#{method_name}"
           cache_key  = options[:cache_key] || method_name
           attributes = options.has_key?(:index) ? @attributes[options[:index]] : @attributes
@@ -242,7 +251,11 @@ module Daylight::Associations
             if attributes.include?(cache_key)
               load_attributes_for(method_name, attributes[cache_key])
             else
-              send(uncached_method_name)
+              if args
+                send(uncached_method_name, args)
+              else
+                send(uncached_method_name)
+              end
             end
 
           # Track of the association hashcode for changes

@@ -23,8 +23,11 @@ module RouteOptions
         end
 
         remoted.each do |remote|
-          model_class.add_remoted(remote) if model_class
-          get remote, to: "#{parent_resource.name}#remoted", defaults: {remoted: remote}, as: remote
+          split_remote = remote.to_s.split('_', 2)
+          verb = split_remote[0]
+          remote_method_name = split_remote[1]
+          model_class.add_remoted(remote_method_name) if model_class
+          self.method(verb).call(remote_method_name, to: "#{parent_resource.name}#remoted", defaults: {remoted: remote_method_name}, as: remote_method_name)
         end
       end
 
