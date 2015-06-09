@@ -236,7 +236,7 @@ describe RouteOptions, type: [:controller, :routing] do
 
     before do
       @routes.draw do
-        resources :test_method_route, remoted: %w[foo]
+        resources :test_method_route, remoted: %w[get_foo]
       end
     end
 
@@ -267,42 +267,73 @@ describe RouteOptions, type: [:controller, :routing] do
   end
 
   describe "remoted resource with alternate model" do
-    # rspec's controller temporarily wipes out routes and recreates
-    # routes for the anonymnous controller, we don't want to do that
-    # also, rspec-rails does not honor the tests(controller) function
     def self.controller_class
       TestMethodRouteAltModelController
     end
 
-    before do
-      @routes.draw do
-        resources :test_method_route_alt_model, remoted: %w[bar]
+    context 'get' do
+      # rspec's controller temporarily wipes out routes and recreates
+      # routes for the anonymnous controller, we don't want to do that
+      # also, rspec-rails does not honor the tests(controller) function
+      before do
+        @routes.draw do
+          resources :test_method_route_alt_model, remoted: %w[get_bar]
+        end
+      end
+
+      it 'adds associated route' do
+        expect(get: '/test_method_route_alt_model/1/bar').to route_to(
+          controller: 'test_method_route_alt_model',
+          action: 'remoted',
+          id: '1',
+          remoted: 'bar'
+        )
+      end
+
+      it 'responds to method with expected params' do
+        get :remoted, id: 1, remoted: 'bar'
+
+        assert_response :success
+
+        response.body.should == 'test_method_route_alt_model/1/bar'
+      end
+
+      it 'sets up named link helpers' do
+        bar_test_method_route_alt_model_path(10).should == '/test_method_route_alt_model/10/bar'
+      end
+
+      it 'keeps track for remoted methods on the controller' do
+        TestAltModel.remoted?(:bar).should be_true
       end
     end
 
-    it 'adds associated route' do
-      expect(get: '/test_method_route_alt_model/1/bar').to route_to(
-        controller: 'test_method_route_alt_model',
-        action: 'remoted',
-        id: '1',
-        remoted: 'bar'
-      )
-    end
+    context 'patch' do
+      before do
+        @routes.draw do
+          resources :test_method_route_alt_model, remoted: %w[patch_bar]
+        end
+      end
 
-    it 'respsonds to method with expected params' do
-      get :remoted, id: 1, remoted: 'bar'
+      it 'adds associated route' do
+        expect(patch: '/test_method_route_alt_model/1/bar').to route_to(
+          controller: 'test_method_route_alt_model',
+          action: 'remoted',
+          id: '1',
+          remoted: 'bar'
+        )
+      end
 
-      assert_response :success
+      it 'responds to method with expected params' do
+        patch :remoted, id: 1, remoted: 'bar'
 
-      response.body.should == 'test_method_route_alt_model/1/bar'
-    end
+        assert_response :success
 
-    it 'sets up named link helpers' do
-      bar_test_method_route_alt_model_path(10).should == '/test_method_route_alt_model/10/bar'
-    end
+        response.body.should == 'test_method_route_alt_model/1/bar'
+      end
 
-    it 'keeps track for remoted methods on the controller' do
-      TestAltModel.remoted?(:bar).should be_true
+      it 'keeps track for remoted methods on the controller' do
+        TestAltModel.remoted?(:bar).should be_true
+      end
     end
   end
 

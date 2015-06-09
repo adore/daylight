@@ -29,6 +29,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'factory_girl'
   s.add_development_dependency 'faker'
   s.add_development_dependency 'rake'
+  s.add_development_dependency 'pry'
 
   s.files            = `git ls-files -- {app,config,lib,rails}/*`.split("\n")
   s.test_files       = `git ls-files -- spec/*`.split("\n")
