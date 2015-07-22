@@ -7,7 +7,7 @@ module RenderJsonMeta
     def _render_option_json(resource, options)
       # All modules that are included will be able to add to the metadata hash
       metadata = (options[:meta] || {}).tap do |metadata|
-        _add_metadata(resource, metadata)
+        _add_metadata(resource, metadata, options)
       end
       options[:meta] = metadata unless metadata.blank?
 
@@ -19,13 +19,13 @@ module RenderJsonMeta
   ##
   # Default metadata method (a no-op) that does not call `super`
   module MetadataDefault
-    def _add_metadata(resource, metadata); end
+    def _add_metadata(resource, metadata, options); end
   end
 
   ##
   # For AssociationRelations, add known `where_values_hash` to the meta data
   module MetadataWhereValues
-    def _add_metadata(resource, metadata)
+    def _add_metadata(resource, metadata, options)
       if ActiveRecord::AssociationRelation === resource && resource.respond_to?(:where_values_hash)
         metadata[:where_values] = resource.where_values_hash
       end
@@ -37,7 +37,7 @@ module RenderJsonMeta
   ##
   # Returns the `natural_key` for the resource
   module MetadataNaturalKey
-    def _add_metadata(resource, metadata)
+    def _add_metadata(resource, metadata, options)
       _collect_metadata(:natural_key, resource, metadata) do |model|
         model.class.natural_key if model.class.respond_to?(:natural_key) && model.class.natural_key
       end
@@ -49,7 +49,7 @@ module RenderJsonMeta
   ##
   # For AssociationRelations, add known `nested_resource_names` to the meta data
   module MetadataNestedResources
-    def _add_metadata(resource, metadata)
+    def _add_metadata(resource, metadata, options)
       _collect_metadata(:nested_resources, resource, metadata) do |model|
         model.class.nested_resource_names if model.class.respond_to?(:nested_resource_names)
       end
@@ -62,10 +62,10 @@ module RenderJsonMeta
   # Adds `read_only` attributes from the serializer of the resource, or traverse
   # the AssociationRelation/Relation for each one of the collection's `read_only` attributes
   module MetadataReadOnly
-    def _add_metadata(resource, metadata)
+    def _add_metadata(resource, metadata, options)
       _collect_metadata(:read_only, resource, metadata) do |model|
 
-        serializer = model.try(:active_model_serializer)
+        serializer = options[:serializer]
         if serializer.respond_to?(:read_only)
           serializer._read_only if serializer.read_only
         end

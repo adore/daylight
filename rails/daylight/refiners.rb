@@ -17,9 +17,13 @@ module Daylight::Refiners
     public_send(name)
   end
 
-  def remoted method
+  def remoted(method, body=nil)
     raise ArgumentError, "Unknown remote: #{method}" unless self.class.remoted?(method)
-    public_send(method)
+    if body.blank?
+      public_send(method)
+    else
+      public_send(method, body)
+    end
   end
 
   ##
@@ -174,7 +178,7 @@ module Daylight::Refiners
       with_helper(params) do |helper|
         self.
           find(params[:id]).
-          remoted(helper.remoted_params)
+          remoted(helper.remoted_params, params[:body])
       end
     end
 
