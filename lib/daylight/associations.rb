@@ -23,6 +23,7 @@ module Daylight::Associations
 
       def call_remote(remoted_method, model, http_method, args)
         response = self.method(http_method).call(remoted_method, args)
+        response = JSON.parse(response.body) if http_method != :get
         # strip the root, but take into consideration metadata
         if Hash === response && response.has_key?(remoted_method.to_s)
           response = response[remoted_method.to_s]
@@ -262,6 +263,8 @@ module Daylight::Associations
           association_hashcodes[method_name] = value.hash
 
           instance_variable_set ivar_name, value
+
+          return instance_variable_get(ivar_name)
         end
 
         # alias our wrapper so calls to the attributes work
