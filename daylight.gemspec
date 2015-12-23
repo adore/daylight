@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
     allow your ActiveResource client API to perform more like to ActiveRecord
   DESC
 
-  s.add_runtime_dependency 'activeresource',           '~> 4.0.0'
+  s.add_runtime_dependency 'activeresource',           '>= 4.0.0'
   s.add_runtime_dependency 'haml',                     '~> 4.0.5'
   s.add_runtime_dependency 'actionpack-page_caching',  '~> 1.0.2'
   s.add_runtime_dependency 'hanna-bootstrap',          '~> 0.0.5'
