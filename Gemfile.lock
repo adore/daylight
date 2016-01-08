@@ -75,7 +75,7 @@ GEM
       sass
     hike (1.2.3)
     i18n (0.6.11)
-    json (1.8.1)
+    json (1.8.3)
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
@@ -167,4 +167,4 @@ DEPENDENCIES
   webmock (~> 1.18.0)
 
 BUNDLED WITH
-   1.10.6
+   1.11.2
