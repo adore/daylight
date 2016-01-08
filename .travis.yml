@@ -6,8 +6,17 @@ env:
   - TEST_DIR=.
   - TEST_DIR=doc/example
 rvm:
+  - 2.3.0
+  - 2.2.2
   - 2.1.1
   - 2.0.0
 gemfile:
   - $TEST_DIR/gemfiles/rails-4.0.gemfile
   - $TEST_DIR/gemfiles/rails-4.1.gemfile
+  - $TEST_DIR/gemfiles/rails-5.0.gemfile
+matrix:
+  exclude:
+    - rvm: 2.1.1
+      gemfile: $TEST_DIR/gemfiles/rails-5.0.gemfile
+    - rvm: 2.0.0
+      gemfile: $TEST_DIR/gemfiles/rails-5.0.gemfile

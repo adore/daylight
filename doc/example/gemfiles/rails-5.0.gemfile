@@ -1,0 +1,13 @@
+source 'https://rubygems.org'
+
+gem 'rails',          '~> 5.0.x'
+gem 'activeresource', '5.0.0', github: 'rails/activeresource'
+
+gem 'sqlite3',        '1.3.9'
+
+gem 'daylight',       path: '../../..'
+
+group :test do
+  gem 'rspec-rails', '~> 2.14.0'
+  gem 'artifice',    '~> 0.6'
+end
