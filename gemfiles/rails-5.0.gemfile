@@ -1,0 +1,8 @@
+source "http://rubygems.org"
+
+gem 'rails', '~> 5.x'
+gem 'activeresource', '5.0.0', github: 'rails/activeresource'
+gem 'activemodel-serializers-xml', github: 'rails/activemodel-serializers-xml'
+gem 'rails-observers', github: 'rails/rails-observers'
+
+gemspec path: "../"
