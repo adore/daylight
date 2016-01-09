@@ -126,7 +126,9 @@ module Daylight::Refiners
     # Supplies where conditions and returns the resulting +ActiveRecord::Relation+.
     # Raises +ArgumentError+ if the keys are not valid attributes on the model.
     def filter_by params
-      where (params||{}).with_indifferent_access.assert_valid_keys(attribute_names + reflection_names)
+      params = params || {}
+      params = params.with_indifferent_access rescue params.to_h
+      where params.assert_valid_keys(attribute_names + reflection_names)
     end
 
     ##
