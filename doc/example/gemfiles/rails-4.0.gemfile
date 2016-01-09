@@ -9,5 +9,6 @@ gem 'daylight',       path: '../../..'
 
 group :test do
   gem 'rspec-rails', '~> 2.14.0'
+  gem 'test-unit',   '~> 3.0'
   gem 'artifice',    '~> 0.6'
 end
