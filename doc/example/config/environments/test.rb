@@ -13,8 +13,17 @@ DaylightExample::Application.configure do
   config.eager_load = false
 
   # Configure static asset server for tests with Cache-Control for performance.
-  config.serve_static_assets  = true
-  config.static_cache_control = "public, max-age=3600"
+  if Rails::VERSION::STRING == '4.2.0'
+    config.serve_static_files = true
+  else
+    config.serve_static_assets  = true
+  end
+
+  if Rails::VERSION::MAJOR >= 5
+    config.public_file_server.headers = {'Cache-Control' => 'public, max-age=3600'}
+  else
+    config.static_cache_control = "public, max-age=3600"
+  end
 
   # Show full error reports and disable caching.
   config.consider_all_requests_local       = true

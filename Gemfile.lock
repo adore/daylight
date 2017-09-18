@@ -4,7 +4,7 @@ PATH
     daylight (0.9.0)
       actionpack-page_caching (~> 1.0.2)
       active_model_serializers (~> 0.8.2)
-      activeresource (~> 4.0.0)
+      activeresource (>= 4.0.0)
       haml (~> 4.0.5)
       hanna-bootstrap (~> 0.0.5)
 
@@ -26,7 +26,7 @@ GEM
       activesupport (= 4.1.4)
       builder (~> 3.1)
       erubis (~> 2.7.0)
-    active_model_serializers (0.8.2)
+    active_model_serializers (0.8.3)
       activemodel (>= 3.0)
     activemodel (4.1.4)
       activesupport (= 4.1.4)
@@ -49,21 +49,21 @@ GEM
     arel (5.0.1.20140414130214)
     builder (3.2.2)
     coderay (1.1.0)
-    coffee-script (2.3.0)
+    coffee-script (2.4.1)
       coffee-script-source
       execjs
-    coffee-script-source (1.8.0)
+    coffee-script-source (1.10.0)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
     diff-lcs (1.2.5)
     docile (1.1.5)
     erubis (2.7.0)
-    execjs (2.2.1)
+    execjs (2.6.0)
     factory_girl (4.4.0)
       activesupport (>= 3.0.0)
     faker (1.4.2)
       i18n (~> 0.5)
-    haml (4.0.5)
+    haml (4.0.7)
       tilt
     hanna-bootstrap (0.0.5)
       bundler
@@ -75,7 +75,7 @@ GEM
       sass
     hike (1.2.3)
     i18n (0.6.11)
-    json (1.8.1)
+    json (1.8.3)
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
@@ -120,8 +120,8 @@ GEM
       rspec-core (~> 2.14.0)
       rspec-expectations (~> 2.14.0)
       rspec-mocks (~> 2.14.0)
-    safe_yaml (1.0.3)
-    sass (3.4.3)
+    safe_yaml (1.0.4)
+    sass (3.4.20)
     simplecov (0.9.0)
       docile (~> 1.1.0)
       multi_json
@@ -165,3 +165,6 @@ DEPENDENCIES
   simplecov-rcov (~> 0.2.3)
   sqlite3
   webmock (~> 1.18.0)
+
+BUNDLED WITH
+   1.11.2

@@ -10,9 +10,9 @@ module RouteOptions
     def set_member_mappings_for_resource
       super
 
-      associated = parent_resource.options[:associated] || []
-      remoted    = parent_resource.options[:remoted]    || []
-      scopes     = parent_resource.options[:scopes]
+      associated = resource_options[:associated] || []
+      remoted    = resource_options[:remoted]    || []
+      scopes     = resource_options[:scopes]
 
       model_class = controller_model_class
       model_class.whitelist_scopes(*scopes) if scopes.present?
@@ -37,6 +37,14 @@ module RouteOptions
         controller && controller.respond_to?(:model) ? controller.send(:model) : parent_resource.name.classify.constantize
       rescue
         Rails.logger.warn "Could not lookup model for #{parent_resource.name} to apply remoted."
+      end
+
+      def resource_options
+        if Rails::VERSION::MAJOR >= 5
+          parent_resource.instance_variable_get(:@options)
+        else
+          parent_resource.options
+        end
       end
 
   end
